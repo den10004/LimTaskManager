@@ -8,8 +8,8 @@ function Header() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState();
   const openModal = () => setIsModalOpen(true);
-
   const handleLoginSuccess = () => {
     setIsModalOpen(false);
   };
@@ -20,7 +20,9 @@ function Header() {
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
     setIsAuthenticated(!!token);
+    setUserData(userData.email);
   }, []);
 
   const getCookie = (name) => {
@@ -42,10 +44,9 @@ function Header() {
       <header>
         <div>
           <NavLink to="/">Limaudio Project Management</NavLink>
-          <b></b>
         </div>
-
         <ul>
+          {userData && <b>{userData}</b>}
           {isAuthenticated && (
             <>
               <li>

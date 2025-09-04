@@ -74,6 +74,8 @@ function Modal({ onCancel, onLoginSuccess }) {
       .catch((error) => {
         console.error("Error:", error);
         alert("Ошибка: " + error.message);
+        setError("Неправильный логин или пароль");
+        setIsLoading(false);
       });
   };
 
@@ -134,6 +136,7 @@ function Modal({ onCancel, onLoginSuccess }) {
         >
           Отмена
         </button>
+        <span className="error_message">{error}</span>
       </div>
     </div>
   );
