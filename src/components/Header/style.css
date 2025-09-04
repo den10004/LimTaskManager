@@ -1,0 +1,71 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    color: var(--color-text);
+    box-sizing: border-box;
+    box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px 0px rgba(0, 0, 0, 0), 0px 0px 0px 0px rgba(0, 0, 0, 0);
+    background: var(--color-background);
+}
+
+header>div {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 24px
+}
+
+
+header>ul {
+    display: flex;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    cursor: pointer;
+}
+
+header>ul>li {
+    margin-left: 30px;
+}
+
+
+.nav-link.active {
+    color: #007bff;
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
+}
+
+
+
+@media screen and (max-width:1024px) {
+    header>ul>li {
+        margin-left: 20px;
+    }
+}
+
+@media screen and (max-width:768px) {
+    header {
+        padding: 20px;
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width:768px) {
+    header>ul {
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    header>ul>li {
+        margin-left: 5px;
+    }
+}
+
+@media screen and (max-width:425px) {
+    header>ul {
+        flex-direction: column;
+    }
+
+    header>ul>li {
+        margin-left: 0px;
+    }
+}
