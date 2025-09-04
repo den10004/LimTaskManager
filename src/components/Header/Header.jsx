@@ -10,6 +10,7 @@ function Header() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState();
   const openModal = () => setIsModalOpen(true);
+  console.log(userData);
   const handleLoginSuccess = () => {
     setIsModalOpen(false);
   };
@@ -46,7 +47,7 @@ function Header() {
           <NavLink to="/">Limaudio Project Management</NavLink>
         </div>
         <ul>
-          {userData && <b>{userData}</b>}
+          {userData && <b>{userData.email}</b>}
           {isAuthenticated && (
             <>
               <li>
