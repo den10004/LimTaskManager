@@ -4,7 +4,7 @@ import "./style.css";
 function UserPage() {
   return (
     <section className="user">
-      <h3 class="h3-mtmb">Список задач</h3>
+      <h3 className="h3-mtmb">Список задач</h3>
       <table id="dataTable">
         <thead>
           <tr>
