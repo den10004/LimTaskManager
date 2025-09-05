@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
+import TaskTableRow from "../../components/TaskTableRow";
 
 function UserPage() {
   const [tasks, setTasks] = useState([]);
@@ -26,11 +27,11 @@ function UserPage() {
         });
 
         if (!response.ok) {
-          throw new Error(`Ошибка HTTP: ${response.status}`);
+          throw new Error(`Ошибка HTTPS: ${response.status}`);
         }
 
         const data = await response.json();
-        setTasks(data);
+        setTasks(data.items);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -67,23 +68,19 @@ function UserPage() {
           <tr>
             <th>ID</th>
             <th>Пользователь</th>
+            <th>Дата</th>
             <th>Описание</th>
             <th>Текст</th>
+            <th>Статус</th>
+            <th>Ссылки</th>
           </tr>
         </thead>
         <tbody id="tableBody">
           {tasks.length > 0 ? (
-            tasks.map((task) => (
-              <tr key={task.id}>
-                <td>{task.id}</td>
-                <td>{task.user || "Не указан"}</td>
-                <td>{task.description || "Нет описания"}</td>
-                <td>{task.text || "Нет текста"}</td>
-              </tr>
-            ))
+            tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
           ) : (
             <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>
+              <td colSpan="7" style={{ textAlign: "center" }}>
                 Нет данных для отображения
               </td>
             </tr>
