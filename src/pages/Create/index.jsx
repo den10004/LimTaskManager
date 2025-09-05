@@ -91,7 +91,7 @@ function CreatePage() {
             due_at: formData.due_at,
             assigned_user_id: formData.assigned_user_id,
             links: formData.links.filter((link) => link.trim() !== ""),
-            files: [], // Если сервер ожидает массив файлов, но через JSON можно отправить только метаданные
+            files: [],
           }),
         }
       );
@@ -170,7 +170,7 @@ function CreatePage() {
           <div className="create__block">
             <label htmlFor="due_at">Срок исполнения</label>
             <input
-              type="date"
+              type="datetime-local"
               id="due_at"
               name="due_at"
               value={formData.due_at}
