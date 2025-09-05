@@ -112,7 +112,7 @@ function TaskDetails() {
       <button style={{ background: "transparent" }} onClick={handleBack}>
         ← Назад
       </button>
-      <h3 class="h3-mtmb">Задача #{task.id}</h3>
+      <h3 className="h3-mtmb">Задача #{task.id}</h3>
       <div className="task-header">
         <ul
           style={{
