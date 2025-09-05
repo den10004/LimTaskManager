@@ -1,9 +1,14 @@
-import React from "react";
 import { formatDate } from "../../utils/dateUtils";
+import { useNavigate } from "react-router-dom";
 
 function TaskTableRow({ task }) {
+  const navigate = useNavigate();
+
+  const handleRowClick = () => {
+    navigate(`/tasks/${task.id}`);
+  };
   return (
-    <tr>
+    <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{task.id}</td>
       <td>{task.assigned_user_id || "Не указан"}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>

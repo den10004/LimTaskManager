@@ -9,11 +9,11 @@ import {
 import TeamPage from "./pages/Team";
 import CreatePage from "./pages/Create";
 import MainPage from "./pages/Main";
+import TaskDetails from "./pages/TaskDetails";
 import Directions from "./pages/Directions";
 import User from "./pages/User";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
-// Protected Route Component
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -48,7 +48,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/tasks/:id"
+              element={
+                <ProtectedRoute>
+                  <TaskDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/directions"
               element={
