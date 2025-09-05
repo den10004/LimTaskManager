@@ -21,7 +21,6 @@ function CreatePage() {
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) {
         const token = parts.pop().split(";").shift();
-        console.log("Найден токен:", token ? "да" : "нет");
         return token;
       }
       console.log("Cookie не найден");
@@ -34,13 +33,8 @@ function CreatePage() {
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
-    console.log("token", token);
     if (token) {
       setAuthToken(token);
-      console.log("Токен установлен");
-    } else {
-      console.log("Токен authTokenPM не найден в cookies");
-      console.log("Все cookies:", document.cookie);
     }
   }, []);
 
@@ -81,29 +75,8 @@ function CreatePage() {
     setIsLoading(true);
 
     const currentToken = getCookie("authTokenPM") || authToken;
+
     try {
-      const submitData = new FormData();
-      submitData.append("title", formData.title);
-      submitData.append("due_at", formData.due_at);
-      submitData.append("assigned_user_id", formData.assigned_user_id);
-      submitData.append("description", formData.description);
-      submitData.append("direction_id", formData.direction_id);
-
-      formData.links.forEach((link) => {
-        if (link && link.trim()) {
-          submitData.append("links[]", link.trim());
-        }
-      });
-
-      formData.files.forEach((file) => {
-        submitData.append("files[]", file);
-      });
-
-      console.log("Отправляемые данные:");
-      for (let [key, value] of submitData.entries()) {
-        console.log(key, value);
-      }
-
       const response = await fetch(
         "https://task-manager.conversionpro-test.ru/task",
         {
@@ -111,11 +84,18 @@ function CreatePage() {
           headers: {
             Authorization: `Bearer ${currentToken}`,
           },
-          body: submitData,
+          body: JSON.stringify({
+            title: formData.title,
+            description: formData.description,
+            direction_id: formData.direction_id,
+            due_at: formData.due_at,
+            assigned_user_id: formData.assigned_user_id,
+            links: formData.links.filter((link) => link.trim() !== ""),
+            files: [], // Если сервер ожидает массив файлов, но через JSON можно отправить только метаданные
+          }),
         }
       );
 
-      console.log("Статус ответа:", response.status);
       console.log(
         "Заголовки ответа:",
         Object.fromEntries(response.headers.entries())
@@ -179,7 +159,7 @@ function CreatePage() {
             <label htmlFor="title">Тема задачи *</label>
             <input
               type="text"
-              id="theme"
+              id="title"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
