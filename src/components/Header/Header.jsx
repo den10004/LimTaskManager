@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Modal from "./../Modal";
+import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
 
 function Header() {
   const navigate = useNavigate();
+  const { isAuthenticated, userData, logout } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState();
+
   const openModal = () => setIsModalOpen(true);
-  console.log(userData);
+
   const handleLoginSuccess = () => {
     setIsModalOpen(false);
   };
@@ -19,27 +20,11 @@ function Header() {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    const token = getCookie("authTokenPM");
-    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-    setIsAuthenticated(!!token);
-    setUserData(userData.email);
-  }, []);
-
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  };
-
-  const Logout = () => {
-    document.cookie =
-      "authTokenPM=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-    localStorage.removeItem("userData");
+  const handleLogout = () => {
+    logout();
     navigate("/");
-    window.location.reload();
-    setIsAuthenticated(false);
   };
+
   return (
     <>
       <header>
@@ -63,7 +48,16 @@ function Header() {
                   Дашборд
                 </NavLink>
               </li>
-              <li>Направления</li>
+              <li>
+                <NavLink
+                  to="/directions"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  Направления
+                </NavLink>
+              </li>
               <li>
                 <NavLink
                   to="/create"
@@ -86,7 +80,10 @@ function Header() {
               </li>
             </>
           )}
-          <li id="auth-button" onClick={isAuthenticated ? Logout : openModal}>
+          <li
+            id="auth-button"
+            onClick={isAuthenticated ? handleLogout : openModal}
+          >
             {isAuthenticated ? "Выйти" : "Войти"}
           </li>
         </ul>

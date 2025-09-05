@@ -108,6 +108,15 @@ textarea {
   color: var(--color-err);
 }
 
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group>input {
+  margin-top: 5px;
+}
+
 @media screen and (max-width:425px) {
   button {
     padding: 8px;
