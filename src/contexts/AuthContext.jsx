@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getCookie } from "../utils/getCookies";
 
 const AuthContext = createContext();
 
@@ -16,13 +17,6 @@ export function AuthProvider({ children }) {
     checkAuthStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
-  };
 
   const checkAuthStatus = async () => {
     try {

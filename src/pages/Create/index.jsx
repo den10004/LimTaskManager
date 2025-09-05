@@ -1,3 +1,4 @@
+import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
 
@@ -14,22 +15,6 @@ function CreatePage() {
 
   const [authToken, setAuthToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const getCookie = (name) => {
-    try {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        const token = parts.pop().split(";").shift();
-        return token;
-      }
-      console.log("Cookie не найден");
-      return null;
-    } catch (error) {
-      console.error("Ошибка при чтении cookie:", error);
-      return null;
-    }
-  };
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
@@ -95,9 +80,6 @@ function CreatePage() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Задача успешно создана:", result);
-
         setFormData({
           title: "",
           due_at: "",
