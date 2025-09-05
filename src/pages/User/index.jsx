@@ -42,51 +42,40 @@ function UserPage() {
     fetchTasks();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="user">
-        <h3 className="h3-mtmb">Список задач</h3>
-        <div className="loading">Загрузка данных...</div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="user">
-        <h3 className="h3-mtmb">Список задач</h3>
-        <div className="error">Ошибка: {error}</div>
-      </section>
-    );
-  }
-
   return (
     <section className="user">
       <h3 className="h3-mtmb">Список задач</h3>
-      <table id="dataTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Пользователь</th>
-            <th>Дата</th>
-            <th>Описание</th>
-            <th>Текст</th>
-            <th>Статус</th>
-            <th>Ссылки</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          {tasks.length > 0 ? (
-            tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
-          ) : (
+
+      {loading ? (
+        <div className="loading">Загрузка данных...</div>
+      ) : error ? (
+        <div className="error">Ошибка: {error}</div>
+      ) : (
+        <table id="dataTable">
+          <thead>
             <tr>
-              <td colSpan="7" style={{ textAlign: "center" }}>
-                Нет данных для отображения
-              </td>
+              <th>ID</th>
+              <th>Пользователь</th>
+              <th>Дата</th>
+              <th>Описание</th>
+              <th>Текст</th>
+              <th>Статус</th>
+              <th>Ссылки</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody id="tableBody">
+            {tasks.length > 0 ? (
+              tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  Нет данных для отображения
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
     </section>
   );
 }
