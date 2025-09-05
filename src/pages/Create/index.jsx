@@ -71,42 +71,33 @@ function CreatePage() {
   };
 
   const handleSubmit = async (e) => {
+    const API_URL = import.meta.env.VITE_API_KEY;
     e.preventDefault();
     setIsLoading(true);
 
     const currentToken = getCookie("authTokenPM") || authToken;
 
     try {
-      const response = await fetch(
-        "https://task-manager.conversionpro-test.ru/task",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${currentToken}`,
-          },
-          body: JSON.stringify({
-            title: formData.title,
-            description: formData.description,
-            direction_id: formData.direction_id,
-            due_at: formData.due_at,
-            assigned_user_id: formData.assigned_user_id,
-            links: formData.links.filter((link) => link.trim() !== ""),
-            files: [],
-          }),
-        }
-      );
-
-      console.log(
-        "Заголовки ответа:",
-        Object.fromEntries(response.headers.entries())
-      );
+      const response = await fetch(`${API_URL}/task`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${currentToken}`,
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          direction_id: formData.direction_id,
+          due_at: formData.due_at,
+          assigned_user_id: formData.assigned_user_id,
+          links: formData.links.filter((link) => link.trim() !== ""),
+          files: [],
+        }),
+      });
 
       if (response.ok) {
         const result = await response.json();
         console.log("Задача успешно создана:", result);
-        alert("Задача успешно создана!");
 
-        // Сброс формы
         setFormData({
           title: "",
           due_at: "",

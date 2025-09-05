@@ -15,18 +15,15 @@ function Modal({ onCancel, onLoginSuccess }) {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
+    const API_URL = import.meta.env.VITE_API_KEY;
     try {
-      const response = await fetch(
-        "https://task-manager.conversionpro-test.ru/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
