@@ -51,7 +51,19 @@ function Modal({ onCancel, onLoginSuccess }) {
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError(error.message || "Неправильный логин или пароль");
+
+      if (error.message?.includes("status: 401")) {
+        setError("Неправильный логин или пароль");
+      } else if (error.message?.includes("status:")) {
+        const statusMatch = error.message.match(/status: (\d+)/);
+        if (statusMatch) {
+          setError(`Ошибка сервера: ${statusMatch[1]}`);
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError(error.message || "Произошла неизвестная ошибка");
+      }
     } finally {
       setIsLoading(false);
     }

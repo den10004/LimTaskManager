@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import "./style.css";
+import { getTranslatedRole } from "../../utils/rolesTranslations";
 
 function TeamPage() {
   const [tasks, setTasks] = useState([]);
@@ -34,7 +35,8 @@ function TeamPage() {
         setTasks(data.items);
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        setError("Ошибка загрузки данных");
+        console.error(err.message);
         setLoading(false);
       }
     };
@@ -50,7 +52,7 @@ function TeamPage() {
       {loading ? (
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
-        <div className="error">Ошибка: {error}</div>
+        <div className="error error-message">{error}</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {tasks.length > 0 ? (
@@ -76,7 +78,7 @@ function TeamPage() {
                   <div style={{ marginLeft: "10px" }}>
                     {task.roles && task.roles.length > 0
                       ? task.roles.map((link, index) => (
-                          <div key={index}>{link}</div>
+                          <div key={index}>{getTranslatedRole(link)}</div>
                         ))
                       : "-"}
                   </div>

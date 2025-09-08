@@ -34,7 +34,8 @@ function UserPage() {
         setTasks(data.items);
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        console.error(err.message);
+        setError("Ошибка загрузки данных");
         setLoading(false);
       }
     };
@@ -50,7 +51,7 @@ function UserPage() {
       {loading ? (
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
-        <div className="error">Ошибка: {error}</div>
+        <div className="error error-message">{error}</div>
       ) : (
         <table id="dataTable">
           <thead>

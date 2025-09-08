@@ -6,7 +6,6 @@ export const getCookie = (name) => {
       const token = parts.pop().split(";").shift();
       return token;
     }
-    console.log("Cookie не найден");
     return null;
   } catch (error) {
     console.error("Ошибка при чтении cookie:", error);

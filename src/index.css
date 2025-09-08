@@ -104,7 +104,7 @@ textarea {
   background-color: var(--color-page);
 }
 
-.error_message {
+.error-message {
   color: var(--color-err);
 }
 
@@ -116,6 +116,7 @@ textarea {
 .form-group>input {
   margin-top: 5px;
 }
+
 
 @media screen and (max-width:425px) {
   button {
