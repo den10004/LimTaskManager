@@ -97,7 +97,7 @@ textarea {
   box-sizing: border-box;
   border: 1px solid var(--color-input);
   border-radius: 8px;
-  padding-left: 10px;
+  padding: 10px;
 }
 
 .page {
