@@ -147,6 +147,7 @@ function TaskDetails() {
 
     return [String(links)];
   };
+  console.log(task);
 
   return (
     <div>
@@ -199,6 +200,26 @@ function TaskDetails() {
                       >
                         {link}
                       </a>
+                    ))}
+                  </div>
+                </li>
+              )}
+              {task.files && (
+                <li style={{ display: "flex" }}>
+                  <b>Файлы: </b>
+                  <div style={{ marginLeft: "5px", display: "flex" }}>
+                    {task.files.map((file, index) => (
+                      <div key={index} style={{ marginRight: "10px" }}>
+                        <a
+                          href={`${import.meta.env.VITE_API_KEY}${
+                            file.file_url
+                          }`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {file.file_name}
+                        </a>
+                      </div>
                     ))}
                   </div>
                 </li>
