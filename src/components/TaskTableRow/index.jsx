@@ -7,6 +7,11 @@ function TaskTableRow({ task }) {
   const handleRowClick = () => {
     navigate(`/tasks/${task.id}`);
   };
+  const statusColors = {
+    "Задача просрочена": "red",
+    Новая: "green",
+  };
+
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{task.id}</td>
@@ -14,7 +19,9 @@ function TaskTableRow({ task }) {
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{task.description || "Нет описания"}</td>
       <td>{task.text || "Нет текста"}</td>
-      <td>{task.status || "Не указан"}</td>
+      <td style={{ color: statusColors[task.status] || "inherit" }}>
+        {task.status || "Не указан"}
+      </td>
       <td>
         {task.links && task.links.length > 0
           ? task.links.map((link, index) => (
