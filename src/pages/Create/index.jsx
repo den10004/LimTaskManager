@@ -63,10 +63,12 @@ function CreatePage() {
     const currentToken = getCookie("authTokenPM") || authToken;
 
     try {
-      const response = await fetch(`${API_URL}/task`, {
+      // Step 1: Create the task
+      const taskResponse = await fetch(`${API_URL}/task`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           title: formData.title,
@@ -75,38 +77,72 @@ function CreatePage() {
           due_at: formData.due_at,
           assigned_user_id: formData.assigned_user_id,
           links: formData.links.filter((link) => link.trim() !== ""),
-          files: [],
+          files: [], // Files are sent separately
         }),
       });
 
-      if (response.ok) {
-        setFormData({
-          title: "",
-          due_at: "",
-          assigned_user_id: "",
-          description: "",
-          direction_id: "",
-          files: [],
-          links: [""],
-        });
-      } else {
-        const errorText = await response.text();
+      if (!taskResponse.ok) {
+        const errorText = await taskResponse.text();
         console.error(
           "Ошибка при создании задачи:",
-          response.status,
+          taskResponse.status,
           errorText
         );
-
-        if (response.status === 401) {
+        if (taskResponse.status === 401) {
           alert(
             "Ошибка авторизации (401). Возможно, токен устарел или недействителен. Пожалуйста, войдите заново."
           );
         } else {
           alert(
-            `Ошибка при создании задачи (${response.status}). Пожалуйста, попробуйте снова.`
+            `Ошибка при создании задачи (${taskResponse.status}). Пожалуйста, попробуйте снова.`
           );
         }
+        setIsLoading(false);
+        return;
       }
+
+      const taskData = await taskResponse.json();
+      const taskId = taskData.id;
+
+      if (formData.files.length > 0) {
+        const formDataToSend = new FormData();
+        formData.files.forEach((file) => {
+          formDataToSend.append("file", file);
+        });
+
+        const fileResponse = await fetch(`${API_URL}/task/${taskId}/files`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+          },
+          body: formDataToSend,
+        });
+
+        if (!fileResponse.ok) {
+          const errorText = await fileResponse.text();
+          console.error(
+            "Ошибка при загрузке файлов:",
+            fileResponse.status,
+            errorText
+          );
+          alert(
+            `Ошибка при загрузке файлов (${fileResponse.status}). Пожалуйста, попробуйте снова.`
+          );
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      setFormData({
+        title: "",
+        due_at: "",
+        assigned_user_id: "",
+        description: "",
+        direction_id: "",
+        files: [],
+        links: [""],
+      });
+      alert("Задача успешно создана!");
     } catch (error) {
       console.error("Ошибка сети:", error);
       alert("Ошибка сети. Пожалуйста, проверьте соединение.");

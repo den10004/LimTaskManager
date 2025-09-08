@@ -12,8 +12,6 @@ function TaskTableRow({ task }) {
     Новая: "#53c153",
   };
 
-  console.log(task);
-
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{task.id}</td>

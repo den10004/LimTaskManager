@@ -140,7 +140,7 @@ function TaskDetails() {
           return parsed;
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
         return links.split(",").map((link) => link.trim());
       }
     }
