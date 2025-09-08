@@ -9,8 +9,10 @@ function TaskTableRow({ task }) {
   };
   const statusColors = {
     "Задача просрочена": "red",
-    Новая: "green",
+    Новая: "#53c153",
   };
+
+  console.log(task);
 
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
@@ -18,7 +20,7 @@ function TaskTableRow({ task }) {
       <td>{task.assigned_user_id || "Не указан"}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{task.description || "Нет описания"}</td>
-      <td>{task.text || "Нет текста"}</td>
+      <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}
       </td>
