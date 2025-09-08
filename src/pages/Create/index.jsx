@@ -63,7 +63,6 @@ function CreatePage() {
     const currentToken = getCookie("authTokenPM") || authToken;
 
     try {
-      // Step 1: Create the task
       const taskResponse = await fetch(`${API_URL}/task`, {
         method: "POST",
         headers: {
@@ -77,7 +76,7 @@ function CreatePage() {
           due_at: formData.due_at,
           assigned_user_id: formData.assigned_user_id,
           links: formData.links.filter((link) => link.trim() !== ""),
-          files: [], // Files are sent separately
+          files: [],
         }),
       });
 

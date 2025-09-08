@@ -147,7 +147,6 @@ function TaskDetails() {
 
     return [String(links)];
   };
-  console.log(task);
 
   return (
     <div>
