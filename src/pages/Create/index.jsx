@@ -1,3 +1,4 @@
+import AddFiles from "../../components/AddFiles/AddFiles";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
@@ -221,7 +222,8 @@ function CreatePage() {
               required
             ></textarea>
           </div>
-
+          <AddFiles formData={formData} handleFileChange={handleFileChange} />
+          {/*
           <div className="create__block">
             <div className="label">Файлы</div>
             <div className="file-upload">
@@ -262,7 +264,7 @@ function CreatePage() {
               </div>
             )}
           </div>
-
+*/}
           <div>
             {formData.links.map((link, index) => (
               <div

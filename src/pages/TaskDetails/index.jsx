@@ -2,10 +2,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
+import AddFiles from "../../components/AddFiles/AddFiles";
 
 const formStyle = {
-  marginTop: "10px",
+  marginTop: "30px",
   width: "100%",
+  padding: "0 30px",
+  boxSizing: "border-box",
 };
 const formtext = {
   width: "100%",
@@ -25,6 +28,15 @@ const comments = {
 };
 
 function TaskDetails() {
+  const [formData, setFormData] = useState({
+    title: "",
+    due_at: "",
+    assigned_user_id: "",
+    description: "",
+    direction_id: "",
+    files: [],
+    links: [""],
+  });
   const { id } = useParams();
   const navigate = useNavigate();
   const [task, setTask] = useState(null);
@@ -148,6 +160,10 @@ function TaskDetails() {
     return [String(links)];
   };
 
+  const handleFileChange = () => {
+    console.log("s");
+  };
+
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -258,6 +274,12 @@ function TaskDetails() {
               >
                 {commentLoading ? "Отправка..." : "Создать комментарий"}
               </button>
+            </form>
+            <form className="create__form" style={{ marginTop: "30px" }}>
+              <AddFiles
+                formData={formData}
+                handleFileChange={handleFileChange}
+              />
             </form>
           </div>
         </>
