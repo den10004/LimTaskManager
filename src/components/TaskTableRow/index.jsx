@@ -1,8 +1,10 @@
 import { formatDate } from "../../utils/dateUtils";
 import { useNavigate } from "react-router-dom";
 
-function TaskTableRow({ task }) {
+function TaskTableRow({ task, directions }) {
   const navigate = useNavigate();
+  const directionName =
+    directions?.find((dir) => dir.id === task.direction_id)?.name || "";
 
   const handleRowClick = () => {
     navigate(`/tasks/${task.id}`);
@@ -18,7 +20,7 @@ function TaskTableRow({ task }) {
       <td>{task.assigned_user_id || "Не указан"}</td>
       <td>{formatDate(task.created_at, "Не установлен")}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
-      <td>{task.direction_id}</td>
+      <td>{directionName}</td>
       <td>{task.description || "Нет описания"}</td>
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>

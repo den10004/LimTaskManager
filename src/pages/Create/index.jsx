@@ -34,7 +34,6 @@ function CreatePage() {
       [name]: value,
     }));
   };
-  console.log(formData);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -182,7 +181,7 @@ function CreatePage() {
       setIsLoading(false);
     }
   };
-  console.log(direction.items);
+
   return (
     <section className="page" style={{ flex: 1 }}>
       <div className="create">

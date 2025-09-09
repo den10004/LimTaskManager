@@ -10,6 +10,7 @@ const addBtn = {
 
 function UserPage() {
   const [tasks, setTasks] = useState([]);
+  const [directions, setDirections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [offset, setOffset] = useState(0);
@@ -17,6 +18,33 @@ function UserPage() {
   const [hasMore, setHasMore] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_KEY;
+
+  const fetchDirections = async () => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+
+      const response = await fetch(`${API_URL}/directions`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTPS: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setDirections(data.items);
+    } catch (err) {
+      console.error(err.message);
+      setError("Ошибка загрузки направлений");
+    }
+  };
 
   const fetchTasks = async (newOffset, newLimit) => {
     try {
@@ -57,6 +85,7 @@ function UserPage() {
   };
 
   useEffect(() => {
+    fetchDirections();
     fetchTasks(offset, limit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -95,7 +124,13 @@ function UserPage() {
             </thead>
             <tbody id="tableBody">
               {tasks.length > 0 ? (
-                tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
+                tasks.map((task) => (
+                  <TaskTableRow
+                    key={task.id}
+                    task={task}
+                    directions={directions}
+                  />
+                ))
               ) : (
                 <tr>
                   <td colSpan="7" style={{ textAlign: "center" }}>

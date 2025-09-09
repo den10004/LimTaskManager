@@ -111,6 +111,15 @@ textarea {
   padding: 10px;
 }
 
+select {
+  height: 48px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-input);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+
 .page {
   background-color: var(--color-page);
 }
