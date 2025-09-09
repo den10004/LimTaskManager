@@ -36,23 +36,16 @@ header>ul>li {
 
 
 
-@media screen and (max-width:1024px) {
-    header>ul>li {
-        margin-left: 20px;
-    }
-}
-
-@media screen and (max-width:768px) {
+@media screen and (max-width:1140px) {
     header {
         padding: 20px;
         flex-direction: column;
     }
-}
 
-@media screen and (max-width:768px) {
     header>ul {
         justify-content: space-between;
         margin-top: 10px;
+        ;
     }
 
     header>ul>li {
@@ -60,7 +53,8 @@ header>ul>li {
     }
 }
 
-@media screen and (max-width:425px) {
+
+@media screen and (max-width:768px) {
     header>ul {
         flex-direction: column;
     }

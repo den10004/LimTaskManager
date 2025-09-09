@@ -46,7 +46,7 @@ function TeamPage() {
   }, []);
 
   return (
-    <section className="user">
+    <section className="container">
       <h3 className="h3-mtmb">Команда</h3>
 
       {loading ? (

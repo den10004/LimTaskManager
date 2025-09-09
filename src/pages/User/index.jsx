@@ -70,7 +70,7 @@ function UserPage() {
   };
 
   return (
-    <section className="user">
+    <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
 
       {loading ? (
@@ -78,31 +78,33 @@ function UserPage() {
       ) : error ? (
         <div className="error error-message">{error}</div>
       ) : (
-        <table id="dataTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Пользователь</th>
-              <th>Дата создания</th>
-              <th>Дата окончания</th>
-              <th>Описание</th>
-              <th>Текст</th>
-              <th>Статус</th>
-              <th>Ссылки</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            {tasks.length > 0 ? (
-              tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
-            ) : (
+        <div className="container-scroll">
+          <table id="dataTable">
+            <thead>
               <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
-                  Нет данных для отображения
-                </td>
+                <th>ID</th>
+                <th>Пользователь</th>
+                <th>Дата создания</th>
+                <th>Дата окончания</th>
+                <th>Описание</th>
+                <th>Текст</th>
+                <th>Статус</th>
+                <th>Ссылки</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody id="tableBody">
+              {tasks.length > 0 ? (
+                tasks.map((task) => <TaskTableRow key={task.id} task={task} />)
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    Нет данных для отображения
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
       {hasMore && !loading && !error && (
         <button className="create-btn" style={addBtn} onClick={handleLoadMore}>

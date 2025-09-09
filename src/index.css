@@ -123,6 +123,16 @@ textarea {
   margin-top: 5px;
 }
 
+.container {
+  max-width: 1200px;
+}
+
+@media screen and (max-width:1240px) {
+  .container {
+    padding: 0 20px;
+  }
+
+}
 
 @media screen and (max-width:425px) {
   button {
