@@ -16,6 +16,7 @@ function TaskTableRow({ task }) {
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{task.id}</td>
       <td>{task.assigned_user_id || "Не указан"}</td>
+      <td>{formatDate(task.created_at, "Не установлен")}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{task.description || "Нет описания"}</td>
       <td>{task.title || "Нет текста"}</td>

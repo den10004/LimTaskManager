@@ -5,10 +5,8 @@ import { formatDate } from "../../utils/dateUtils";
 import AddFiles from "../../components/AddFiles/AddFiles";
 
 const formStyle = {
-  marginTop: "30px",
+  marginTop: "10px",
   width: "100%",
-  padding: "0 30px",
-  boxSizing: "border-box",
 };
 const formtext = {
   width: "100%",
@@ -27,23 +25,20 @@ const comments = {
   marginTop: "5px",
 };
 
+const taskHeader = {
+  margin: "30px 0",
+};
+
 function TaskDetails() {
-  const [formData, setFormData] = useState({
-    title: "",
-    due_at: "",
-    assigned_user_id: "",
-    description: "",
-    direction_id: "",
-    files: [],
-    links: [""],
-  });
   const { id } = useParams();
   const navigate = useNavigate();
   const [task, setTask] = useState(null);
   const [comment, setComment] = useState("");
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentLoading, setCommentLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   const fetchTaskById = async (id) => {
     const API_URL = import.meta.env.VITE_API_KEY;
@@ -116,6 +111,63 @@ function TaskDetails() {
     }
   };
 
+  const uploadFiles = async (e) => {
+    e.preventDefault();
+    if (files.length === 0) return;
+
+    setFileLoading(true);
+    setError("");
+    const API_URL = import.meta.env.VITE_API_KEY;
+    const token = getCookie("authTokenPM");
+
+    if (!token) {
+      setError("Токен авторизации отсутствует");
+      setFileLoading(false);
+      return;
+    }
+
+    try {
+      const formDataToSend = new FormData();
+      files.forEach((file) => {
+        formDataToSend.append("file", file);
+      });
+
+      const fileResponse = await fetch(`${API_URL}/task/${id}/files`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSend,
+      });
+
+      if (!fileResponse.ok) {
+        throw new Error("Ошибка загрузки файлов");
+      }
+
+      const newFiles = await fileResponse.json();
+
+      const normalizedFiles = Array.isArray(newFiles)
+        ? newFiles
+        : newFiles && newFiles.file
+        ? [newFiles.file]
+        : newFiles
+        ? [newFiles]
+        : [];
+
+      setTask((prevTask) => ({
+        ...prevTask,
+        files: [...(prevTask.files || []), ...normalizedFiles],
+      }));
+
+      setFiles([]);
+    } catch (err) {
+      console.error(err);
+      setError("Ошибка загрузки файлов");
+    } finally {
+      setFileLoading(false);
+    }
+  };
+
   useEffect(() => {
     const loadTask = async () => {
       try {
@@ -136,6 +188,10 @@ function TaskDetails() {
 
   const handleBack = () => {
     navigate("/user");
+  };
+
+  const handleFileChange = (e) => {
+    setFiles(Array.from(e.target.files));
   };
 
   const normalizeLinks = (links) => {
@@ -160,10 +216,6 @@ function TaskDetails() {
     return [String(links)];
   };
 
-  const handleFileChange = () => {
-    console.log("s");
-  };
-
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -177,13 +229,12 @@ function TaskDetails() {
       ) : (
         <>
           <h3 className="h3-mtmb">Задача #{task.id}</h3>
-          <div className="task-header">
+          <div style={{ taskHeader }}>
             <ul
               style={{
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
-                marginTop: "20px",
               }}
             >
               <li className={`status-badge status-${task.status}`}>
@@ -275,11 +326,55 @@ function TaskDetails() {
                 {commentLoading ? "Отправка..." : "Создать комментарий"}
               </button>
             </form>
-            <form className="create__form" style={{ marginTop: "30px" }}>
-              <AddFiles
-                formData={formData}
-                handleFileChange={handleFileChange}
-              />
+
+            <form onSubmit={uploadFiles} style={formStyle}>
+              <div className="create__block">
+                <div className="label">Файлы</div>
+                <div className="file-upload">
+                  <img src="/files.svg" alt="загрузка файлов" />
+                  <div>
+                    Перетащите файлы сюда или&nbsp;
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById("files").click();
+                      }}
+                    >
+                      загрузите
+                    </a>
+                    <input
+                      type="file"
+                      id="files"
+                      name="files"
+                      multiple
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </div>
+                  <span
+                    style={{
+                      margin: "0 auto",
+                      color: "rgba(156, 163, 175, 1)",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Поддержка нескольких типов файлов
+                  </span>
+                </div>
+                {files.length > 0 && (
+                  <div style={{ marginTop: "10px" }}>
+                    Выбрано файлов: {files.length}
+                  </div>
+                )}
+              </div>
+              <button
+                className="create-btn modal-button"
+                style={{ width: "200px", marginTop: "10px" }}
+                disabled={fileLoading || files.length === 0}
+              >
+                {fileLoading ? "Загрузка..." : "Загрузить файлы"}
+              </button>
             </form>
           </div>
         </>

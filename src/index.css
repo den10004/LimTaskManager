@@ -69,6 +69,12 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .create-btn {
   background-color: rgba(33, 197, 140, 1);
   color: var(--color-background)

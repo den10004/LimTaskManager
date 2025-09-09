@@ -34,6 +34,7 @@ function AddFiles({ formData, handleFileChange }) {
           Поддержка нескольких типов файлов
         </span>
       </div>
+
       {formData.files.length > 0 && (
         <div style={{ marginTop: "10px" }}>
           Выбрано файлов: {formData.files.length}
