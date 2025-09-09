@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
@@ -68,6 +68,7 @@ function UserPage() {
     setLimit(newLimit);
     fetchTasks(newOffset, newLimit);
   };
+  console.log(tasks);
 
   return (
     <section className="container">

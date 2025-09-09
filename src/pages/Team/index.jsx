@@ -4,7 +4,7 @@ import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
 
 function TeamPage() {
-  const [tasks, setTasks] = useState([]);
+  const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,7 +31,7 @@ function TeamPage() {
         }
 
         const data = await response.json();
-        setTasks(data.items);
+        setTeam(data.items);
         setLoading(false);
       } catch (err) {
         setError("Ошибка загрузки данных");
@@ -54,7 +54,7 @@ function TeamPage() {
         <div className="error error-message">{error}</div>
       ) : (
         <div className="container-scroll">
-          {tasks.length > 0 ? (
+          {team.length > 0 ? (
             <table>
               <thead>
                 <tr>
@@ -67,7 +67,7 @@ function TeamPage() {
                 </tr>
               </thead>
               <tbody>
-                {tasks.map((task) => (
+                {team.map((task) => (
                   <tr key={task.id}>
                     <td>{task.id}</td>
                     <td>{task.name}</td>
