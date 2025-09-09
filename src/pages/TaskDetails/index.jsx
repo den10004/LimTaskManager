@@ -39,9 +39,11 @@ function TaskDetails() {
   const [error, setError] = useState(null);
   const [commentLoading, setCommentLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
+  const [direction, setDirection] = useState([]);
+
+  const API_URL = import.meta.env.VITE_API_KEY;
 
   const fetchTaskById = async (id) => {
-    const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
 
     if (!token) {
@@ -67,6 +69,39 @@ function TaskDetails() {
       throw new Error("Ошибка загрузки задачи", err);
     }
   };
+
+  const fetchDirections = async () => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+
+      const response = await fetch(`${API_URL}/directions`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTPS: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      setDirection(data.items);
+    } catch (err) {
+      console.error(err.message);
+      setError("Ошибка загрузки направлений");
+    }
+  };
+
+  useEffect(() => {
+    fetchDirections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const AddComments = async (e) => {
     e.preventDefault();
@@ -215,7 +250,10 @@ function TaskDetails() {
 
     return [String(links)];
   };
-
+  const getDirectionName = (direction_id) => {
+    const foundDirection = direction.find((dir) => dir.id === direction_id);
+    return foundDirection ? foundDirection.name : "Не указано";
+  };
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -245,6 +283,9 @@ function TaskDetails() {
               </li>
               <li>
                 <b>Дата создания:</b> {formatDate(task.due_at)}
+              </li>
+              <li>
+                <b>Направление:</b> {getDirectionName(task.direction_id)}
               </li>
               <li>
                 <b>Описание:</b> {task.description}
