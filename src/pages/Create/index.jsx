@@ -16,12 +16,15 @@ function CreatePage() {
 
   const [authToken, setAuthToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [direction, setDirection] = useState([]);
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
     if (token) {
       setAuthToken(token);
     }
+    fetchDirection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (e) => {
@@ -31,6 +34,7 @@ function CreatePage() {
       [name]: value,
     }));
   };
+  console.log(formData);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -54,6 +58,34 @@ function CreatePage() {
       ...prev,
       links: [...prev.links, ""],
     }));
+  };
+
+  const API_URL = import.meta.env.VITE_API_KEY;
+
+  const fetchDirection = async () => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+
+      const response = await fetch(`${API_URL}/directions`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTPS: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setDirection(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -138,7 +170,7 @@ function CreatePage() {
         due_at: "",
         assigned_user_id: "",
         description: "",
-        direction_id: "",
+        direction_id: 0,
         files: [],
         links: [""],
       });
@@ -150,7 +182,7 @@ function CreatePage() {
       setIsLoading(false);
     }
   };
-
+  console.log(direction.items);
   return (
     <section className="page" style={{ flex: 1 }}>
       <div className="create">
@@ -190,14 +222,21 @@ function CreatePage() {
 
           <div className="create__block">
             <label htmlFor="direction_id">Направление</label>
-            <input
-              type="text"
+            <select
               id="direction_id"
               name="direction_id"
               value={formData.direction_id}
               onChange={handleInputChange}
               required
-            />
+            >
+              <option value="">Выберите направление</option>
+
+              {direction?.items?.map((dir) => (
+                <option key={dir.id} value={dir.id}>
+                  {dir.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="create__block">

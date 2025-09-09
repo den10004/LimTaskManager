@@ -18,6 +18,7 @@ function TaskTableRow({ task }) {
       <td>{task.assigned_user_id || "Не указан"}</td>
       <td>{formatDate(task.created_at, "Не установлен")}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
+      <td>{task.direction_id}</td>
       <td>{task.description || "Нет описания"}</td>
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>

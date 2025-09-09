@@ -68,7 +68,6 @@ function UserPage() {
     setLimit(newLimit);
     fetchTasks(newOffset, newLimit);
   };
-  console.log(tasks);
 
   return (
     <section className="container">
@@ -87,6 +86,7 @@ function UserPage() {
                 <th>Пользователь</th>
                 <th>Дата создания</th>
                 <th>Дата окончания</th>
+                <th>Направление</th>
                 <th>Описание</th>
                 <th>Текст</th>
                 <th>Статус</th>
