@@ -1,17 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 
-function DirectionModal({ isOpen, onClose, onDirectionAdded }) {
+function DirectionModal({
+  isOpen,
+  onClose,
+  onDirectionAdded,
+  onDirectionEdited,
+  mode,
+  directionToEdit,
+}) {
   const [direction, setDirection] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
+  useEffect(() => {
+    if (mode === "edit" && directionToEdit) {
+      setDirection(directionToEdit.name);
+    } else {
+      setDirection("");
+    }
+  }, [mode, directionToEdit]);
+
   if (!isOpen) return null;
 
-  const handleDirection = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -22,35 +37,70 @@ function DirectionModal({ isOpen, onClose, onDirectionAdded }) {
         throw new Error("Токен авторизации отсутствует");
       }
 
-      const newDirection = { name: direction, id: Date.now() }; // Temporary ID for optimistic update
-      if (typeof onDirectionAdded === "function") {
-        onDirectionAdded(newDirection, true); // Pass new direction for optimistic update
+      if (mode === "add") {
+        const newDirection = { name: direction, id: Date.now() };
+        if (typeof onDirectionAdded === "function") {
+          onDirectionAdded(newDirection, true);
+        }
+
+        const response = await fetch(`${API_URL}/directions`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: direction }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTPS: ${response.status}`);
+        }
+
+        const addedDirection = await response.json();
+        setDirection("");
+        if (typeof onDirectionAdded === "function") {
+          onDirectionAdded(addedDirection, false);
+        }
+      } else if (mode === "edit" && directionToEdit) {
+        const updatedDirection = { name: direction, id: directionToEdit.id };
+        if (typeof onDirectionEdited === "function") {
+          onDirectionEdited(updatedDirection);
+        }
+
+        const response = await fetch(
+          `${API_URL}/directions/${directionToEdit.id}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: direction }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTPS: ${response.status}`);
+        }
+
+        const editedDirection = await response.json();
+        if (typeof onDirectionEdited === "function") {
+          onDirectionEdited(editedDirection);
+        }
       }
 
-      const response = await fetch(`${API_URL}/directions`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: direction }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
-
-      const addedDirection = await response.json(); // Get the server response
-      setDirection("");
-      if (typeof onDirectionAdded === "function") {
-        onDirectionAdded(addedDirection, false); // Trigger server refresh
-      }
-      onClose(); // Close the modal
+      onClose();
     } catch (err) {
-      setError("Ошибка при добавлении направления");
+      setError(
+        `Ошибка при ${
+          mode === "add" ? "добавлении" : "редактировании"
+        } направления`
+      );
       console.error(err.message);
-      if (typeof onDirectionAdded === "function") {
-        onDirectionAdded(null, false); // Revert optimistic update on error
+      if (mode === "add" && typeof onDirectionAdded === "function") {
+        onDirectionAdded(null, false);
+      } else if (mode === "edit" && typeof onDirectionEdited === "function") {
+        onDirectionEdited(null);
       }
     } finally {
       setIsLoading(false);
@@ -60,8 +110,12 @@ function DirectionModal({ isOpen, onClose, onDirectionAdded }) {
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h2>Добавить направление</h2>
-        <form id="login-form" onSubmit={handleDirection}>
+        <h2>
+          {mode === "add"
+            ? "Добавить направление"
+            : "Редактировать направление"}
+        </h2>
+        <form id="direction-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
               type="text"
@@ -69,6 +123,7 @@ function DirectionModal({ isOpen, onClose, onDirectionAdded }) {
               value={direction}
               onChange={(e) => setDirection(e.target.value)}
               disabled={isLoading}
+              placeholder="Введите название направления"
             />
           </div>
           {error && <div className="error-message">{error}</div>}
@@ -78,7 +133,11 @@ function DirectionModal({ isOpen, onClose, onDirectionAdded }) {
             className="create-btn modal-button"
             disabled={isLoading}
           >
-            {isLoading ? "Загрузка..." : "Отправить"}
+            {isLoading
+              ? "Загрузка..."
+              : mode === "add"
+              ? "Добавить"
+              : "Сохранить"}
           </button>
         </form>
         <button

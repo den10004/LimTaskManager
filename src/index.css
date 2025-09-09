@@ -85,6 +85,11 @@ button:disabled {
   color: var(--color-create)
 }
 
+.delete-btn {
+  background-color: var(--color-err);
+  color: var(--color-background)
+}
+
 
 .h3-mtmb {
   margin: 30px 0;

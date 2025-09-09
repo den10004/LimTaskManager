@@ -8,6 +8,8 @@ function Directions() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
+  const [directionToEdit, setDirectionToEdit] = useState(null); // Direction being edited
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
@@ -40,24 +42,81 @@ function Directions() {
     }
   };
 
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Вы уверены, что хотите удалить это направление?"
+    );
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+
+      const response = await fetch(`${API_URL}/directions/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка при удалении: ${response.status}`);
+      }
+
+      setDirection((prev) => prev.filter((task) => task.id !== id));
+    } catch (err) {
+      setError("Ошибка при удалении направления");
+      console.error(err.message);
+      fetchTasks();
+    }
+  };
+
+  const handleEdit = (direction) => {
+    setModalMode("edit");
+    setDirectionToEdit(direction);
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     fetchTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const openModal = () => {
+    setModalMode("add");
+    setDirectionToEdit(null);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setDirectionToEdit(null);
+  };
 
   const handleDirectionAdded = (newDirection, isOptimistic) => {
     if (isOptimistic && newDirection) {
-      // Optimistic update: add the new direction to the state immediately
       setDirection((prev) => [...prev, newDirection]);
     } else if (!isOptimistic && newDirection) {
-      // Replace temporary direction with server data
-      fetchTasks(); // Refresh from server
+      fetchTasks();
     } else if (!isOptimistic && !newDirection) {
-      // Revert optimistic update on error
-      fetchTasks(); // Refresh to ensure correct state
+      fetchTasks();
+    }
+  };
+
+  const handleDirectionEdited = (updatedDirection) => {
+    if (updatedDirection) {
+      setDirection((prev) =>
+        prev.map((dir) =>
+          dir.id === updatedDirection.id ? updatedDirection : dir
+        )
+      );
+    } else {
+      fetchTasks();
     }
   };
 
@@ -76,6 +135,7 @@ function Directions() {
                 <tr>
                   <th>ID</th>
                   <th>Направления</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -83,6 +143,20 @@ function Directions() {
                   <tr key={task.id}>
                     <td>{task.id}</td>
                     <td>{task.name}</td>
+                    <td>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(task.id)}
+                      >
+                        Удалить
+                      </button>
+                      <button
+                        className="create-btn"
+                        onClick={() => handleEdit(task)}
+                      >
+                        Исправить
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -103,6 +177,9 @@ function Directions() {
         isOpen={isModalOpen}
         onClose={closeModal}
         onDirectionAdded={handleDirectionAdded}
+        onDirectionEdited={handleDirectionEdited}
+        mode={modalMode}
+        directionToEdit={directionToEdit}
       />
     </section>
   );
