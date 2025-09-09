@@ -1,0 +1,24 @@
+.no-border-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.no-border-table th:first-child,
+.no-border-table td:first-child {
+    width: 100px;
+    text-align: left;
+}
+
+
+.no-border-table th:nth-child(2),
+.no-border-table td:nth-child(2) {
+    width: 100%;
+}
+
+
+.no-border-table td:nth-child(2)>div {
+    display: flex;
+    justify-content: flex-end;
+    margin-left: auto;
+}

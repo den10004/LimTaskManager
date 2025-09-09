@@ -8,8 +8,8 @@ function Directions() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(null);
-  const [modalMode, setModalMode] = useState("add"); // "add" or "edit"
-  const [directionToEdit, setDirectionToEdit] = useState(null); // Direction being edited
+  const [modalMode, setModalMode] = useState("add");
+  const [directionToEdit, setDirectionToEdit] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
@@ -120,6 +120,12 @@ function Directions() {
     }
   };
 
+  const restrictedDirections = [
+    "Дистрибуция",
+    "Партнерская программа",
+    "Строительство",
+  ];
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Направления</h3>
@@ -128,34 +134,43 @@ function Directions() {
       ) : error ? (
         <div className="error error-message">{error}</div>
       ) : (
-        <div className="container-scroll">
+        <div>
           {direction.length > 0 ? (
             <table>
               <thead>
                 <tr>
                   <th>ID</th>
                   <th>Направления</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {direction.map((task) => (
                   <tr key={task.id}>
                     <td>{task.id}</td>
-                    <td>{task.name}</td>
-                    <td>
-                      <button
-                        className="delete-btn"
-                        onClick={() => handleDelete(task.id)}
-                      >
-                        Удалить
-                      </button>
-                      <button
-                        className="create-btn"
-                        onClick={() => handleEdit(task)}
-                      >
-                        Исправить
-                      </button>
+                    <td
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {task.name}
+                      {!restrictedDirections.includes(task.name) && (
+                        <div style={{ display: "flex", marginLeft: "auto" }}>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            Удалить
+                          </button>
+                          <button
+                            style={{ marginLeft: "10px" }}
+                            className="create-btn"
+                            onClick={() => handleEdit(task)}
+                          >
+                            Исправить
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
