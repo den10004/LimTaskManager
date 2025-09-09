@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
-import "./style.css";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
 
 function TeamPage() {
@@ -54,39 +53,42 @@ function TeamPage() {
       ) : error ? (
         <div className="error error-message">{error}</div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div className="container-scroll">
           {tasks.length > 0 ? (
-            tasks.map((task) => (
-              <ul key={task.id} style={{ display: "flex" }}>
-                <li style={{ marginRight: "10px" }}>
-                  <b>Id:</b> {task.id}
-                </li>
-                <li style={{ marginRight: "10px" }}>
-                  <b>Имя:</b> {task.name}
-                </li>
-                <li style={{ marginRight: "10px" }}>
-                  <b>email:</b> {task.email}
-                </li>
-                <li style={{ marginRight: "10px" }}>
-                  <b>Телеграм id</b> {task.telegram_id}
-                </li>
-                <li style={{ marginRight: "10px" }}>
-                  <b>Создан:</b> {formatDate(task.created_at)}
-                </li>
-                <li style={{ display: "flex" }}>
-                  <b>Роль: </b>
-                  <div style={{ marginLeft: "10px" }}>
-                    {task.roles && task.roles.length > 0
-                      ? task.roles.map((link, index) => (
-                          <div key={index}>{getTranslatedRole(link)}</div>
-                        ))
-                      : "-"}
-                  </div>
-                </li>
-              </ul>
-            ))
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Имя</th>
+                  <th>Email</th>
+                  <th>Телеграм</th>
+                  <th>Создан</th>
+                  <th>Роль</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td>{task.id}</td>
+                    <td>{task.name}</td>
+                    <td>{task.email}</td>
+                    <td>{task.telegram_id}</td>
+                    <td>{formatDate(task.created_at)}</td>
+                    <td>
+                      {task.roles && task.roles.length > 0
+                        ? task.roles.map((link, index) => (
+                            <div key={index}>{getTranslatedRole(link)}</div>
+                          ))
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : (
-            <div>Нет данных для отображения</div>
+            <div className="error error-message">
+              Нет данных для отображения
+            </div>
           )}
         </div>
       )}
