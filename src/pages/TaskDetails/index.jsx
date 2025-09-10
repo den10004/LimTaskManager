@@ -11,20 +11,17 @@ const formStyle = {
 const formtext = {
   width: "100%",
 };
-
 const commentsWrap = {
   marginBottom: "15px",
   padding: "10px",
   backgroundColor: "#f5f5f5",
   borderRadius: "5px",
 };
-
 const comments = {
   fontSize: "12px",
   color: "#666",
   marginTop: "5px",
 };
-
 const taskHeader = {
   margin: "30px 0",
 };
@@ -66,7 +63,7 @@ function TaskDetails() {
       return data;
     } catch (err) {
       console.error(err);
-      throw new Error("Ошибка загрузки задачи", err);
+      throw new Error(`Ошибка загрузки задачи: ${err.message}`);
     }
   };
 
@@ -74,11 +71,28 @@ function TaskDetails() {
     fetchDirections(setDirection, setIsLoading, setError);
   }, []);
 
+  useEffect(() => {
+    const loadTask = async () => {
+      try {
+        setIsLoading(true);
+        const taskData = await fetchTaskById(id);
+        setTask(taskData);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      loadTask();
+    }
+  }, [id]); // Добавляем id в зависимости
+
   const AddComments = async (e) => {
     e.preventDefault();
     setCommentLoading(true);
     setError("");
-    const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
 
     if (!token) {
@@ -105,7 +119,7 @@ function TaskDetails() {
 
       setTask((prevTask) => ({
         ...prevTask,
-        comments: [...prevTask.comments, newComment],
+        comments: [...(prevTask?.comments || []), newComment],
       }));
 
       setComment("");
@@ -123,7 +137,6 @@ function TaskDetails() {
 
     setFileLoading(true);
     setError("");
-    const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
 
     if (!token) {
@@ -162,7 +175,7 @@ function TaskDetails() {
 
       setTask((prevTask) => ({
         ...prevTask,
-        files: [...(prevTask.files || []), ...normalizedFiles],
+        files: [...(prevTask?.files || []), ...normalizedFiles],
       }));
 
       setFiles([]);
@@ -173,24 +186,6 @@ function TaskDetails() {
       setFileLoading(false);
     }
   };
-
-  useEffect(() => {
-    const loadTask = async () => {
-      try {
-        setIsLoading(true);
-        const taskData = await fetchTaskById(id);
-        setTask(taskData);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      loadTask();
-    }
-  }, [id]);
 
   const handleBack = () => {
     navigate("/user");
@@ -221,10 +216,12 @@ function TaskDetails() {
 
     return [String(links)];
   };
+
   const getDirectionName = (direction_id) => {
     const foundDirection = direction.find((dir) => dir.id === direction_id);
     return foundDirection ? foundDirection.name : "Не указано";
   };
+
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -235,10 +232,10 @@ function TaskDetails() {
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
         <div className="error">Ошибка: {error}</div>
-      ) : (
+      ) : task ? (
         <>
           <h3 className="h3-mtmb">Задача #{task.id}</h3>
-          <div style={{ taskHeader }}>
+          <div style={taskHeader}>
             <ul
               style={{
                 display: "flex",
@@ -246,23 +243,23 @@ function TaskDetails() {
                 gap: "10px",
               }}
             >
-              <li className={`status-badge status-${task.status}`}>
-                <b>Статус:</b> {task.status}
+              <li className={`status-badge status-${task.status || ""}`}>
+                <b>Статус:</b> {task.status || "Не указано"}
               </li>
               <li>
-                <b>Пользователь:</b> {task.id}
+                <b>Пользователь:</b> {task.id || "Не указано"}
               </li>
               <li>
-                <b>Дата создания:</b> {formatDate(task.due_at)}
+                <b>Дата создания:</b> {formatDate(task.due_at) || "Не указано"}
               </li>
               <li>
                 <b>Направление:</b> {getDirectionName(task.direction_id)}
               </li>
               <li>
-                <b>Описание:</b> {task.description}
+                <b>Описание:</b> {task.description || "Не указано"}
               </li>
               <li>
-                <b>Текст:</b> {task.title}
+                <b>Текст:</b> {task.title || "Не указано"}
               </li>
               {task.links && (
                 <li style={{ display: "flex" }}>
@@ -295,7 +292,7 @@ function TaskDetails() {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          {file.file_name}
+                          {file.file_name || "Файл без имени"}
                         </a>
                       </div>
                     ))}
@@ -308,9 +305,10 @@ function TaskDetails() {
                   {task.comments && task.comments.length > 0 ? (
                     task.comments.map((comment, index) => (
                       <div key={index} style={commentsWrap}>
-                        <div>{comment.text}</div>
+                        <div>{comment.text || "Комментарий отсутствует"}</div>
                         <div style={comments}>
-                          <b>Дата создания:</b> {formatDate(comment.created_at)}
+                          <b>Дата создания:</b>{" "}
+                          {formatDate(comment.created_at) || "Не указано"}
                         </div>
                       </div>
                     ))
@@ -390,6 +388,8 @@ function TaskDetails() {
             </form>
           </div>
         </>
+      ) : (
+        <div>Данные задачи отсутствуют</div>
       )}
     </div>
   );
