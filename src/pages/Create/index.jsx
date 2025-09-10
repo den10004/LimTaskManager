@@ -27,7 +27,6 @@ function CreatePage() {
       setAuthToken(token);
     }
     fetchDirections(setDirection, setIsLoading, setError);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleInputChange = (e) => {

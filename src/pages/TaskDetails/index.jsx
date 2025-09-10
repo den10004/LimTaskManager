@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
-import AddFiles from "../../components/AddFiles/AddFiles";
+import { fetchDirections } from "../../hooks/useFetchDirection";
 
 const formStyle = {
   marginTop: "10px",
@@ -35,7 +35,7 @@ function TaskDetails() {
   const [task, setTask] = useState(null);
   const [comment, setComment] = useState("");
   const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [commentLoading, setCommentLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
@@ -70,37 +70,8 @@ function TaskDetails() {
     }
   };
 
-  const fetchDirections = async () => {
-    try {
-      const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-
-      const response = await fetch(`${API_URL}/directions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      setDirection(data.items);
-    } catch (err) {
-      console.error(err.message);
-      setError("Ошибка загрузки направлений");
-    }
-  };
-
   useEffect(() => {
-    fetchDirections();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchDirections(setDirection, setIsLoading, setError);
   }, []);
 
   const AddComments = async (e) => {
@@ -206,13 +177,13 @@ function TaskDetails() {
   useEffect(() => {
     const loadTask = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         const taskData = await fetchTaskById(id);
         setTask(taskData);
       } catch (err) {
         setError(err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 

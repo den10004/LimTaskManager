@@ -1,9 +1,9 @@
-// UserPage.jsx
 import { useState, useEffect } from "react";
-import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import useFetchTeam from "../../hooks/useFetchTeam";
+import { fetchDirections } from "../../hooks/useFetchDirection";
+import "./style.css";
 
 const addBtn = {
   display: "flex",
@@ -13,40 +13,13 @@ const addBtn = {
 function UserPage() {
   const [tasks, setTasks] = useState([]);
   const [directions, setDirections] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [offset, setOffset] = useState(0);
   const [limit, setLimit] = useState(20);
   const [hasMore, setHasMore] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_KEY;
-
-  const fetchDirections = async () => {
-    try {
-      const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-
-      const response = await fetch(`${API_URL}/directions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setDirections(data.items);
-    } catch (err) {
-      console.error(err.message);
-      setError("Ошибка загрузки направлений");
-    }
-  };
 
   const fetchTasks = async (newOffset, newLimit) => {
     try {
@@ -77,17 +50,17 @@ function UserPage() {
         return [...prevTasks, ...newTasks];
       });
       setHasMore(data.items.length === newLimit);
-      setLoading(false);
+      setIsLoading(false);
     } catch (err) {
       console.error(err.message);
       setError("Ошибка загрузки данных");
-      setLoading(false);
+      setIsLoading(false);
       setHasMore(false);
     }
   };
 
   useEffect(() => {
-    fetchDirections();
+    fetchDirections(setDirections, setIsLoading, setError);
     fetchTasks(offset, limit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
