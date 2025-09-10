@@ -1,7 +1,7 @@
-import { formatDate } from "../../utils/dateUtils";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../../utils/dateUtils";
 
-function TaskTableRow({ task, directions }) {
+function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
   const directionName =
     directions?.find((dir) => dir.id === task.direction_id)?.name || "";
@@ -14,10 +14,17 @@ function TaskTableRow({ task, directions }) {
     Новая: "#53c153",
   };
 
+  const user = team.find((member) => member.id === task.assigned_user_id);
+  const userName = user ? user.name : "Пользователь не указан";
+
+  const userCreated = team.find((member) => member.id === task.created_by);
+  const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
+
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{task.id}</td>
-      <td>{task.assigned_user_id || "Не указан"}</td>
+      <td>{createdBy}</td>
+      <td>{userName}</td>
       <td>{formatDate(task.created_at, "Не установлен")}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{directionName}</td>

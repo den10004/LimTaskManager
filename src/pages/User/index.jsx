@@ -1,7 +1,9 @@
+// UserPage.jsx
 import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
+import useFetchTeam from "../../hooks/useFetchTeam";
 
 const addBtn = {
   display: "flex",
@@ -98,7 +100,8 @@ function UserPage() {
     fetchTasks(newOffset, newLimit);
   };
 
-  console.log(tasks);
+  const { team } = useFetchTeam(API_URL);
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
@@ -113,7 +116,8 @@ function UserPage() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Пользователь</th>
+                <th>Назначил</th>
+                <th>Назначено</th>
                 <th>Дата создания</th>
                 <th>Дата окончания</th>
                 <th>Направление</th>
@@ -130,6 +134,7 @@ function UserPage() {
                     key={task.id}
                     task={task}
                     directions={directions}
+                    team={team}
                   />
                 ))
               ) : (

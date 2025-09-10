@@ -1,48 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
+import useFetchTeam from "../../hooks/useFetchTeam";
 
 function TeamPage() {
-  const [team, setTeam] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
   const API_URL = import.meta.env.VITE_API_KEY;
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = getCookie("authTokenPM");
-        if (!token) {
-          throw new Error("Токен авторизации отсутствует");
-        }
-
-        const response = await fetch(`${API_URL}/users`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTPS: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setTeam(data.items);
-        setLoading(false);
-      } catch (err) {
-        setError("Ошибка загрузки данных");
-        console.error(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { team, loading, error } = useFetchTeam(API_URL);
 
   return (
     <section className="container">

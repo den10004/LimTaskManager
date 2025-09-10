@@ -1,4 +1,5 @@
 import AddFiles from "../../components/AddFiles/AddFiles";
+import useFetchTeam from "../../hooks/useFetchTeam";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
@@ -17,7 +18,6 @@ function CreatePage() {
   const [authToken, setAuthToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [direction, setDirection] = useState([]);
-  const [team, setTeam] = useState([]);
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
@@ -183,38 +183,7 @@ function CreatePage() {
     }
   };
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const token = getCookie("authTokenPM");
-        if (!token) {
-          throw new Error("Токен авторизации отсутствует");
-        }
-
-        const response = await fetch(`${API_URL}/users`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTPS: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setTeam(data.items);
-        setIsLoading(false);
-      } catch (err) {
-        console.error(err.message);
-        setIsLoading(false);
-      }
-    };
-
-    fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { team, loading, error } = useFetchTeam(API_URL);
 
   return (
     <section className="page" style={{ flex: 1 }}>
@@ -274,22 +243,27 @@ function CreatePage() {
 
           <div className="create__block">
             <label htmlFor="assigned_user_id">Выбрать пользователя *</label>
-            <select
-              type="text"
-              id="assigned_user_id"
-              name="assigned_user_id"
-              value={formData.assigned_user_id}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Выберите направление</option>
-
-              {team?.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
+            {loading ? (
+              <div className="loading">Загрузка пользователей...</div>
+            ) : error ? (
+              <div className="error error-message">{error}</div>
+            ) : (
+              <select
+                type="text"
+                id="assigned_user_id"
+                name="assigned_user_id"
+                value={formData.assigned_user_id}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Выберите направление *</option>
+                {team?.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="create__block">
