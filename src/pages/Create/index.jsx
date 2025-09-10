@@ -232,7 +232,7 @@ function CreatePage() {
                 onChange={handleInputChange}
                 required
               >
-                <option value="">Выберите направление *</option>
+                <option value="">Выберите пользователя *</option>
                 {team?.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
