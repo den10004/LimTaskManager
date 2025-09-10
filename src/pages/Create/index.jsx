@@ -1,4 +1,5 @@
 import AddFiles from "../../components/AddFiles/AddFiles";
+import { fetchDirections } from "../../hooks/useFetchDirection";
 import useFetchTeam from "../../hooks/useFetchTeam";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
@@ -18,13 +19,14 @@ function CreatePage() {
   const [authToken, setAuthToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [direction, setDirection] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
     if (token) {
       setAuthToken(token);
     }
-    fetchDirection();
+    fetchDirections(setDirection, setIsLoading, setError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -62,34 +64,7 @@ function CreatePage() {
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
-  const fetchDirection = async () => {
-    try {
-      const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-
-      const response = await fetch(`${API_URL}/directions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setDirection(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleSubmit = async (e) => {
-    const API_URL = import.meta.env.VITE_API_KEY;
     e.preventDefault();
     setIsLoading(true);
 
@@ -183,7 +158,7 @@ function CreatePage() {
     }
   };
 
-  const { team, loading, error } = useFetchTeam(API_URL);
+  const { team, loading, error: teamError } = useFetchTeam(API_URL);
 
   return (
     <section className="page" style={{ flex: 1 }}>
@@ -195,6 +170,9 @@ function CreatePage() {
             <div style={{ color: "red", marginTop: "10px" }}>
               Внимание: токен авторизации не найден!
             </div>
+          )}
+          {error && (
+            <div style={{ color: "red", marginTop: "10px" }}>{error}</div>
           )}
         </div>
         <form className="create__form" onSubmit={handleSubmit}>
@@ -232,8 +210,7 @@ function CreatePage() {
               required
             >
               <option value="">Выберите направление</option>
-
-              {direction?.items?.map((dir) => (
+              {direction?.map((dir) => (
                 <option key={dir.id} value={dir.id}>
                   {dir.name}
                 </option>
@@ -245,8 +222,8 @@ function CreatePage() {
             <label htmlFor="assigned_user_id">Выбрать пользователя *</label>
             {loading ? (
               <div className="loading">Загрузка пользователей...</div>
-            ) : error ? (
-              <div className="error error-message">{error}</div>
+            ) : teamError ? (
+              <div className="error error-message">{teamError}</div>
             ) : (
               <select
                 type="text"

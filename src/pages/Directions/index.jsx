@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
+import { fetchDirections } from "../../hooks/useFetchDirection";
 
 function Directions() {
   const [direction, setDirection] = useState([]);
@@ -12,35 +13,6 @@ function Directions() {
   const [directionToEdit, setDirectionToEdit] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
-
-  const fetchTasks = async () => {
-    try {
-      const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
-
-      const response = await fetch(`${API_URL}/directions`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setDirection(data.items);
-      setLoading(false);
-    } catch (err) {
-      setError("Ошибка загрузки данных");
-      console.error(err.message);
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
@@ -72,7 +44,7 @@ function Directions() {
     } catch (err) {
       setError("Ошибка при удалении направления");
       console.error(err.message);
-      fetchTasks();
+      fetchDirections(setDirection, setLoading, setError);
     }
   };
 
@@ -83,8 +55,7 @@ function Directions() {
   };
 
   useEffect(() => {
-    fetchTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchDirections(setDirection, setLoading, setError);
   }, []);
 
   const openModal = () => {
@@ -102,9 +73,9 @@ function Directions() {
     if (isOptimistic && newDirection) {
       setDirection((prev) => [...prev, newDirection]);
     } else if (!isOptimistic && newDirection) {
-      fetchTasks();
+      fetchDirections(setDirection, setLoading, setError);
     } else if (!isOptimistic && !newDirection) {
-      fetchTasks();
+      fetchDirections(setDirection, setLoading, setError);
     }
   };
 
@@ -116,7 +87,7 @@ function Directions() {
         )
       );
     } else {
-      fetchTasks();
+      fetchDirections(setDirection, setLoading, setError);
     }
   };
 
