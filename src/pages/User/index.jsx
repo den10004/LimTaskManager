@@ -98,6 +98,7 @@ function UserPage() {
     fetchTasks(newOffset, newLimit);
   };
 
+  console.log(tasks);
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
