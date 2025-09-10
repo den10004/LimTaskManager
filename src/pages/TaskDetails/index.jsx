@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
@@ -37,6 +37,8 @@ function TaskDetails() {
   const [commentLoading, setCommentLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [direction, setDirection] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
@@ -87,7 +89,41 @@ function TaskDetails() {
     if (id) {
       loadTask();
     }
-  }, [id]); // Добавляем id в зависимости
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  // Обработчик события drag over
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  // Обработчик события drag leave
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  // Обработчик события drop
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      setFiles(Array.from(droppedFiles));
+    }
+  }, []);
+
+  // Обработчик клика по области загрузки
+  const handleAreaClick = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
 
   const AddComments = async (e) => {
     e.preventDefault();
@@ -340,7 +376,24 @@ function TaskDetails() {
             <form onSubmit={uploadFiles} style={formStyle}>
               <div className="create__block">
                 <div className="label">Файлы</div>
-                <div className="file-upload">
+                <div
+                  className={`file-upload ${
+                    isDragging ? "file-upload--dragging" : ""
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragEnter={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={handleAreaClick}
+                  style={{
+                    cursor: "pointer",
+                    border: isDragging
+                      ? "2px dashed #3b82f6"
+                      : "2px dashed #d1d5db",
+                    backgroundColor: isDragging ? "#f0f9ff" : "transparent",
+                    transition: "all 0.2s ease",
+                  }}
+                >
                   <img src="/files.svg" alt="загрузка файлов" />
                   <div>
                     Перетащите файлы сюда или&nbsp;
@@ -348,19 +401,12 @@ function TaskDetails() {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        document.getElementById("files").click();
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
                       }}
                     >
                       загрузите
                     </a>
-                    <input
-                      type="file"
-                      id="files"
-                      name="files"
-                      multiple
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                    />
                   </div>
                   <span
                     style={{
@@ -371,6 +417,16 @@ function TaskDetails() {
                   >
                     Поддержка нескольких типов файлов
                   </span>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    id="files"
+                    name="files"
+                    multiple
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
                 </div>
                 {files.length > 0 && (
                   <div style={{ marginTop: "10px" }}>
