@@ -3,7 +3,7 @@ import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import { roleTranslations } from "../../utils/rolesTranslations";
 
-function AddUser({ isOpen, onClose, onUserCreated }) {
+function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -16,15 +16,14 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
-  // Функция для сброса ошибки при изменении паролей
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    if (error) setError(""); // Сбрасываем ошибку при изменении пароля
+    if (error) setError("");
   };
 
   const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
-    if (error) setError(""); // Сбрасываем ошибку при изменении подтверждения пароля
+    if (error) setError("");
   };
 
   const handleUser = async (e) => {
@@ -32,7 +31,6 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
     setIsLoading(true);
     setError("");
 
-    // Проверка совпадения паролей
     if (password !== confirmPassword) {
       setError("Пароли не совпадают");
       setIsLoading(false);
@@ -84,13 +82,72 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
     }
   };
 
+  const handleUpdateUser = async (e) => {
+    console.log("sd");
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (password !== confirmPassword) {
+      setError("Пароли не совпадают");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const formData = {
+        name,
+        password,
+        telegram_id: telegram,
+        roles: [roles],
+      };
+      const response = await fetch(`${API_URL}/users/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        throw new Error(
+          errorData.message || "Ошибка при создании пользователя"
+        );
+      }
+      setName("");
+      setPassword("");
+      setConfirmPassword("");
+      setTelegram("");
+      setRoles("");
+      setIsLoading(false);
+      if (onUserCreated) {
+        onUserCreated();
+      }
+
+      onClose();
+    } catch (err) {
+      setError(err.message || "Произошла ошибка при создании пользователя");
+      setIsLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="modal-backdrop">
       <div className="modal-content">
-        <h2>Создать пользователя</h2>
-        <form id="login-form" onSubmit={handleUser}>
+        {mode === "create" ? (
+          <h2>Создать пользователя</h2>
+        ) : (
+          <h2>Редактирование пользователя</h2>
+        )}
+        <form
+          id="login-form"
+          onSubmit={mode === "create" ? handleUser : handleUpdateUser}
+        >
           <div className="form-group">
             <label>Имя:</label>
             <input
@@ -102,18 +159,19 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               placeholder="Введите имя"
             />
           </div>
-
-          <div className="form-group">
-            <label>Email:</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              placeholder="Введите ваш email"
-            />
-          </div>
+          {mode === "create" && (
+            <div className="form-group">
+              <label>Email:</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                placeholder="Введите ваш email"
+              />
+            </div>
+          )}
 
           <div className="form-group">
             <label>Пароль:</label>
@@ -121,7 +179,7 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               type="password"
               required
               value={password}
-              onChange={handlePasswordChange} // Используем новую функцию
+              onChange={handlePasswordChange}
               disabled={isLoading}
               placeholder="Введите пароль"
             />
@@ -133,7 +191,7 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               type="password"
               required
               value={confirmPassword}
-              onChange={handleConfirmPasswordChange} // Используем новую функцию
+              onChange={handleConfirmPasswordChange}
               disabled={isLoading}
               placeholder="Повторите пароль"
             />
@@ -175,7 +233,11 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
             className="create-btn modal-button"
             disabled={isLoading}
           >
-            {isLoading ? "Загрузка..." : "Создать"}
+            {isLoading
+              ? "Загрузка..."
+              : mode === "create"
+              ? "Создать"
+              : "Редактировать"}
           </button>
         </form>
         <button

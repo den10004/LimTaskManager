@@ -9,12 +9,21 @@ function TeamPage() {
 
   const { team, loading, error, refetch } = useFetchTeam(API_URL);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("");
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
-  const openModal = () => {
+  const openCreateModal = () => {
+    setIsModalOpen(true);
+    setModalMode("create");
+  };
+
+  const openEditModal = (taskId) => {
+    setSelectedTaskId(taskId);
+    setModalMode("edit");
     setIsModalOpen(true);
   };
 
@@ -38,6 +47,7 @@ function TeamPage() {
                   <th>Телеграм</th>
                   <th>Создан</th>
                   <th>Роль</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -56,6 +66,14 @@ function TeamPage() {
                           })
                         : "-"}
                     </td>
+                    <td>
+                      <button
+                        className="create-btn"
+                        onClick={() => openEditModal(task.id)}
+                      >
+                        Редактирование
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -66,7 +84,11 @@ function TeamPage() {
             </div>
           )}
 
-          <button type="submit" className="create-btn" onClick={openModal}>
+          <button
+            type="submit"
+            className="create-btn"
+            onClick={openCreateModal}
+          >
             Coздать пользователя
           </button>
         </div>
@@ -75,6 +97,8 @@ function TeamPage() {
         isOpen={isModalOpen}
         onClose={closeModal}
         onUserCreated={refetch}
+        mode={modalMode}
+        id={selectedTaskId}
       />
     </section>
   );
