@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 function TeamPage() {
   const API_URL = import.meta.env.VITE_API_KEY;
 
-  const { team, loading, error } = useFetchTeam(API_URL);
+  const { team, loading, error, refetch } = useFetchTeam(API_URL);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roles, setRoles] = useState();
 
@@ -83,7 +83,11 @@ function TeamPage() {
           </button>
         </div>
       )}
-      <AddUser isOpen={isModalOpen} onClose={closeModal} />
+      <AddUser
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onUserCreated={refetch}
+      />
     </section>
   );
 }

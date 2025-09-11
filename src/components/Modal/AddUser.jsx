@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 
-function AddUser({ isOpen, onClose }) {
+function AddUser({ isOpen, onClose, onUserCreated }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -45,6 +45,10 @@ function AddUser({ isOpen, onClose }) {
       setTelegram("");
       setRoles("");
       setIsLoading(false);
+      if (onUserCreated) {
+        onUserCreated();
+      }
+
       onClose();
     } catch (err) {
       setError(err.message || "Произошла ошибка при создании пользователя");
