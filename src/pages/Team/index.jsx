@@ -1,11 +1,34 @@
 import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
 import useFetchTeam from "../../hooks/useFetchTeam";
+import AddUser from "../../components/Modal/AddUser";
+import { useEffect, useState } from "react";
 
 function TeamPage() {
   const API_URL = import.meta.env.VITE_API_KEY;
 
   const { team, loading, error } = useFetchTeam(API_URL);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [roles, setRoles] = useState();
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const transformTaskRoles = (teamData) => {
+    return [...new Set(teamData.flatMap((task) => task.roles))];
+  };
+
+  useEffect(() => {
+    const uniqueRoles = transformTaskRoles(team);
+    setRoles(uniqueRoles);
+    const translatedRole = getTranslatedRole(uniqueRoles);
+    console.log("translatedRole", translatedRole);
+  }, [team]);
 
   return (
     <section className="container">
@@ -39,9 +62,10 @@ function TeamPage() {
                     <td>{formatDate(task.created_at)}</td>
                     <td>
                       {task.roles && task.roles.length > 0
-                        ? task.roles.map((link, index) => (
-                            <div key={index}>{getTranslatedRole(link)}</div>
-                          ))
+                        ? task.roles.map((link, index) => {
+                            const translatedRole = getTranslatedRole(link);
+                            return <div key={index}>{translatedRole}</div>;
+                          })
                         : "-"}
                     </td>
                   </tr>
@@ -53,8 +77,13 @@ function TeamPage() {
               Нет данных для отображения
             </div>
           )}
+
+          <button type="submit" className="create-btn" onClick={openModal}>
+            Coздать пользователя
+          </button>
         </div>
       )}
+      <AddUser isOpen={isModalOpen} onClose={closeModal} />
     </section>
   );
 }
