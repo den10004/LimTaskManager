@@ -1,12 +1,14 @@
 import { useState } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
+import { roleTranslations } from "../../utils/rolesTranslations";
 
 function AddUser({ isOpen, onClose, onUserCreated }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [roles, setRoles] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -14,10 +16,28 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
+  // Функция для сброса ошибки при изменении паролей
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (error) setError(""); // Сбрасываем ошибку при изменении пароля
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    if (error) setError(""); // Сбрасываем ошибку при изменении подтверждения пароля
+  };
+
   const handleUser = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+
+    // Проверка совпадения паролей
+    if (password !== confirmPassword) {
+      setError("Пароли не совпадают");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const formData = {
@@ -37,11 +57,19 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
       });
 
       if (!response.ok) {
-        throw new Error("Ошибка при создании пользователя");
+        const errorData = await response.json().catch(() => ({}));
+
+        if (response.status === 409) {
+          throw new Error("Пользователь с таким email уже существует");
+        }
+        throw new Error(
+          errorData.message || "Ошибка при создании пользователя"
+        );
       }
       setName("");
       setEmail("");
       setPassword("");
+      setConfirmPassword("");
       setTelegram("");
       setRoles("");
       setIsLoading(false);
@@ -55,12 +83,8 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
       setIsLoading(false);
     }
   };
-  if (!isOpen) return null;
 
-  const roless = [
-    { admin: "Администратор" },
-    { sales_manager: "Менеджер продаж" },
-  ];
+  if (!isOpen) return null;
 
   return (
     <div className="modal-backdrop">
@@ -90,17 +114,31 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               placeholder="Введите ваш email"
             />
           </div>
+
           <div className="form-group">
             <label>Пароль:</label>
             <input
               type="password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange} // Используем новую функцию
               disabled={isLoading}
-              placeholder="Введите ваш пароль"
+              placeholder="Введите пароль"
             />
           </div>
+
+          <div className="form-group">
+            <label>Повторите пароль:</label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange} // Используем новую функцию
+              disabled={isLoading}
+              placeholder="Повторите пароль"
+            />
+          </div>
+
           <div className="form-group">
             <label>Телеграм:</label>
             <input
@@ -108,9 +146,10 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               value={telegram}
               onChange={(e) => setTelegram(e.target.value)}
               disabled={isLoading}
-              placeholder="Введите телеграм (не обзязательно)"
+              placeholder="Введите телеграм (не обязательно)"
             />
           </div>
+
           <div className="form-group">
             <label>Роль:</label>
             <select
@@ -121,17 +160,14 @@ function AddUser({ isOpen, onClose, onUserCreated }) {
               required
             >
               <option value="">Выберите роль</option>
-              {roless?.map((roleObj, id) => {
-                const key = Object.keys(roleObj)[0];
-                const value = roleObj[key];
-                return (
-                  <option key={id} value={key}>
-                    {value}
-                  </option>
-                );
-              })}
+              {Object.entries(roleTranslations).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
             </select>
           </div>
+
           {error && <div className="error-message">{error}</div>}
 
           <button

@@ -2,14 +2,13 @@ import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
 import useFetchTeam from "../../hooks/useFetchTeam";
 import AddUser from "../../components/Modal/AddUser";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function TeamPage() {
   const API_URL = import.meta.env.VITE_API_KEY;
 
   const { team, loading, error, refetch } = useFetchTeam(API_URL);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roles, setRoles] = useState();
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -18,17 +17,6 @@ function TeamPage() {
   const openModal = () => {
     setIsModalOpen(true);
   };
-
-  const transformTaskRoles = (teamData) => {
-    return [...new Set(teamData.flatMap((task) => task.roles))];
-  };
-
-  useEffect(() => {
-    const uniqueRoles = transformTaskRoles(team);
-    setRoles(uniqueRoles);
-    const translatedRole = getTranslatedRole(uniqueRoles);
-    console.log("translatedRole", translatedRole);
-  }, [team]);
 
   return (
     <section className="container">
