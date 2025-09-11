@@ -87,19 +87,28 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
     setIsLoading(true);
     setError("");
 
-    if (password !== confirmPassword) {
+    if (password && password !== confirmPassword) {
       setError("Пароли не совпадают");
       setIsLoading(false);
       return;
     }
 
     try {
-      const formData = {
-        name,
-        password,
-        telegram_id: telegram,
-        roles: [roles],
-      };
+      // Создаем объект только с заполненными полями
+      const formData = {};
+
+      if (name) formData.name = name;
+      if (password) formData.password = password;
+      if (telegram !== undefined) formData.telegram_id = telegram;
+      if (roles) formData.roles = [roles];
+
+      // Проверяем, есть ли хоть одно поле для обновления
+      if (Object.keys(formData).length === 0) {
+        setError("Нет данных для обновления");
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(`${API_URL}/users/${id}`, {
         method: "PATCH",
         headers: {
@@ -111,28 +120,29 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-
         throw new Error(
-          errorData.message || "Ошибка при создании пользователя"
+          errorData.message || "Ошибка при обновлении пользователя"
         );
       }
+
+      // Сбрасываем состояние только после успешного обновления
       setName("");
       setPassword("");
       setConfirmPassword("");
       setTelegram("");
       setRoles("");
       setIsLoading(false);
+
       if (onUserCreated) {
         onUserCreated();
       }
 
       onClose();
     } catch (err) {
-      setError(err.message || "Произошла ошибка при создании пользователя");
+      setError(err.message || "Произошла ошибка при обновлении пользователя");
       setIsLoading(false);
     }
   };
-
   if (!isOpen) return null;
 
   return (
