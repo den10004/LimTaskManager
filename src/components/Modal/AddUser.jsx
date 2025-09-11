@@ -83,7 +83,6 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
   };
 
   const handleUpdateUser = async (e) => {
-    console.log("sd");
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -152,7 +151,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
             <label>Имя:</label>
             <input
               type="text"
-              required
+              required={mode === "create"}
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isLoading}
@@ -164,7 +163,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               <label>Email:</label>
               <input
                 type="email"
-                required
+                required={mode === "create"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -177,7 +176,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
             <label>Пароль:</label>
             <input
               type="password"
-              required
+              required={mode === "create"}
               value={password}
               onChange={handlePasswordChange}
               disabled={isLoading}
@@ -189,7 +188,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
             <label>Повторите пароль:</label>
             <input
               type="password"
-              required
+              required={mode === "create"}
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
               disabled={isLoading}
@@ -214,8 +213,8 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               id="role"
               name="role"
               value={roles}
+              required={mode === "create"}
               onChange={(e) => setRoles(e.target.value)}
-              required
             >
               <option value="">Выберите роль</option>
               {Object.entries(roleTranslations).map(([key, value]) => (
