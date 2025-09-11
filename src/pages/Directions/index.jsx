@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
-import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
+import { restrictedDirections } from "../../utils/rolesTranslations";
+import "./style.css";
+import { useAuth } from "../../contexts/AuthContext";
 
 function Directions() {
+  const { userData } = useAuth();
+  const rolesUser = userData.roles.join("");
+
   const [direction, setDirection] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,12 +96,6 @@ function Directions() {
     }
   };
 
-  const restrictedDirections = [
-    "Дистрибуция",
-    "Партнерская программа",
-    "Строительство",
-  ];
-
   return (
     <section className="container">
       <h3 className="h3-mtmb">Направления</h3>
@@ -127,19 +126,23 @@ function Directions() {
                       {task.name}
                       {!restrictedDirections.includes(task.name) && (
                         <div style={{ display: "flex", marginLeft: "auto" }}>
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDelete(task.id)}
-                          >
-                            Удалить
-                          </button>
-                          <button
-                            style={{ marginLeft: "10px" }}
-                            className="create-btn"
-                            onClick={() => handleEdit(task)}
-                          >
-                            Исправить
-                          </button>
+                          {rolesUser === "admin" && (
+                            <>
+                              <button
+                                className="delete-btn"
+                                onClick={() => handleDelete(task.id)}
+                              >
+                                Удалить
+                              </button>
+                              <button
+                                style={{ marginLeft: "10px" }}
+                                className="create-btn"
+                                onClick={() => handleEdit(task)}
+                              >
+                                Исправить
+                              </button>
+                            </>
+                          )}
                         </div>
                       )}
                     </td>
@@ -155,9 +158,11 @@ function Directions() {
         </div>
       )}
 
-      <button className="create-btn" onClick={openModal}>
-        Добавить
-      </button>
+      {rolesUser === "admin" && (
+        <button className="create-btn" onClick={openModal}>
+          Добавить
+        </button>
+      )}
 
       <DirectionModal
         isOpen={isModalOpen}

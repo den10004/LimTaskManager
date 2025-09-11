@@ -6,3 +6,9 @@ export const roleTranslations = {
 export const getTranslatedRole = (role) => {
   return roleTranslations[role] || role;
 };
+
+export const restrictedDirections = [
+  "Дистрибуция",
+  "Партнерская программа",
+  "Строительство",
+];

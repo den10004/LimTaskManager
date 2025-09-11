@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
 import useFetchTeam from "../../hooks/useFetchTeam";
 import AddUser from "../../components/Modal/AddUser";
-import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 function TeamPage() {
+  const { userData } = useAuth();
+  const rolesUser = userData.roles.join("");
   const API_URL = import.meta.env.VITE_API_KEY;
 
   const { team, loading, error, refetch } = useFetchTeam(API_URL);
@@ -67,12 +70,14 @@ function TeamPage() {
                         : "-"}
                     </td>
                     <td>
-                      <button
-                        className="create-btn"
-                        onClick={() => openEditModal(task.id)}
-                      >
-                        Редактирование
-                      </button>
+                      {rolesUser === "admin" && (
+                        <button
+                          className="create-btn"
+                          onClick={() => openEditModal(task.id)}
+                        >
+                          Редактирование
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -84,13 +89,15 @@ function TeamPage() {
             </div>
           )}
 
-          <button
-            type="submit"
-            className="create-btn"
-            onClick={openCreateModal}
-          >
-            Coздать пользователя
-          </button>
+          {rolesUser === "admin" && (
+            <button
+              type="submit"
+              className="create-btn"
+              onClick={openCreateModal}
+            >
+              Coздать пользователя
+            </button>
+          )}
         </div>
       )}
       <AddUser
