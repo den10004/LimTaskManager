@@ -141,6 +141,10 @@ select {
   max-width: 1200px;
 }
 
+.lastRow {
+  border: none !important;
+}
+
 @media screen and (max-width:1240px) {
   .container {
     padding: 0 20px;

@@ -50,7 +50,7 @@ function TeamPage() {
                   <th>Телеграм</th>
                   <th>Создан</th>
                   <th>Роль</th>
-                  <th></th>
+                  <th className="lastRow"></th>
                 </tr>
               </thead>
               <tbody>
@@ -69,7 +69,7 @@ function TeamPage() {
                           })
                         : "-"}
                     </td>
-                    <td>
+                    <td className="lastRow">
                       {rolesUser === "admin" && (
                         <button
                           className="create-btn"
