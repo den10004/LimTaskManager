@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/dateUtils";
+import { statusColors } from "../../utils/rolesTranslations";
 
 function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
@@ -8,10 +9,6 @@ function TaskTableRow({ task, directions, team }) {
 
   const handleRowClick = () => {
     navigate(`/tasks/${task.id}`);
-  };
-  const statusColors = {
-    "Задача просрочена": "red",
-    Новая: "#53c153",
   };
 
   const user = team.find((member) => member.id === task.assigned_user_id);
