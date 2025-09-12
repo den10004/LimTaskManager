@@ -97,7 +97,8 @@ function UserPage() {
                 <th>Описание</th>
                 <th>Текст</th>
                 <th>Статус</th>
-                <th>Ссылки</th>
+                {/*
+                <th>Ссылки</th>*/}
               </tr>
             </thead>
             <tbody id="tableBody">

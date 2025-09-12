@@ -30,6 +30,7 @@ function TaskTableRow({ task, directions, team }) {
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}
       </td>
+      {/*
       <td>
         {task.links && task.links.length > 0
           ? task.links.map((link, index) => (
@@ -40,7 +41,7 @@ function TaskTableRow({ task, directions, team }) {
               </div>
             ))
           : "-"}
-      </td>
+      </td>*/}
     </tr>
   );
 }
