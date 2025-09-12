@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
+import useFetchTeam from "../../hooks/useFetchTeam";
 
 const formStyle = {
   marginTop: "10px",
@@ -41,6 +42,12 @@ function TaskDetails() {
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
+  const { team } = useFetchTeam(API_URL);
+
+  const getUserName = (userId) => {
+    const foundUser = team.find((user) => user.id === userId);
+    return foundUser ? foundUser.name : "Неизвестный пользователь";
+  };
 
   const fetchTaskById = async (id) => {
     const token = getCookie("authTokenPM");
@@ -343,7 +350,8 @@ function TaskDetails() {
                       <div key={index} style={commentsWrap}>
                         <div>{comment.text || "Комментарий отсутствует"}</div>
                         <div style={comments}>
-                          <b>Дата создания:</b>{" "}
+                          <b>{getUserName(comment.user_id)},&nbsp;</b>
+                          <b>Дата создания:&nbsp;</b>
                           {formatDate(comment.created_at) || "Не указано"}
                         </div>
                       </div>
@@ -367,7 +375,7 @@ function TaskDetails() {
               <button
                 className="create-btn modal-button"
                 style={{ width: "200px" }}
-                disabled={commentLoading}
+                disabled={commentLoading || comment.length === 0}
               >
                 {commentLoading ? "Отправка..." : "Создать комментарий"}
               </button>
