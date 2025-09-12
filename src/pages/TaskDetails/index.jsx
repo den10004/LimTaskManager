@@ -4,6 +4,7 @@ import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import useFetchTeam from "../../hooks/useFetchTeam";
+import { taskStatus } from "../../utils/rolesTranslations";
 
 const formStyle = {
   marginTop: "10px",
@@ -39,10 +40,13 @@ function TaskDetails() {
   const [fileLoading, setFileLoading] = useState(false);
   const [direction, setDirection] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [statusLoading, setStatusLoading] = useState(false); // Добавляем состояние для загрузки статуса
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useFetchTeam(API_URL);
+  const token = getCookie("authTokenPM");
 
   const getUserName = (userId) => {
     const foundUser = team.find((user) => user.id === userId);
@@ -50,8 +54,6 @@ function TaskDetails() {
   };
 
   const fetchTaskById = async (id) => {
-    const token = getCookie("authTokenPM");
-
     if (!token) {
       throw new Error("Токен авторизации отсутствует");
     }
@@ -99,21 +101,18 @@ function TaskDetails() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Обработчик события drag over
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   }, []);
 
-  // Обработчик события drag leave
   const handleDragLeave = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   }, []);
 
-  // Обработчик события drop
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -125,7 +124,6 @@ function TaskDetails() {
     }
   }, []);
 
-  // Обработчик клика по области загрузки
   const handleAreaClick = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -136,7 +134,6 @@ function TaskDetails() {
     e.preventDefault();
     setCommentLoading(true);
     setError("");
-    const token = getCookie("authTokenPM");
 
     if (!token) {
       setError("Токен авторизации отсутствует");
@@ -180,7 +177,6 @@ function TaskDetails() {
 
     setFileLoading(true);
     setError("");
-    const token = getCookie("authTokenPM");
 
     if (!token) {
       setError("Токен авторизации отсутствует");
@@ -265,6 +261,63 @@ function TaskDetails() {
     return foundDirection ? foundDirection.name : "Не указано";
   };
 
+  useEffect(() => {
+    if (task && task.status) {
+      setSelectedStatus(task.status);
+    }
+  }, [task]);
+
+  const updateStatus = async (id) => {
+    if (!selectedStatus) {
+      setError("Выберите статус");
+      return;
+    }
+
+    setError("");
+    setStatusLoading(true);
+
+    if (!token) {
+      setError("Токен авторизации отсутствует");
+      setStatusLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/task/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: selectedStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Ошибка обновления статуса");
+      }
+
+      const updatedTask = await response.json();
+      setTask((prevTask) => ({
+        ...prevTask,
+        status: updatedTask.status,
+      }));
+    } catch (err) {
+      console.error(err);
+      setError("Ошибка обновления статуса: " + err.message);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    setSelectedStatus(event.target.value);
+  };
+
+  const handleStatusSubmit = (e) => {
+    e.preventDefault();
+    updateStatus(id);
+  };
+
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -304,6 +357,7 @@ function TaskDetails() {
               <li>
                 <b>Текст:</b> {task.title || "Не указано"}
               </li>
+
               {task.links && (
                 <li style={{ display: "flex" }}>
                   <b>Ссылки: </b>
@@ -322,6 +376,43 @@ function TaskDetails() {
                   </div>
                 </li>
               )}
+
+              <li>
+                <form
+                  onSubmit={handleStatusSubmit}
+                  style={{
+                    ...formStyle,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <label htmlFor="status">
+                    <b>Статус:&nbsp;</b>
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={selectedStatus}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Выберите статус</option>
+                    {taskStatus.map((status, index) => (
+                      <option key={index} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
+                  &nbsp;
+                  <button
+                    className="create-btn modal-button"
+                    style={{ width: "200px" }}
+                    disabled={statusLoading || !selectedStatus}
+                  >
+                    {statusLoading ? "Обновление..." : "Обновить статус"}
+                  </button>
+                </form>
+              </li>
               {task.files && (
                 <li style={{ display: "flex" }}>
                   <b>Файлы: </b>
