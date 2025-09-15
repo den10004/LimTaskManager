@@ -45,7 +45,7 @@ function Header() {
                     isActive ? "nav-link active" : "nav-link"
                   }
                 >
-                  Дашборд
+                  Задачи
                 </NavLink>
               </li>
               <li>

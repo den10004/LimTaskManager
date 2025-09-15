@@ -145,6 +145,41 @@ select {
   border: none !important;
 }
 
+
+.container-scroll {
+  max-width: 1200px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+thead>tr {
+  background-color: #f1f5f9;
+}
+
+
+table {
+  border-collapse: collapse;
+  width: 1200px;
+  margin: 20px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+th,
+td {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  overflow-wrap: break-word;
+  white-space: normal;
+  padding: 8px;
+}
+
+tr:hover td {
+  background-color: #f8fafc;
+}
+
+
 @media screen and (max-width:1240px) {
   .container {
     padding: 0 20px;

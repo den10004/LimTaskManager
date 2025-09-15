@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
-//import useFetchTeam from "../../hooks/useFetchTeam";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import "./style.css";
 
 const addBtn = {
   display: "flex",
