@@ -13,6 +13,7 @@ import TaskDetails from "./pages/TaskDetails";
 import Directions from "./pages/Directions";
 import User from "./pages/User";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { TeamProvider } from "./contexts/TeamContext";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,54 +28,56 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <Header />
-          <Routes>
-            <Route path="/" element={<MainPage />} />
-            <Route
-              path="/user"
-              element={
-                <ProtectedRoute>
-                  <User />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/team"
-              element={
-                <ProtectedRoute>
-                  <TeamPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/tasks/:id"
-              element={
-                <ProtectedRoute>
-                  <TaskDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/directions"
-              element={
-                <ProtectedRoute>
-                  <Directions />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <ProtectedRoute>
-                  <CreatePage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </Router>
+      <TeamProvider>
+        <Router>
+          <div className="App">
+            <Header />
+            <Routes>
+              <Route path="/" element={<MainPage />} />
+              <Route
+                path="/user"
+                element={
+                  <ProtectedRoute>
+                    <User />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/team"
+                element={
+                  <ProtectedRoute>
+                    <TeamPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tasks/:id"
+                element={
+                  <ProtectedRoute>
+                    <TaskDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/directions"
+                element={
+                  <ProtectedRoute>
+                    <Directions />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <CreatePage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </TeamProvider>
     </AuthProvider>
   );
 }

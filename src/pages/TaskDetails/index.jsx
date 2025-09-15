@@ -40,8 +40,8 @@ function TaskDetails() {
   const [fileLoading, setFileLoading] = useState(false);
   const [direction, setDirection] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [statusLoading, setStatusLoading] = useState(false); // Добавляем состояние для загрузки статуса
+  const [selectedStatus, setSelectedStatus] = useState(""); // Инициализация пустой строкой
+  const [statusLoading, setStatusLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -88,6 +88,12 @@ function TaskDetails() {
         setIsLoading(true);
         const taskData = await fetchTaskById(id);
         setTask(taskData);
+        // Устанавливаем selectedStatus только если task.status существует и входит в taskStatus
+        setSelectedStatus(
+          taskData.status && taskStatus.includes(taskData.status)
+            ? taskData.status
+            : ""
+        );
       } catch (err) {
         setError(err.message);
       } finally {
@@ -260,12 +266,6 @@ function TaskDetails() {
     const foundDirection = direction.find((dir) => dir.id === direction_id);
     return foundDirection ? foundDirection.name : "Не указано";
   };
-
-  useEffect(() => {
-    if (task && task.status) {
-      setSelectedStatus(task.status);
-    }
-  }, [task]);
 
   const updateStatus = async (id) => {
     if (!selectedStatus) {

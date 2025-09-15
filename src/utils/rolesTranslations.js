@@ -23,7 +23,7 @@ export const taskStatus = [
 
 export const statusColors = {
   "Задача просрочена": "red",
-  Новая: "#90972bff",
+  Новая: "#24c5eeff",
   "Задача выполнена": "#2eac08ff",
   "Задача принята в работу": "#0950d3ff",
 };

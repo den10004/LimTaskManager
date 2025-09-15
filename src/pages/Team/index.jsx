@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
 import { getTranslatedRole } from "../../utils/rolesTranslations";
-import useFetchTeam from "../../hooks/useFetchTeam";
 import AddUser from "../../components/Modal/AddUser";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTeam } from "../../contexts/TeamContext";
 
 function TeamPage() {
   const { userData } = useAuth();
+  const { team, loading, error, refetch } = useTeam();
   const rolesUser = userData.roles.join("");
-  const API_URL = import.meta.env.VITE_API_KEY;
-
-  const { team, loading, error, refetch } = useFetchTeam(API_URL);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
   const [selectedTaskId, setSelectedTaskId] = useState(null);
