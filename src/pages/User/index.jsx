@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
-import useFetchTeam from "../../hooks/useFetchTeam";
+//import useFetchTeam from "../../hooks/useFetchTeam";
+import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import "./style.css";
 
@@ -73,7 +74,8 @@ function UserPage() {
     fetchTasks(newOffset, newLimit);
   };
 
-  const { team } = useFetchTeam(API_URL);
+  //const { team } = useFetchTeam(API_URL);
+  const { team } = useTeam();
 
   return (
     <section className="container">

@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import useFetchTeam from "../../hooks/useFetchTeam";
+import { useTeam } from "../../contexts/TeamContext";
 import { taskStatus } from "../../utils/rolesTranslations";
 
 const formStyle = {
@@ -45,7 +45,7 @@ function TaskDetails() {
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
-  const { team } = useFetchTeam(API_URL);
+  const { team } = useTeam();
   const token = getCookie("authTokenPM");
 
   const getUserName = (userId) => {

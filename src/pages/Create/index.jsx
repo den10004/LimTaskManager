@@ -1,6 +1,6 @@
 import AddFiles from "../../components/AddFiles/AddFiles";
+import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import useFetchTeam from "../../hooks/useFetchTeam";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
@@ -157,7 +157,7 @@ function CreatePage() {
     }
   };
 
-  const { team, loading, error: teamError } = useFetchTeam(API_URL);
+  const { team, loading, error: teamError } = useTeam();
 
   return (
     <section className="page" style={{ flex: 1 }}>
