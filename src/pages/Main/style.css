@@ -74,10 +74,6 @@
     border-bottom: 1px solid var(--color-input);
 }
 
-
-
-
-
 .calendar-day.today .day-number {
     background: var(--color-err);
     color: var(--color-background);
@@ -110,12 +106,10 @@
 
 .event {
     background: var(--color-blue);
-    color: white;
     padding: 4px 6px;
     border-radius: 4px;
     font-size: 11px;
     margin-bottom: 2px;
-    cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -143,6 +137,7 @@
 .event-time {
     font-size: 9px;
     opacity: 0.9;
+    color: var(--color-background);
     margin-right: 4px;
 }
 
@@ -154,6 +149,7 @@
 
 .event-description {
     font-weight: 500;
+    color: var(--color-background);
 }
 
 .loading {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import "./style.css";
 import { getCookie } from "../../utils/getCookies";
+import "./style.css";
 
 function MainPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -157,10 +157,19 @@ function MainPage() {
           <div className="day-number">{day}</div>
           <div className="events">
             {dayEvents.map((event) => (
-              <div
+              <a
                 key={`${event.id}-${event.date.getTime()}`}
                 className={getEventClassName(event)}
                 title={getEventTitle(event)}
+                href={`/tasks/${event.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "block",
+                  textDecoration: "none",
+                  color: "inherit",
+                  cursor: "pointer",
+                }}
               >
                 {event.isStartDay && (
                   <span className="event-time">
@@ -177,7 +186,7 @@ function MainPage() {
                     {formatEventTime(event.dueAt)}
                   </span>
                 )}
-              </div>
+              </a>
             ))}
           </div>
         </div>
