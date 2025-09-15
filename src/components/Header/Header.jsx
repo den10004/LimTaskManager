@@ -40,7 +40,7 @@ function Header() {
               </li>
               <li>
                 <NavLink
-                  to="/"
+                  to="/calendar"
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"
                   }

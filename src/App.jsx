@@ -10,6 +10,7 @@ import CreatePage from "./pages/Create";
 import MainPage from "./pages/Main";
 import TaskDetails from "./pages/TaskDetails";
 import Directions from "./pages/Directions";
+import Calendar from "./pages/Calendar";
 import User from "./pages/User";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { TeamProvider } from "./contexts/TeamContext";
@@ -33,6 +34,15 @@ function App() {
             <Header />
             <Routes>
               <Route path="/" element={<MainPage />} />
+
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/user"
                 element={
