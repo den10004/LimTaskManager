@@ -104,7 +104,7 @@ function Directions() {
       ) : error ? (
         <div className="error error-message">{error}</div>
       ) : (
-        <div>
+        <div className="container-scroll">
           {direction.length > 0 ? (
             <table>
               <thead>
@@ -136,7 +136,7 @@ function Directions() {
                               </button>
                               <button
                                 style={{ marginLeft: "10px" }}
-                                className="create-btn"
+                                className="change-btn"
                                 onClick={() => handleEdit(task)}
                               >
                                 Исправить
@@ -159,7 +159,11 @@ function Directions() {
       )}
 
       {rolesUser === "admin" && (
-        <button className="create-btn" onClick={openModal}>
+        <button
+          className="create-btn"
+          style={{ marginTop: "20px" }}
+          onClick={openModal}
+        >
           Добавить
         </button>
       )}

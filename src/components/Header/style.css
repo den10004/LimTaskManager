@@ -29,9 +29,9 @@ header>ul>li {
 
 
 .nav-link.active {
-    color: #007bff;
+    color: var(--color-blue);
     font-weight: bold;
-    border-bottom: 2px solid #007bff;
+    border-bottom: 2px solid var(--color-blue);
 }
 
 

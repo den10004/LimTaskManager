@@ -70,7 +70,7 @@ function TeamPage() {
                     <td className="lastRow">
                       {rolesUser === "admin" && (
                         <button
-                          className="create-btn"
+                          className="change-btn"
                           onClick={() => openEditModal(task.id)}
                         >
                           Редактирование
