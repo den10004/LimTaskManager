@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
+import { colorMap } from "../../utils/rolesTranslations";
 
 function MainPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -9,7 +10,12 @@ function MainPage() {
 
   useEffect(() => {
     loadEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getDirectionColor = (directionId) => {
+    return colorMap[directionId] || "#26ddebff";
+  };
 
   const loadEvents = async () => {
     const API_URL = import.meta.env.VITE_API_KEY;
@@ -62,7 +68,9 @@ function MainPage() {
               isStartDay: currentDay.getTime() === startDate.getTime(),
               isEndDay: currentDay.getTime() === endDate.getTime(),
               isMultiDay: startDate.getTime() !== endDate.getTime(),
-              status: event.status, // сохраняем статус для возможного использования
+              status: event.status,
+              directionId: event.direction_id,
+              color: getDirectionColor(event.direction_id),
             });
 
             currentDay.setDate(currentDay.getDate() + 1);
@@ -172,6 +180,8 @@ function MainPage() {
                   textDecoration: "none",
                   color: "inherit",
                   cursor: "pointer",
+                  backgroundColor: event.color, // добавляем цвет фона
+                  borderLeft: `4px solid ${event.color}`, // добавляем цветную полосу слева
                 }}
               >
                 {event.isStartDay && (

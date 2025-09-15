@@ -27,3 +27,9 @@ export const statusColors = {
   "Задача выполнена": "#2eac08ff",
   "Задача принята в работу": "#0950d3ff",
 };
+
+export const colorMap = {
+  44247: "#ff6b6b",
+  44086: "#4e96e9ff",
+  43668: "#1bb830ff",
+};

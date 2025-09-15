@@ -350,7 +350,7 @@ function TaskDetails() {
                 {formatDate(task.created_at) || "Не указано"}
               </li>
               <li>
-                <b>Дата завершения:</b>{" "}
+                <b>Срок выполнения:</b>{" "}
                 {formatDate(task.due_at) || "Не указано"}
               </li>
               <li>
