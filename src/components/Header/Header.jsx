@@ -29,10 +29,10 @@ function Header() {
     <>
       <header>
         <div>
-          <NavLink to="/">Limaudio Project Management</NavLink>
+          <NavLink to="/">Limaudio Project Management</NavLink>{" "}
+          {userData && <b>{userData.email}</b>}
         </div>
         <ul>
-          {userData && <b>{userData.email}</b>}
           {isAuthenticated && (
             <>
               <li>
