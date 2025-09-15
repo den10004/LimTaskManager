@@ -43,7 +43,9 @@ function MainPage() {
           if (endDate < startDate) {
             endDate.setDate(startDate.getDate());
           }
+          endDate.setHours(23, 59, 59, 999);
           const currentDay = new Date(startDate);
+          currentDay.setHours(0, 0, 0, 0);
           while (currentDay <= endDate) {
             const dateKey = currentDay.toDateString();
 

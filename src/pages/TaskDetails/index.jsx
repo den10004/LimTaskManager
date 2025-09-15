@@ -346,7 +346,12 @@ function TaskDetails() {
                 <b>Пользователь:</b> {task.id || "Не указано"}
               </li>
               <li>
-                <b>Дата создания:</b> {formatDate(task.due_at) || "Не указано"}
+                <b>Дата создания:</b>{" "}
+                {formatDate(task.created_at) || "Не указано"}
+              </li>
+              <li>
+                <b>Дата завершения:</b>{" "}
+                {formatDate(task.due_at) || "Не указано"}
               </li>
               <li>
                 <b>Направление:</b> {getDirectionName(task.direction_id)}
