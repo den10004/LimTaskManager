@@ -73,6 +73,31 @@ function UserPage() {
   };
   const { team } = useTeam();
 
+  const handleDeleteTask = async (taskId) => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
+
+      const response = await fetch(`${API_URL}/task/${taskId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка HTTPS: ${response.status}`);
+      }
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    } catch (err) {
+      console.error("Ошибка при удалении задачи:", err.message);
+      alert("Не удалось удалить задачу");
+    }
+  };
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
@@ -94,8 +119,6 @@ function UserPage() {
                 <th>Направление</th>
                 <th>Название</th>
                 <th>Статус</th>
-                {/*
-                <th>Ссылки</th>*/}
               </tr>
             </thead>
             <tbody id="tableBody">
@@ -106,6 +129,7 @@ function UserPage() {
                     task={task}
                     directions={directions}
                     team={team}
+                    onDelete={handleDeleteTask}
                   />
                 ))
               ) : (
