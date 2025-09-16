@@ -5,6 +5,7 @@ import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import { taskStatus } from "../../utils/rolesTranslations";
+import DateModal from "../../components/Modal/DateModal";
 
 const formStyle = {
   marginTop: "10px",
@@ -26,26 +27,6 @@ const comments = {
 };
 const taskHeader = {
   margin: "30px 0",
-};
-const datePickerModal = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  backgroundColor: "#fff",
-  padding: "20px",
-  borderRadius: "5px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-  zIndex: 1000,
-};
-const overlay = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: "rgba(0,0,0,0.5)",
-  zIndex: 999,
 };
 
 function TaskDetails() {
@@ -340,7 +321,7 @@ function TaskDetails() {
     updateStatus(id);
   };
 
-  const updateDueDate = async () => {
+  const updateDueDate = async (newDueDate) => {
     if (!newDueDate) {
       setError("Выберите дату и время");
       return;
@@ -615,43 +596,13 @@ function TaskDetails() {
             </form>
 
             {showDatePicker && (
-              <>
-                <div
-                  style={overlay}
-                  onClick={() => setShowDatePicker(false)}
-                  className="modal-backdrop"
-                />
-                <div style={datePickerModal}>
-                  <h2>Выберите срок выполнения</h2>
-                  <input
-                    type="datetime-local"
-                    value={newDueDate}
-                    onChange={(e) => setNewDueDate(e.target.value)}
-                    style={{
-                      marginBottom: "10px",
-                      width: "100%",
-                      zIndex: 1002,
-                    }}
-                  />
-                  <div style={{ display: "flex", gap: "10px", zIndex: 1002 }}>
-                    <button
-                      className="create-btn modal-button"
-                      onClick={updateDueDate}
-                      disabled={dateLoading || !newDueDate}
-                      style={{ zIndex: 1002 }}
-                    >
-                      {dateLoading ? "Сохранение..." : "Сохранить"}
-                    </button>
-                    <button
-                      className="create-btn modal-button"
-                      onClick={() => setShowDatePicker(false)}
-                      style={{ zIndex: 1002 }}
-                    >
-                      Отмена
-                    </button>
-                  </div>
-                </div>
-              </>
+              <DateModal
+                isOpen={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                onSave={updateDueDate}
+                initialDate={newDueDate}
+                loading={dateLoading}
+              />
             )}
           </div>
         </>
