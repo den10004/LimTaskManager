@@ -391,9 +391,9 @@ function TaskDetails() {
               <li>
                 <b>Пользователь:</b> {task.id || "Не указано"}
               </li>
-              <li>
-                <b>Срок выполнения:</b>{" "}
-                {formatDate(task.due_at) || "Не указано"}
+              <li style={{ display: "flex", alignItems: "center" }}>
+                <b>Срок выполнения:&nbsp;</b>
+                {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
                 <button
                   className="create-btn"
                   onClick={() => setShowDatePicker(true)}
@@ -413,7 +413,7 @@ function TaskDetails() {
 
               {task.links && (
                 <li style={{ display: "flex" }}>
-                  <b>Ссылки: </b>
+                  <b>Ссылки:&nbsp;</b>
                   <div style={{ marginLeft: "5px" }}>
                     {normalizeLinks(task.links).map((link, index) => (
                       <a
