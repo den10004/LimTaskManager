@@ -27,6 +27,26 @@ const comments = {
 const taskHeader = {
   margin: "30px 0",
 };
+const datePickerModal = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  backgroundColor: "#fff",
+  padding: "20px",
+  borderRadius: "5px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+  zIndex: 1000,
+};
+const overlay = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  zIndex: 999,
+};
 
 function TaskDetails() {
   const { id } = useParams();
@@ -40,8 +60,10 @@ function TaskDetails() {
   const [fileLoading, setFileLoading] = useState(false);
   const [direction, setDirection] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(""); // Инициализация пустой строкой
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [statusLoading, setStatusLoading] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [newDueDate, setNewDueDate] = useState("");
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -88,7 +110,6 @@ function TaskDetails() {
         setIsLoading(true);
         const taskData = await fetchTaskById(id);
         setTask(taskData);
-        // Устанавливаем selectedStatus только если task.status существует и входит в taskStatus
         setSelectedStatus(
           taskData.status && taskStatus.includes(taskData.status)
             ? taskData.status
@@ -318,6 +339,49 @@ function TaskDetails() {
     updateStatus(id);
   };
 
+  const updateDueDate = async () => {
+    if (!newDueDate) {
+      setError("Выберите дату и время");
+      return;
+    }
+    setError("");
+    setIsLoading(true);
+
+    if (!token) {
+      setError("Токен авторизации отсутствует");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/task/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ deadline: newDueDate }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Ошибка обновления срока выполнения");
+      }
+
+      const updatedTask = await response.json();
+      setTask((prevTask) => ({
+        ...prevTask,
+        deadline: updatedTask.deadline,
+      }));
+      setShowDatePicker(false);
+      setNewDueDate("");
+    } catch (err) {
+      console.error(err);
+      setError("Ошибка обновления срока выполнения: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -346,12 +410,14 @@ function TaskDetails() {
                 <b>Пользователь:</b> {task.id || "Не указано"}
               </li>
               <li>
-                <b>Дата создания:</b>{" "}
-                {formatDate(task.created_at) || "Не указано"}
-              </li>
-              <li>
                 <b>Срок выполнения:</b>{" "}
                 {formatDate(task.due_at) || "Не указано"}
+                <button
+                  className="create-btn"
+                  onClick={() => setShowDatePicker(true)}
+                >
+                  Изменить
+                </button>
               </li>
               <li>
                 <b>Направление:</b> {getDirectionName(task.direction_id)}
@@ -546,6 +612,46 @@ function TaskDetails() {
                 {fileLoading ? "Загрузка..." : "Загрузить файлы"}
               </button>
             </form>
+
+            {showDatePicker && (
+              <>
+                <div
+                  style={overlay}
+                  onClick={() => setShowDatePicker(false)}
+                  className="modal-backdrop"
+                />
+                <div style={datePickerModal}>
+                  <h2>Выберите срок выполнения</h2>
+                  <input
+                    type="datetime-local"
+                    value={newDueDate}
+                    onChange={(e) => setNewDueDate(e.target.value)}
+                    style={{
+                      marginBottom: "10px",
+                      width: "100%",
+                      zIndex: 1002,
+                    }}
+                  />
+                  <div style={{ display: "flex", gap: "10px", zIndex: 1002 }}>
+                    <button
+                      className="create-btn modal-button"
+                      onClick={updateDueDate}
+                      disabled={loading || !newDueDate}
+                      style={{ zIndex: 1002 }}
+                    >
+                      {loading ? "Сохранение..." : "Сохранить"}
+                    </button>
+                    <button
+                      className="create-btn modal-button"
+                      onClick={() => setShowDatePicker(false)}
+                      style={{ zIndex: 1002 }}
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </>
       ) : (
