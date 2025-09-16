@@ -64,6 +64,7 @@ function TaskDetails() {
   const [statusLoading, setStatusLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
+  const [dateLoading, setDateLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -345,11 +346,11 @@ function TaskDetails() {
       return;
     }
     setError("");
-    setIsLoading(true);
+    setDateLoading(true);
 
     if (!token) {
       setError("Токен авторизации отсутствует");
-      setIsLoading(false);
+      setDateLoading(false);
       return;
     }
 
@@ -370,7 +371,7 @@ function TaskDetails() {
       const updatedTask = await response.json();
       setTask((prevTask) => ({
         ...prevTask,
-        deadline: updatedTask.deadline,
+        due_at: updatedTask.due_at || updatedTask.deadline,
       }));
       setShowDatePicker(false);
       setNewDueDate("");
@@ -378,7 +379,7 @@ function TaskDetails() {
       console.error(err);
       setError("Ошибка обновления срока выполнения: " + err.message);
     } finally {
-      setIsLoading(false);
+      setDateLoading(false);
     }
   };
 
@@ -636,10 +637,10 @@ function TaskDetails() {
                     <button
                       className="create-btn modal-button"
                       onClick={updateDueDate}
-                      disabled={loading || !newDueDate}
+                      disabled={dateLoading || !newDueDate}
                       style={{ zIndex: 1002 }}
                     >
-                      {loading ? "Сохранение..." : "Сохранить"}
+                      {dateLoading ? "Сохранение..." : "Сохранить"}
                     </button>
                     <button
                       className="create-btn modal-button"
