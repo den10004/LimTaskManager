@@ -71,8 +71,6 @@ function UserPage() {
     setLimit(newLimit);
     fetchTasks(newOffset, newLimit);
   };
-
-  //const { team } = useFetchTeam(API_URL);
   const { team } = useTeam();
 
   return (
@@ -94,8 +92,7 @@ function UserPage() {
                 <th>Дата создания</th>
                 <th>Срок выполнения</th>
                 <th>Направление</th>
-                <th>Описание</th>
-                <th>Текст</th>
+                <th>Название</th>
                 <th>Статус</th>
                 {/*
                 <th>Ссылки</th>*/}

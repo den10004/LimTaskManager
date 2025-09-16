@@ -56,7 +56,7 @@ function TaskDetails() {
     const foundUser = team.find((user) => user.id === userId);
     return foundUser ? foundUser.name : "Неизвестный пользователь";
   };
-  console.log(task);
+
   const fetchTaskById = async (id) => {
     if (!token) {
       throw new Error("Токен авторизации отсутствует");
@@ -381,7 +381,9 @@ function TaskDetails() {
         <div className="error error-message">{error}</div>
       ) : task ? (
         <>
-          <h3 className="h3-mtmb">Задача #{task.id}</h3>
+          <h3 className="h3-mtmb">
+            Задача #{task.id} - {task.title || "Не указано"}
+          </h3>
           <div style={taskHeader}>
             <ul
               style={{
@@ -411,9 +413,6 @@ function TaskDetails() {
               </li>
               <li>
                 <b>Описание:</b> {task.description || "Не указано"}
-              </li>
-              <li>
-                <b>Текст:</b> {task.title || "Не указано"}
               </li>
 
               {task.links && (
