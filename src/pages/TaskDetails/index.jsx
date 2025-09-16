@@ -56,7 +56,7 @@ function TaskDetails() {
     const foundUser = team.find((user) => user.id === userId);
     return foundUser ? foundUser.name : "Неизвестный пользователь";
   };
-
+  console.log(task);
   const fetchTaskById = async (id) => {
     if (!token) {
       throw new Error("Токен авторизации отсутствует");
@@ -353,7 +353,12 @@ function TaskDetails() {
       setTask((prevTask) => ({
         ...prevTask,
         due_at: updatedTask.due_at || updatedTask.deadline,
+        status: updatedTask.status,
       }));
+      if (updatedTask.status) {
+        setSelectedStatus(updatedTask.status);
+      }
+
       setShowDatePicker(false);
       setNewDueDate("");
     } catch (err) {
@@ -373,7 +378,7 @@ function TaskDetails() {
       {loading ? (
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
-        <div className="error">Ошибка: {error}</div>
+        <div className="error error-message">{error}</div>
       ) : task ? (
         <>
           <h3 className="h3-mtmb">Задача #{task.id}</h3>
