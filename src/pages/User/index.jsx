@@ -72,7 +72,7 @@ function UserPage() {
     fetchTasks(newOffset, newLimit);
   };
   const { team } = useTeam();
-
+  /*
   const handleDeleteTask = async (taskId) => {
     try {
       const token = getCookie("authTokenPM");
@@ -97,7 +97,7 @@ function UserPage() {
       alert("Не удалось удалить задачу");
     }
   };
-
+*/
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
@@ -129,7 +129,8 @@ function UserPage() {
                     task={task}
                     directions={directions}
                     team={team}
-                    onDelete={handleDeleteTask}
+                    /*
+                    onDelete={handleDeleteTask}*/
                   />
                 ))
               ) : (

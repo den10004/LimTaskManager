@@ -369,6 +369,37 @@ function TaskDetails() {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    const isConfirmed = window.confirm(
+      `Вы уверены, что хотите удалить задачу "${task.title || "без названия"}"?`
+    );
+
+    if (isConfirmed) {
+      try {
+        const token = getCookie("authTokenPM");
+        if (!token) {
+          throw new Error("Токен авторизации отсутствует");
+        }
+
+        const response = await fetch(`${API_URL}/task/${taskId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`${response.status}`);
+        }
+        window.location.href = "/user";
+      } catch (err) {
+        console.error("Ошибка при удалении задачи:", err.message);
+        alert("Не удалось удалить задачу");
+      }
+    }
+  };
+
   return (
     <div>
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -598,7 +629,13 @@ function TaskDetails() {
                 {fileLoading ? "Загрузка..." : "Загрузить файлы"}
               </button>
             </form>
-
+            <button
+              className="delete-btn"
+              style={{ width: "200px", marginTop: "10px" }}
+              onClick={() => handleDeleteTask(task.id)}
+            >
+              Удалить
+            </button>
             {showDatePicker && (
               <DateModal
                 isOpen={showDatePicker}
