@@ -7,14 +7,16 @@ import { useTeam } from "../../contexts/TeamContext";
 
 function TeamPage() {
   const { userData } = useAuth();
-  const { team, loading, error, refetch } = useTeam();
+  const { team, loading, error } = useTeam();
   const rolesUser = userData.roles.join("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setSelectedUser(null);
+    setModalMode("");
   };
 
   const openCreateModal = () => {
@@ -22,10 +24,21 @@ function TeamPage() {
     setModalMode("create");
   };
 
-  const openEditModal = (taskId) => {
-    setSelectedTaskId(taskId);
+  const openEditModal = (user) => {
+    setSelectedUser(user);
     setModalMode("edit");
     setIsModalOpen(true);
+  };
+
+  const handleUserActionSuccess = (action, userData) => {
+    if (action === "create") {
+      team.unshift(userData);
+    } else if (action === "edit" && selectedUser) {
+      const index = team.findIndex((u) => u.id === selectedUser.id);
+      if (index !== -1) {
+        team[index] = { ...team[index], ...userData };
+      }
+    }
   };
 
   return (
@@ -52,16 +65,16 @@ function TeamPage() {
                 </tr>
               </thead>
               <tbody>
-                {team.map((task) => (
-                  <tr key={task.id}>
-                    <td>{task.id}</td>
-                    <td>{task.name}</td>
-                    <td>{task.email}</td>
-                    <td>{task.telegram_id}</td>
-                    <td>{formatDate(task.created_at)}</td>
+                {team.map((user) => (
+                  <tr key={user.id}>
+                    <td>{user.id}</td>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.telegram_id}</td>
+                    <td>{formatDate(user.created_at)}</td>
                     <td>
-                      {task.roles && task.roles.length > 0
-                        ? task.roles.map((link, index) => {
+                      {user.roles && user.roles.length > 0
+                        ? user.roles.map((link, index) => {
                             const translatedRole = getTranslatedRole(link);
                             return <div key={index}>{translatedRole}</div>;
                           })
@@ -71,7 +84,7 @@ function TeamPage() {
                       {rolesUser === "admin" && (
                         <button
                           className="change-btn"
-                          onClick={() => openEditModal(task.id)}
+                          onClick={() => openEditModal(user)}
                         >
                           Редактирование
                         </button>
@@ -93,7 +106,7 @@ function TeamPage() {
               className="create-btn"
               onClick={openCreateModal}
             >
-              Coздать пользователя
+              Создать пользователя
             </button>
           )}
         </div>
@@ -101,9 +114,9 @@ function TeamPage() {
       <AddUser
         isOpen={isModalOpen}
         onClose={closeModal}
-        onUserCreated={refetch}
+        onUserCreated={handleUserActionSuccess}
         mode={modalMode}
-        id={selectedTaskId}
+        user={selectedUser}
       />
     </section>
   );

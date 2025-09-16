@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import { roleTranslations } from "../../utils/rolesTranslations";
 
-function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
+function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -15,6 +15,45 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+
+  useEffect(() => {
+    if (!isOpen) {
+      const timer = setTimeout(() => {
+        setName("");
+        setEmail("");
+        setTelegram("");
+        setPassword("");
+        setConfirmPassword("");
+        setRoles("");
+        setIsLoading(false);
+        setError("");
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (mode === "edit" && user) {
+        setName(user.name || "");
+        setEmail(user.email || "");
+        setTelegram(user.telegram_id || "");
+        setRoles(user.roles?.[0] || "");
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        setName("");
+        setEmail("");
+        setTelegram("");
+        setPassword("");
+        setConfirmPassword("");
+        setRoles("");
+      }
+      setIsLoading(false);
+      setError("");
+    }
+  }, [isOpen, mode, user]);
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -45,6 +84,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
         telegram_id: telegram,
         roles: [roles],
       };
+
       const response = await fetch(`${API_URL}/users`, {
         method: "POST",
         headers: {
@@ -56,7 +96,6 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-
         if (response.status === 409) {
           throw new Error("Пользователь с таким email уже существует");
         }
@@ -64,15 +103,11 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
           errorData.message || "Ошибка при создании пользователя"
         );
       }
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setTelegram("");
-      setRoles("");
-      setIsLoading(false);
+
+      const newUser = await response.json();
+
       if (onUserCreated) {
-        onUserCreated();
+        onUserCreated("create", newUser);
       }
 
       onClose();
@@ -94,7 +129,6 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
     }
 
     try {
-      // Создаем объект только с заполненными полями
       const formData = {};
 
       if (name) formData.name = name;
@@ -102,14 +136,13 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
       if (telegram !== undefined) formData.telegram_id = telegram;
       if (roles) formData.roles = [roles];
 
-      // Проверяем, есть ли хоть одно поле для обновления
       if (Object.keys(formData).length === 0) {
         setError("Нет данных для обновления");
         setIsLoading(false);
         return;
       }
 
-      const response = await fetch(`${API_URL}/users/${id}`, {
+      const response = await fetch(`${API_URL}/users/${user.id}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -125,16 +158,10 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
         );
       }
 
-      // Сбрасываем состояние только после успешного обновления
-      setName("");
-      setPassword("");
-      setConfirmPassword("");
-      setTelegram("");
-      setRoles("");
-      setIsLoading(false);
+      const updatedUser = await response.json();
 
       if (onUserCreated) {
-        onUserCreated();
+        onUserCreated("edit", updatedUser);
       }
 
       onClose();
@@ -143,6 +170,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
       setIsLoading(false);
     }
   };
+
   if (!isOpen) return null;
 
   return (
@@ -168,6 +196,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               placeholder="Введите имя"
             />
           </div>
+
           {mode === "create" && (
             <div className="form-group">
               <label>Email:</label>
@@ -177,7 +206,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                placeholder="Введите ваш email"
+                placeholder="Введите email"
               />
             </div>
           )}
@@ -190,7 +219,11 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               value={password}
               onChange={handlePasswordChange}
               disabled={isLoading}
-              placeholder="Введите пароль"
+              placeholder={
+                mode === "create"
+                  ? "Введите пароль"
+                  : "Оставьте пустым, если не меняете"
+              }
             />
           </div>
 
@@ -202,7 +235,11 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
               disabled={isLoading}
-              placeholder="Повторите пароль"
+              placeholder={
+                mode === "create"
+                  ? "Повторите пароль"
+                  : "Оставьте пустым, если не меняете"
+              }
             />
           </div>
 
@@ -220,11 +257,10 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
           <div className="form-group">
             <label>Роль:</label>
             <select
-              id="role"
-              name="role"
               value={roles}
               required={mode === "create"}
               onChange={(e) => setRoles(e.target.value)}
+              disabled={isLoading}
             >
               <option value="">Выберите роль</option>
               {Object.entries(roleTranslations).map(([key, value]) => (
@@ -246,7 +282,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, id }) {
               ? "Загрузка..."
               : mode === "create"
               ? "Создать"
-              : "Редактировать"}
+              : "Сохранить"}
           </button>
         </form>
         <button
