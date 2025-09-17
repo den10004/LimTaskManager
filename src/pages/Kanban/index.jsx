@@ -69,7 +69,12 @@ function Kanban() {
   };
 
   const taskSpans = tasks.map(getTaskSpan).filter((span) => span !== null);
-  console.log(taskSpans);
+
+  const formattedDates = uniqueDates.map((date) => {
+    const [year, month, day] = date.split("-");
+    return `${day}.${month}.${year}`;
+  });
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Доска</h3>
@@ -78,10 +83,10 @@ function Kanban() {
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
         <div className="error error-message">{error}</div>
-      ) : taskSpans ? (
+      ) : formattedDates ? (
         <div className="kanban-board" ref={boardRef}>
           <div className="date-header">
-            {uniqueDates.map((date) => (
+            {formattedDates.map((date) => (
               <div key={date} className="date-column">
                 {date}
               </div>
@@ -90,7 +95,7 @@ function Kanban() {
           <div
             className="task-grid"
             style={{
-              gridTemplateColumns: `repeat(${uniqueDates.length}, 8rem)`,
+              gridTemplateColumns: `repeat(${uniqueDates.length}, 10rem)`,
             }}
           >
             {taskSpans.map(({ task, startIndex, span }, index) => {
