@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../utils/getCookies";
-import "./style.css";
 import { colorMap } from "../../utils/rolesTranslations";
+import "./style.css";
 
 function MainPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -180,8 +180,8 @@ function MainPage() {
                   textDecoration: "none",
                   color: "inherit",
                   cursor: "pointer",
-                  backgroundColor: event.color, // добавляем цвет фона
-                  borderLeft: `4px solid ${event.color}`, // добавляем цветную полосу слева
+                  backgroundColor: event.color,
+                  borderLeft: `4px solid ${event.color}`,
                 }}
               >
                 {event.isStartDay && (
