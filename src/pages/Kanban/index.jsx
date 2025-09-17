@@ -10,6 +10,11 @@ function Kanban() {
   const boardRef = useRef(null);
   const { team } = useTeam();
 
+  // Состояния для перетаскивания
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
   const loadEvents = async () => {
     const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
@@ -43,6 +48,34 @@ function Kanban() {
   useEffect(() => {
     loadEvents();
   }, []);
+
+  // Обработчики для перетаскивания
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.pageX - boardRef.current.offsetLeft);
+    setScrollLeft(boardRef.current.scrollLeft);
+    boardRef.current.style.cursor = "grabbing";
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      setIsDragging(false);
+      boardRef.current.style.cursor = "grab";
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    boardRef.current.style.cursor = "grab";
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - boardRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Умножаем для более плавного скролла
+    boardRef.current.scrollLeft = scrollLeft - walk;
+  };
 
   const getUniqueDates = () => {
     const dates = new Set();
@@ -84,7 +117,14 @@ function Kanban() {
       ) : error ? (
         <div className="error error-message">{error}</div>
       ) : formattedDates ? (
-        <div className="kanban-board" ref={boardRef}>
+        <div
+          className="kanban-board"
+          ref={boardRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
           <div className="date-header">
             {formattedDates.map((date) => (
               <div key={date} className="date-column">
