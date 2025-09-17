@@ -40,6 +40,16 @@ function Header() {
               </li>
               <li>
                 <NavLink
+                  to="/kanban"
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  Доска
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/calendar"
                   className={({ isActive }) =>
                     isActive ? "nav-link active" : "nav-link"

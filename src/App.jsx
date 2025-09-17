@@ -14,6 +14,7 @@ import Calendar from "./pages/Calendar";
 import User from "./pages/User";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { TeamProvider } from "./contexts/TeamContext";
+import Kanban from "./pages/Kanban";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -34,6 +35,15 @@ function App() {
             <Header />
             <Routes>
               <Route path="/" element={<MainPage />} />
+
+              <Route
+                path="/kanban"
+                element={
+                  <ProtectedRoute>
+                    <Kanban />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route
                 path="/calendar"
