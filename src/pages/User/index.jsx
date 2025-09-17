@@ -10,8 +10,8 @@ const addBtn = {
 };
 
 function UserPage() {
-  const [tasks, setTasks] = useState([]);
-  const [filteredTasks, setFilteredTasks] = useState([]);
+  const [allTasks, setAllTasks] = useState([]); // Все задачи
+  const [displayedTasks, setDisplayedTasks] = useState([]); // Отображаемые задачи (с пагинацией)
   const [directions, setDirections] = useState([]);
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,14 +24,15 @@ function UserPage() {
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
 
-  const fetchTasks = async (newOffset, newLimit, fetchAll = false) => {
+  // Функция для загрузки ВСЕХ задач
+  const fetchAllTasks = async () => {
     try {
       const token = getCookie("authTokenPM");
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
 
-      const url = `${API_URL}/task?limit=${newLimit}&offset=${newOffset}`;
+      const url = `${API_URL}/task`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -46,20 +47,9 @@ function UserPage() {
       }
 
       const data = await response.json();
-
-      setTasks((prevTasks) => {
-        const existingIds = new Set(prevTasks.map((task) => task.id));
-        const newTasks = data.items.filter((task) => !existingIds.has(task.id));
-        return [...prevTasks, ...newTasks];
-      });
-
-      setHasMore(data.items.length === newLimit);
+      setAllTasks(data.items || []);
       setIsLoading(false);
-
-      if (fetchAll && data.items.length === newLimit) {
-        const nextOffset = newOffset + newLimit;
-        fetchTasks(nextOffset, newLimit, true);
-      }
+      setHasMore(false); // Все задачи загружены
     } catch (err) {
       console.error("Fetch error:", err.message);
       setError(`Ошибка загрузки данных: ${err.message}`);
@@ -70,32 +60,43 @@ function UserPage() {
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
-    fetchTasks(0, limit, searchName.trim() !== "");
+    fetchAllTasks(); // Загружаем все задачи
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Эффект для фильтрации, сортировки и пагинации
   useEffect(() => {
-    if (searchName.trim() === "") {
-      setFilteredTasks(tasks);
-    } else {
+    let result = allTasks;
+
+    // Фильтрация по имени
+    if (searchName.trim() !== "") {
       const lowerSearchName = searchName.toLowerCase();
-      setFilteredTasks(
-        tasks.filter((task) => {
-          const user = team.find(
-            (member) => member.id === task.assigned_user_id
-          );
-          return user?.name.toLowerCase().includes(lowerSearchName);
-        })
-      );
+      result = result.filter((task) => {
+        const user = team.find((member) => member.id === task.assigned_user_id);
+        return user?.name.toLowerCase().includes(lowerSearchName);
+      });
     }
-  }, [searchName, tasks, team]);
+
+    // Сортировка
+    if (sortDirection) {
+      result = [...result].sort((a, b) => {
+        const dateA = new Date(a.due_at || 0);
+        const dateB = new Date(b.due_at || 0);
+        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      });
+    }
+
+    // Применяем пагинацию
+    const paginatedResult = result.slice(0, offset + limit);
+    setDisplayedTasks(paginatedResult);
+
+    // Проверяем, есть ли еще задачи для загрузки
+    setHasMore(result.length > paginatedResult.length);
+  }, [allTasks, searchName, team, sortDirection, offset, limit]);
 
   const handleLoadMore = () => {
-    const newOffset = offset + 10;
-    const newLimit = limit + 20;
-    setOffset(newOffset);
-    setLimit(newLimit);
-    fetchTasks(newOffset, newLimit);
+    setOffset((prevOffset) => prevOffset + 10);
+    setLimit((prevLimit) => prevLimit + 20);
   };
 
   const handleSearch = (e) => {
@@ -103,21 +104,12 @@ function UserPage() {
     setSearchName(newSearchName);
     setOffset(0);
     setLimit(20);
-    setTasks([]);
-    setFilteredTasks([]);
-    setIsLoading(true);
-    setHasMore(true);
-    fetchTasks(0, 20, newSearchName.trim() !== "");
   };
 
   const handleSort = (direction) => {
-    const sortedTasks = [...filteredTasks].sort((a, b) => {
-      const dateA = new Date(a.due_at);
-      const dateB = new Date(b.due_at);
-      return direction === "asc" ? dateA - dateB : dateB - dateA;
-    });
-    setFilteredTasks(sortedTasks);
     setSortDirection(direction);
+    setOffset(0);
+    setLimit(20);
   };
 
   return (
@@ -175,8 +167,8 @@ function UserPage() {
               </tr>
             </thead>
             <tbody id="tableBody">
-              {filteredTasks.length > 0 ? (
-                filteredTasks.map((task) => (
+              {displayedTasks.length > 0 ? (
+                displayedTasks.map((task) => (
                   <TaskTableRow
                     key={task.id}
                     task={task}
@@ -186,7 +178,7 @@ function UserPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                  <td colSpan="8" style={{ textAlign: "center" }}>
                     Нет данных для отображения
                   </td>
                 </tr>
@@ -195,7 +187,7 @@ function UserPage() {
           </table>
         </div>
       )}
-      {hasMore && !loading && !error && !searchName.trim() && (
+      {hasMore && !loading && !error && (
         <button className="create-btn" style={addBtn} onClick={handleLoadMore}>
           Загрузить ещё
         </button>
