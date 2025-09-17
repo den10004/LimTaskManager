@@ -9,7 +9,8 @@
   --color-page: rgba(248, 250, 252, 1);
   --color-link: rgba(79, 70, 229, 1);
   --color-err: red;
-  --color-blue: #007bff
+  --color-blue: #007bff;
+  --color-green: rgba(33, 197, 140, 1)
 }
 
 * {
@@ -42,7 +43,7 @@ a {
 }
 
 nav ul li.active {
-  background-color: #f0f0f0;
+  background-color: var(--color-page);
   border-radius: 4px;
 }
 
@@ -77,7 +78,7 @@ button:disabled {
 }
 
 .create-btn {
-  background-color: rgba(33, 197, 140, 1);
+  background-color: var(--color-green);
   color: var(--color-background)
 }
 

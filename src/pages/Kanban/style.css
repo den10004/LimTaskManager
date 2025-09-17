@@ -55,3 +55,13 @@
     font-size: 18px;
     color: var(--color-text);
 }
+
+.bg-green-500 {
+    background-color: var(--color-green);
+    color: var(--color-background);
+}
+
+.bg-red-500 {
+    background-color: var(--color-err);
+    color: var(--color-background);
+}

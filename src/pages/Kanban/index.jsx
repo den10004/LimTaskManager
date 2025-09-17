@@ -69,7 +69,7 @@ function Kanban() {
   };
 
   const taskSpans = tasks.map(getTaskSpan).filter((span) => span !== null);
-
+  console.log(taskSpans);
   return (
     <section className="container">
       <h3 className="h3-mtmb">Доска</h3>
@@ -103,7 +103,13 @@ function Kanban() {
                 <a
                   key={task.id}
                   href={`/tasks/${task.id}`}
-                  className="task-bar"
+                  className={`task-bar ${
+                    task.status === "Задача выполнена"
+                      ? "bg-green-500 text-white"
+                      : task.status === "Задача просрочена"
+                      ? "bg-red-500 text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
                   style={{
                     gridColumn: `${startIndex} / ${startIndex + span}`,
                     gridRow: index + 1,
