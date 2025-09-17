@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 
@@ -6,6 +6,7 @@ function Kanban() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const boardRef = useRef(null);
 
   const loadEvents = async () => {
     const API_URL = import.meta.env.VITE_API_KEY;
@@ -41,6 +42,48 @@ function Kanban() {
     loadEvents();
   }, []);
 
+  // Drag-to-scroll functionality
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board) return;
+
+    let isDragging = false;
+    let startX;
+    let scrollLeft;
+
+    const startDragging = (e) => {
+      isDragging = true;
+      startX = e.pageX - board.offsetLeft;
+      scrollLeft = board.scrollLeft;
+      board.style.cursor = "grabbing";
+    };
+
+    const stopDragging = () => {
+      isDragging = false;
+      board.style.cursor = "grab";
+    };
+
+    const drag = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - board.offsetLeft;
+      const walk = (x - startX) * 1;
+      board.scrollLeft = scrollLeft - walk;
+    };
+
+    board.addEventListener("mousedown", startDragging);
+    board.addEventListener("mouseup", stopDragging);
+    board.addEventListener("mouseleave", stopDragging);
+    board.addEventListener("mousemove", drag);
+
+    return () => {
+      board.removeEventListener("mousedown", startDragging);
+      board.removeEventListener("mouseup", stopDragging);
+      board.removeEventListener("mouseleave", stopDragging);
+      board.removeEventListener("mousemove", drag);
+    };
+  }, []);
+
   // Extract unique dates from created_at and due_at
   const getUniqueDates = () => {
     const dates = new Set();
@@ -62,7 +105,8 @@ function Kanban() {
     const endDate = new Date(task.due_at).toISOString().split("T")[0];
     const startIndex = uniqueDates.indexOf(startDate) + 1; // +1 for grid column
     const endIndex = uniqueDates.indexOf(endDate) + 1;
-    if (startIndex === -1 || endIndex === -1) return null;
+    if (startIndex === -1 || endIndex === -1 || endIndex < startIndex)
+      return null;
     return { startIndex, span: endIndex - startIndex + 1, task };
   };
 
@@ -79,7 +123,7 @@ function Kanban() {
   return (
     <section className="container">
       <h3 className="h3-mtmb">Доска</h3>
-      <div className="kanban-board">
+      <div className="kanban-board" ref={boardRef}>
         <div className="date-header">
           {uniqueDates.map((date) => (
             <div key={date} className="date-column">
@@ -89,19 +133,14 @@ function Kanban() {
         </div>
         <div
           className="task-grid"
-          style={{
-            gridTemplateColumns: `repeat(${uniqueDates.length}, 16rem)`,
-          }}
+          style={{ gridTemplateColumns: `repeat(${uniqueDates.length}, 8rem)` }}
         >
           {taskSpans.map(({ task, startIndex, span }, index) => (
-            <a
-              href={`/tasks/${task.id}`}
+            <div
               key={task.id}
-              target="_blank"
-              rel="noopener noreferrer"
               className="task-bar"
               style={{
-                gridColumn: `${startIndex} / span ${span}`,
+                gridColumn: `${startIndex} / ${startIndex + span}`,
                 gridRow: index + 1,
               }}
             >
@@ -110,7 +149,7 @@ function Kanban() {
                 {new Date(task.created_at).toLocaleDateString()} -{" "}
                 {new Date(task.due_at).toLocaleDateString()}
               </p>
-            </a>
+            </div>
           ))}
         </div>
       </div>
