@@ -227,7 +227,7 @@ function MainPage() {
   }
 
   return (
-    <section className="calendar container">
+    <section className="container">
       <h3 className="h3-mtmb">Календарь</h3>
       <div className="calendar-header">
         <button onClick={() => navigateMonth(-1)} className="nav-button">

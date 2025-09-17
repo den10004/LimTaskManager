@@ -1,11 +1,3 @@
-.calendar {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: var(--color-page);
-    min-height: 100vh;
-}
-
 .calendar-header {
     display: flex;
     justify-content: space-between;

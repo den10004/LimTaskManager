@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
+import { useTeam } from "../../contexts/TeamContext";
 
 function Kanban() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const boardRef = useRef(null);
+  const { team } = useTeam();
 
   const loadEvents = async () => {
     const API_URL = import.meta.env.VITE_API_KEY;
@@ -42,49 +44,6 @@ function Kanban() {
     loadEvents();
   }, []);
 
-  // Drag-to-scroll functionality
-  useEffect(() => {
-    const board = boardRef.current;
-    if (!board) return;
-
-    let isDragging = false;
-    let startX;
-    let scrollLeft;
-
-    const startDragging = (e) => {
-      isDragging = true;
-      startX = e.pageX - board.offsetLeft;
-      scrollLeft = board.scrollLeft;
-      board.style.cursor = "grabbing";
-    };
-
-    const stopDragging = () => {
-      isDragging = false;
-      board.style.cursor = "grab";
-    };
-
-    const drag = (e) => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - board.offsetLeft;
-      const walk = (x - startX) * 1;
-      board.scrollLeft = scrollLeft - walk;
-    };
-
-    board.addEventListener("mousedown", startDragging);
-    board.addEventListener("mouseup", stopDragging);
-    board.addEventListener("mouseleave", stopDragging);
-    board.addEventListener("mousemove", drag);
-
-    return () => {
-      board.removeEventListener("mousedown", startDragging);
-      board.removeEventListener("mouseup", stopDragging);
-      board.removeEventListener("mouseleave", stopDragging);
-      board.removeEventListener("mousemove", drag);
-    };
-  }, []);
-
-  // Extract unique dates from created_at and due_at
   const getUniqueDates = () => {
     const dates = new Set();
     tasks.forEach((task) => {
@@ -98,7 +57,6 @@ function Kanban() {
 
   const uniqueDates = getUniqueDates();
 
-  // Calculate task spans for grid positioning
   const getTaskSpan = (task) => {
     if (!task.created_at || !task.due_at) return null;
     const startDate = new Date(task.created_at).toISOString().split("T")[0];
@@ -112,47 +70,60 @@ function Kanban() {
 
   const taskSpans = tasks.map(getTaskSpan).filter((span) => span !== null);
 
-  if (loading) {
-    return <div className="container">Загрузка...</div>;
-  }
-
-  if (error) {
-    return <div className="container error">Ошибка: {error}</div>;
-  }
-
   return (
     <section className="container">
       <h3 className="h3-mtmb">Доска</h3>
-      <div className="kanban-board" ref={boardRef}>
-        <div className="date-header">
-          {uniqueDates.map((date) => (
-            <div key={date} className="date-column">
-              {date}
-            </div>
-          ))}
+
+      {loading ? (
+        <div className="loading">Загрузка данных...</div>
+      ) : error ? (
+        <div className="error error-message">{error}</div>
+      ) : taskSpans ? (
+        <div className="kanban-board" ref={boardRef}>
+          <div className="date-header">
+            {uniqueDates.map((date) => (
+              <div key={date} className="date-column">
+                {date}
+              </div>
+            ))}
+          </div>
+          <div
+            className="task-grid"
+            style={{
+              gridTemplateColumns: `repeat(${uniqueDates.length}, 8rem)`,
+            }}
+          >
+            {taskSpans.map(({ task, startIndex, span }, index) => {
+              const user = team.find(
+                (member) => member.id === task.assigned_user_id
+              );
+              const userName = user ? user.name : "Пользователь не указан";
+
+              return (
+                <a
+                  key={task.id}
+                  href={`/tasks/${task.id}`}
+                  className="task-bar"
+                  style={{
+                    gridColumn: `${startIndex} / ${startIndex + span}`,
+                    gridRow: index + 1,
+                  }}
+                >
+                  <h5 className="task-title">Описание: {task.title}</h5>
+                  <p>Назначена: {userName}</p>
+                  <p>{task.status}</p>
+                  <p className="task-meta">
+                    {new Date(task.created_at).toLocaleDateString()} -{" "}
+                    {new Date(task.due_at).toLocaleDateString()}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
         </div>
-        <div
-          className="task-grid"
-          style={{ gridTemplateColumns: `repeat(${uniqueDates.length}, 8rem)` }}
-        >
-          {taskSpans.map(({ task, startIndex, span }, index) => (
-            <div
-              key={task.id}
-              className="task-bar"
-              style={{
-                gridColumn: `${startIndex} / ${startIndex + span}`,
-                gridRow: index + 1,
-              }}
-            >
-              <h5 className="task-title">{task.title}</h5>
-              <p className="task-meta">
-                {new Date(task.created_at).toLocaleDateString()} -{" "}
-                {new Date(task.due_at).toLocaleDateString()}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      ) : (
+        <div>Данные задачи отсутствуют</div>
+      )}
     </section>
   );
 }

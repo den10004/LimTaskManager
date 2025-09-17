@@ -8,7 +8,7 @@ import { useTeam } from "../../contexts/TeamContext";
 function TeamPage() {
   const { userData } = useAuth();
   const { team, loading, error } = useTeam();
-
+  const rolesUser = userData.roles.join("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -81,7 +81,7 @@ function TeamPage() {
                         : "-"}
                     </td>
                     <td className="lastRow">
-                      {userData.roles.includes("admin") && (
+                      {rolesUser === "admin" && (
                         <button
                           className="change-btn"
                           onClick={() => openEditModal(user)}
@@ -100,7 +100,7 @@ function TeamPage() {
             </div>
           )}
 
-          {userData.roles.includes("admin") && (
+          {rolesUser === "admin" && (
             <button
               type="submit"
               className="create-btn"
