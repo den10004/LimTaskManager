@@ -6,6 +6,7 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import { taskStatus } from "../../utils/rolesTranslations";
 import DateModal from "../../components/Modal/DateModal";
+import { useAuth } from "../../contexts/AuthContext";
 
 const formStyle = {
   marginTop: "10px",
@@ -50,6 +51,7 @@ function TaskDetails() {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
+  const { userData } = useAuth();
   const token = getCookie("authTokenPM");
 
   const getUserName = (userId) => {
@@ -629,13 +631,15 @@ function TaskDetails() {
                 {fileLoading ? "Загрузка..." : "Загрузить файлы"}
               </button>
             </form>
-            <button
-              className="delete-btn"
-              style={{ width: "200px", marginTop: "10px" }}
-              onClick={() => handleDeleteTask(task.id)}
-            >
-              Удалить
-            </button>
+            {userData.roles.includes("admin") && (
+              <button
+                className="delete-btn"
+                style={{ width: "200px", marginTop: "10px" }}
+                onClick={() => handleDeleteTask(task.id)}
+              >
+                Удалить
+              </button>
+            )}
             {showDatePicker && (
               <DateModal
                 isOpen={showDatePicker}
