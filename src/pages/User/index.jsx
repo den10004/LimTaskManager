@@ -22,40 +22,47 @@ function UserPage() {
   const [sortDirection, setSortDirection] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_KEY;
+  const { team } = useTeam();
 
-  const fetchTasks = async (newOffset, newLimit) => {
+  const fetchTasks = async (newOffset, newLimit, fetchAll = false) => {
     try {
       const token = getCookie("authTokenPM");
       if (!token) {
         throw new Error("Токен авторизации отсутствует");
       }
 
-      const response = await fetch(
-        `${API_URL}/task?limit=${newLimit}&offset=${newOffset}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const url = `${API_URL}/task?limit=${newLimit}&offset=${newOffset}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Ошибка HTTPS: ${response.status}`);
       }
 
       const data = await response.json();
+
       setTasks((prevTasks) => {
         const existingIds = new Set(prevTasks.map((task) => task.id));
         const newTasks = data.items.filter((task) => !existingIds.has(task.id));
         return [...prevTasks, ...newTasks];
       });
+
       setHasMore(data.items.length === newLimit);
       setIsLoading(false);
+
+      if (fetchAll && data.items.length === newLimit) {
+        const nextOffset = newOffset + newLimit;
+        fetchTasks(nextOffset, newLimit, true);
+      }
     } catch (err) {
-      console.error(err.message);
-      setError("Ошибка загрузки данных");
+      console.error("Fetch error:", err.message);
+      setError(`Ошибка загрузки данных: ${err.message}`);
       setIsLoading(false);
       setHasMore(false);
     }
@@ -63,12 +70,9 @@ function UserPage() {
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
-    fetchTasks(offset, limit);
-    fetchTasks(0, 50000);
+    fetchTasks(0, limit, searchName.trim() !== "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const { team } = useTeam();
 
   useEffect(() => {
     if (searchName.trim() === "") {
@@ -95,21 +99,23 @@ function UserPage() {
   };
 
   const handleSearch = (e) => {
-    setSearchName(e.target.value);
+    const newSearchName = e.target.value;
+    setSearchName(newSearchName);
+    setOffset(0);
+    setLimit(20);
+    setTasks([]);
+    setFilteredTasks([]);
+    setIsLoading(true);
+    setHasMore(true);
+    fetchTasks(0, 20, newSearchName.trim() !== "");
   };
 
   const handleSort = (direction) => {
     const sortedTasks = [...filteredTasks].sort((a, b) => {
       const dateA = new Date(a.due_at);
       const dateB = new Date(b.due_at);
-
-      if (direction === "asc") {
-        return dateA - dateB;
-      } else {
-        return dateB - dateA;
-      }
+      return direction === "asc" ? dateA - dateB : dateB - dateA;
     });
-
     setFilteredTasks(sortedTasks);
     setSortDirection(direction);
   };
@@ -189,7 +195,7 @@ function UserPage() {
           </table>
         </div>
       )}
-      {hasMore && !loading && !error && (
+      {hasMore && !loading && !error && !searchName.trim() && (
         <button className="create-btn" style={addBtn} onClick={handleLoadMore}>
           Загрузить ещё
         </button>
