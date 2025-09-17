@@ -98,8 +98,20 @@ function UserPage() {
     setSearchName(e.target.value);
   };
 
-  const handleSort = () => {
-    console.log(1);
+  const handleSort = (direction) => {
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+      const dateA = new Date(a.due_at);
+      const dateB = new Date(b.due_at);
+
+      if (direction === "asc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    });
+
+    setFilteredTasks(sortedTasks);
+    setSortDirection(direction);
   };
 
   return (
