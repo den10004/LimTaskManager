@@ -11,7 +11,8 @@ const useFetchTeam = (apiUrl) => {
       setLoading(true);
       const token = getCookie("authTokenPM");
       if (!token) {
-        throw new Error("Токен авторизации отсутствует");
+        return;
+        // throw new Error("Токен авторизации отсутствует");
       }
 
       const response = await fetch(`${apiUrl}/users`, {

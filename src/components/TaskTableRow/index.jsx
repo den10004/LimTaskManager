@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/dateUtils";
 import { statusColors } from "../../utils/rolesTranslations";
 
-function TaskTableRow({ task, directions, team /*onDelete */ }) {
+function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
   const directionName =
     directions?.find((dir) => dir.id === task.direction_id)?.name || "";
@@ -10,20 +10,7 @@ function TaskTableRow({ task, directions, team /*onDelete */ }) {
   const handleRowClick = () => {
     navigate(`/tasks/${task.id}`);
   };
-  /*
-  const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    const isConfirmed = window.confirm(
-      `Вы уверены, что хотите удалить задачу "${task.title || "без названия"}"?`
-    );
 
-    if (isConfirmed) {
-      if (onDelete) {
-        onDelete(task.id);
-      }
-    }
-  };
-*/
   const user = team.find((member) => member.id === task.assigned_user_id);
   const userName = user ? user.name : "Пользователь не указан";
 
@@ -41,10 +28,6 @@ function TaskTableRow({ task, directions, team /*onDelete */ }) {
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}{" "}
-        {/*
-        <button className="delete-btn" onClick={handleDeleteClick}>
-          Удалить
-        </button>*/}
       </td>
     </tr>
   );
