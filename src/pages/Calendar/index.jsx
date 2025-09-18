@@ -234,11 +234,11 @@ function MainPage() {
       <h3 className="h3-mtmb">Календарь</h3>
       <div className="calendar-header">
         <button onClick={() => navigateMonth(-1)} className="nav-button">
-          ← Предыдущий
+          ←
         </button>
         <h2>{monthName}</h2>
         <button onClick={() => navigateMonth(1)} className="nav-button">
-          Следующий →
+          →
         </button>
       </div>
 
