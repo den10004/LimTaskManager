@@ -45,7 +45,7 @@ function Modal({ onCancel, onLoginSuccess }) {
 
         login(data.token, userData);
         onLoginSuccess();
-        navigate("/user");
+        navigate("/task");
       } else {
         throw new Error("Отсутствует токен в ответе");
       }

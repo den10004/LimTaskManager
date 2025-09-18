@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 

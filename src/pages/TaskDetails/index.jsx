@@ -238,7 +238,7 @@ function TaskDetails() {
   };
 
   const handleBack = () => {
-    navigate("/user");
+    navigate("/task");
   };
 
   const handleFileChange = (e) => {
@@ -394,7 +394,7 @@ function TaskDetails() {
         if (!response.ok) {
           throw new Error(`${response.status}`);
         }
-        window.location.href = "/user";
+        window.location.href = "/task";
       } catch (err) {
         console.error("Ошибка при удалении задачи:", err.message);
         alert("Не удалось удалить задачу");
