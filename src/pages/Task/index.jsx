@@ -9,7 +9,7 @@ const addBtn = {
   margin: "30px auto",
 };
 
-function UserPage() {
+function Task() {
   const [allTasks, setAllTasks] = useState([]);
   const [displayedTasks, setDisplayedTasks] = useState([]);
   const [directions, setDirections] = useState([]);
@@ -266,4 +266,4 @@ function UserPage() {
   );
 }
 
-export default UserPage;
+export default Task;

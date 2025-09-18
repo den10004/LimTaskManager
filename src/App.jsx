@@ -11,7 +11,7 @@ import MainPage from "./pages/Main";
 import TaskDetails from "./pages/TaskDetails";
 import Directions from "./pages/Directions";
 import Calendar from "./pages/Calendar";
-import User from "./pages/User";
+import Task from "./pages/Task";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { TeamProvider } from "./contexts/TeamContext";
 import Kanban from "./pages/Kanban";
@@ -54,10 +54,10 @@ function App() {
                 }
               />
               <Route
-                path="/user"
+                path="/task"
                 element={
                   <ProtectedRoute>
-                    <User />
+                    <Task />
                   </ProtectedRoute>
                 }
               />
