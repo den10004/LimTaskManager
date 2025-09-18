@@ -1,16 +1,14 @@
 import { useEffect, useState, useRef } from "react";
+
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
-import { useTeam } from "../../contexts/TeamContext";
 
 function Kanban() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const boardRef = useRef(null);
-  const { team } = useTeam();
 
-  // Состояния для перетаскивания
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -49,7 +47,6 @@ function Kanban() {
     loadEvents();
   }, []);
 
-  // Обработчики для перетаскивания
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setStartX(e.pageX - boardRef.current.offsetLeft);
@@ -73,7 +70,7 @@ function Kanban() {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - boardRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Умножаем для более плавного скролла
+    const walk = (x - startX) * 2;
     boardRef.current.scrollLeft = scrollLeft - walk;
   };
 
@@ -101,11 +98,31 @@ function Kanban() {
     return { startIndex, span: endIndex - startIndex + 1, task };
   };
 
-  const taskSpans = tasks.map(getTaskSpan).filter((span) => span !== null);
+  const taskSpans = tasks
+    .filter((task) => task.status !== "Задача выполнена")
+    .map(getTaskSpan)
+    .filter((span) => span !== null);
+
+  const months = [
+    "январь",
+    "февраль",
+    "март",
+    "апрель",
+    "май",
+    "июнь",
+    "июль",
+    "август",
+    "сентябрь",
+    "октябрь",
+    "ноябрь",
+    "декабрь",
+  ];
 
   const formattedDates = uniqueDates.map((date) => {
-    const [year, month, day] = date.split("-");
-    return `${day}.${month}.${year}`;
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    return `${day} ${month}`;
   });
 
   return (
@@ -139,19 +156,12 @@ function Kanban() {
             }}
           >
             {taskSpans.map(({ task, startIndex, span }, index) => {
-              const user = team.find(
-                (member) => member.id === task.assigned_user_id
-              );
-              const userName = user ? user.name : "Пользователь не указан";
-
               return (
                 <a
                   key={task.id}
                   href={`/tasks/${task.id}`}
                   className={`task-bar ${
-                    task.status === "Задача выполнена"
-                      ? "bg-green-500 text-white"
-                      : task.status === "Задача просрочена"
+                    task.status === "Задача просрочена"
                       ? "bg-red-500 text-white"
                       : "bg-gray-200 text-black"
                   }`}
@@ -160,13 +170,7 @@ function Kanban() {
                     gridRow: index + 1,
                   }}
                 >
-                  <h5 className="task-title">Описание: {task.title}</h5>
-                  <p>Назначена: {userName}</p>
-                  <p>{task.status}</p>
-                  <p className="task-meta">
-                    {new Date(task.created_at).toLocaleDateString()} -{" "}
-                    {new Date(task.due_at).toLocaleDateString()}
-                  </p>
+                  <h5 className="task-title">{task.title}</h5>
                 </a>
               );
             })}
