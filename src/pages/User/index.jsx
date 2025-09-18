@@ -10,8 +10,8 @@ const addBtn = {
 };
 
 function UserPage() {
-  const [allTasks, setAllTasks] = useState([]); // Все задачи
-  const [displayedTasks, setDisplayedTasks] = useState([]); // Отображаемые задачи (с пагинацией)
+  const [allTasks, setAllTasks] = useState([]);
+  const [displayedTasks, setDisplayedTasks] = useState([]);
   const [directions, setDirections] = useState([]);
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,11 +20,16 @@ function UserPage() {
   const [hasMore, setHasMore] = useState(true);
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
+  const [statusFilters, setStatusFilters] = useState({
+    completed: true,
+    overdue: true,
+    extended: true,
+    assigned: true,
+  });
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
 
-  // Функция для загрузки ВСЕХ задач
   const fetchAllTasks = async () => {
     try {
       const token = getCookie("authTokenPM");
@@ -49,7 +54,7 @@ function UserPage() {
       const data = await response.json();
       setAllTasks(data.items || []);
       setIsLoading(false);
-      setHasMore(false); // Все задачи загружены
+      setHasMore(false);
     } catch (err) {
       console.error("Fetch error:", err.message);
       setError(`Ошибка загрузки данных: ${err.message}`);
@@ -60,15 +65,13 @@ function UserPage() {
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
-    fetchAllTasks(); // Загружаем все задачи
+    fetchAllTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Эффект для фильтрации, сортировки и пагинации
   useEffect(() => {
     let result = allTasks;
 
-    // Фильтрация по имени
     if (searchName.trim() !== "") {
       const lowerSearchName = searchName.toLowerCase();
       result = result.filter((task) => {
@@ -77,7 +80,25 @@ function UserPage() {
       });
     }
 
-    // Сортировка
+    if (
+      !statusFilters.completed ||
+      !statusFilters.overdue ||
+      !statusFilters.extended ||
+      !statusFilters.assigned
+    ) {
+      result = result.filter((task) => {
+        if (task.status === "Задача выполнена" && !statusFilters.completed)
+          return false;
+        if (task.status === "Задача просрочена" && !statusFilters.overdue)
+          return false;
+        if (task.status === "Задача продлена" && !statusFilters.extended)
+          return false;
+        if (task.status === "Ответственный назначен" && !statusFilters.assigned)
+          return false;
+        return true;
+      });
+    }
+
     if (sortDirection) {
       result = [...result].sort((a, b) => {
         const dateA = new Date(a.due_at || 0);
@@ -86,13 +107,11 @@ function UserPage() {
       });
     }
 
-    // Применяем пагинацию
     const paginatedResult = result.slice(0, offset + limit);
     setDisplayedTasks(paginatedResult);
 
-    // Проверяем, есть ли еще задачи для загрузки
     setHasMore(result.length > paginatedResult.length);
-  }, [allTasks, searchName, team, sortDirection, offset, limit]);
+  }, [allTasks, searchName, team, sortDirection, offset, limit, statusFilters]);
 
   const handleLoadMore = () => {
     setOffset((prevOffset) => prevOffset + 10);
@@ -112,6 +131,15 @@ function UserPage() {
     setLimit(20);
   };
 
+  const handleStatusFilterChange = (status) => {
+    setStatusFilters((prev) => ({
+      ...prev,
+      [status]: !prev[status],
+    }));
+    setOffset(0);
+    setLimit(20);
+  };
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
@@ -122,6 +150,48 @@ function UserPage() {
         onChange={handleSearch}
         style={{ marginBottom: "20px", padding: "8px", width: "100%" }}
       />
+
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          gap: "15px",
+          flexWrap: "wrap",
+        }}
+      >
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.completed}
+            onChange={() => handleStatusFilterChange("completed")}
+          />
+          Задача выполнена
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.overdue}
+            onChange={() => handleStatusFilterChange("overdue")}
+          />
+          Задача просрочена
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.extended}
+            onChange={() => handleStatusFilterChange("extended")}
+          />
+          Задача продлена
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.assigned}
+            onChange={() => handleStatusFilterChange("assigned")}
+          />
+          Ответственный назначен
+        </label>
+      </div>
 
       {loading ? (
         <div className="loading">Загрузка данных...</div>

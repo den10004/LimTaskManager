@@ -111,7 +111,7 @@ label,
   line-height: 24px;
 }
 
-input,
+input:not([type="checkbox"]),
 textarea {
   height: 48px;
   box-sizing: border-box;
@@ -128,6 +128,13 @@ select {
   padding: 10px;
 }
 
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+}
 
 .page {
   background-color: var(--color-page);
