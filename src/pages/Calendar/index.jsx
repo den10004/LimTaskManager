@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../utils/getCookies";
-import { colorMap } from "../../utils/rolesTranslations";
 import "./style.css";
+
+const statusColorMap = {
+  "Задача просрочена": "var(--color-err)",
+  default: "var(--color-blue)",
+};
 
 function MainPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -13,8 +17,8 @@ function MainPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getDirectionColor = (directionId) => {
-    return colorMap[directionId] || "#26ddebff";
+  const getStatusColor = (status) => {
+    return statusColorMap[status] || statusColorMap["default"];
   };
 
   const loadEvents = async () => {
@@ -70,7 +74,7 @@ function MainPage() {
               isMultiDay: startDate.getTime() !== endDate.getTime(),
               status: event.status,
               directionId: event.direction_id,
-              color: getDirectionColor(event.direction_id),
+              color: getStatusColor(event.status),
             });
 
             currentDay.setDate(currentDay.getDate() + 1);
@@ -181,7 +185,6 @@ function MainPage() {
                   color: "inherit",
                   cursor: "pointer",
                   backgroundColor: event.color,
-                  borderLeft: `4px solid ${event.color}`,
                 }}
               >
                 {event.isStartDay && (
