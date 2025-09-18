@@ -1,4 +1,5 @@
 import AddFiles from "../../components/AddFiles/AddFiles";
+import Toast from "../../components/Toast";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { getCookie } from "../../utils/getCookies";
@@ -15,7 +16,11 @@ function CreatePage() {
     files: [],
     links: [""],
   });
-
+  const [toast, setToast] = useState({
+    show: false,
+    text: "",
+    color: "",
+  });
   const [authToken, setAuthToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [direction, setDirection] = useState([]);
@@ -95,13 +100,17 @@ function CreatePage() {
           errorText
         );
         if (taskResponse.status === 401) {
-          alert(
-            "Ошибка авторизации (401). Возможно, токен устарел или недействителен. Пожалуйста, войдите заново."
-          );
+          setToast({
+            show: true,
+            text: "Ошибка авторизации (401). Возможно, токен устарел или недействителен. Пожалуйста, войдите заново.",
+            color: "red",
+          });
         } else {
-          alert(
-            `Ошибка при создании задачи (${taskResponse.status}). Пожалуйста, попробуйте снова.`
-          );
+          setToast({
+            show: true,
+            text: `Ошибка при создании задачи (${taskResponse.status}). Пожалуйста, попробуйте снова.`,
+            color: "red",
+          });
         }
         setIsLoading(false);
         return;
@@ -131,9 +140,12 @@ function CreatePage() {
             fileResponse.status,
             errorText
           );
-          alert(
-            `Ошибка при загрузке файлов (${fileResponse.status}). Пожалуйста, попробуйте снова.`
-          );
+
+          setToast({
+            show: true,
+            text: `Ошибка при загрузке файлов (${fileResponse.status}). Пожалуйста, попробуйте снова.`,
+            color: "red",
+          });
           setIsLoading(false);
           return;
         }
@@ -148,10 +160,18 @@ function CreatePage() {
         files: [],
         links: [""],
       });
-      alert("Задача успешно создана!");
+      setToast({
+        show: true,
+        text: "Задача успешно создана",
+        color: "rgba(33, 197, 140, 1)",
+      });
     } catch (error) {
       console.error("Ошибка сети:", error);
-      alert("Ошибка сети. Пожалуйста, проверьте соединение.");
+      setToast({
+        show: true,
+        text: "Ошибка сети. Пожалуйста, проверьте соединения",
+        color: "red",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -305,7 +325,14 @@ function CreatePage() {
             </div>
           )}
         </form>
-      </div>
+      </div>{" "}
+      {toast.show && (
+        <Toast
+          text={toast.text}
+          color={toast.color}
+          onClose={() => setToast({ show: false, text: "", color: "" })}
+        />
+      )}
     </section>
   );
 }
