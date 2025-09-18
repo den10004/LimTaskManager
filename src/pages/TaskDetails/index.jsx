@@ -585,7 +585,7 @@ function TaskDetails() {
                 >
                   <img src="/files.svg" alt="загрузка файлов" />
                   <div>
-                    Перетащите файлы сюда или&nbsp;
+                    Перетащите файл сюда или&nbsp;
                     <a
                       href="#"
                       onClick={(e) => {
@@ -596,7 +596,8 @@ function TaskDetails() {
                     >
                       загрузите
                     </a>
-                  </div>
+                  </div>{" "}
+                  {/*
                   <span
                     style={{
                       margin: "0 auto",
@@ -606,7 +607,7 @@ function TaskDetails() {
                   >
                     Поддержка нескольких типов файлов
                   </span>
-
+*/}
                   <input
                     ref={fileInputRef}
                     type="file"

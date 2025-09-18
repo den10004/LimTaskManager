@@ -61,7 +61,7 @@ function AddFiles({ formData, handleFileChange }) {
       >
         <img src="/files.svg" alt="загрузка файлов" />
         <div>
-          Перетащите файлы сюда или&nbsp;
+          Перетащите файл сюда или&nbsp;
           <a
             href="#"
             onClick={(e) => {
@@ -73,6 +73,7 @@ function AddFiles({ formData, handleFileChange }) {
             загрузите
           </a>
         </div>
+        {/*
         <span
           style={{
             margin: "0 auto",
@@ -82,7 +83,7 @@ function AddFiles({ formData, handleFileChange }) {
         >
           Поддержка нескольких типов файлов
         </span>
-
+*/}
         <input
           ref={fileInputRef}
           type="file"
