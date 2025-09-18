@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import "./style.css";
 import { getCookie } from "../../utils/getCookies";
 import { roleTranslations } from "../../utils/rolesTranslations";
+import "./style.css";
 
 function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
   const [name, setName] = useState("");

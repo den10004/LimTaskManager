@@ -7,6 +7,7 @@ import { useTeam } from "../../contexts/TeamContext";
 import { taskStatus } from "../../utils/rolesTranslations";
 import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
+import Toast from "../../components/Toast";
 
 const formStyle = {
   marginTop: "10px",
@@ -48,6 +49,11 @@ function TaskDetails() {
   const [newDueDate, setNewDueDate] = useState("");
   const [dateLoading, setDateLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const [toast, setToast] = useState({
+    show: false,
+    text: "",
+    color: "",
+  });
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
@@ -74,12 +80,22 @@ function TaskDetails() {
       });
 
       if (!response.ok) {
+        setToast({
+          show: true,
+          text: "Ошибка загрузки задачи",
+          color: "red",
+        });
+
         throw new Error("Ошибка загрузки задачи");
       }
       const data = await response.json();
       return data;
     } catch (err) {
-      console.error(err);
+      setToast({
+        show: true,
+        text: `Ошибка загрузки задачи: ${err.message}`,
+        color: "red",
+      });
       throw new Error(`Ошибка загрузки задачи: ${err.message}`);
     }
   };
@@ -397,7 +413,11 @@ function TaskDetails() {
         window.location.href = "/task";
       } catch (err) {
         console.error("Ошибка при удалении задачи:", err.message);
-        alert("Не удалось удалить задачу");
+        setToast({
+          show: true,
+          text: "Не удалось удалить задачу",
+          color: "red",
+        });
       }
     }
   };
@@ -654,6 +674,14 @@ function TaskDetails() {
         </>
       ) : (
         <div>Данные задачи отсутствуют</div>
+      )}
+
+      {toast.show && (
+        <Toast
+          text={toast.text}
+          color={toast.color}
+          onClose={() => setToast({ show: false, text: "", color: "" })}
+        />
       )}
     </div>
   );
