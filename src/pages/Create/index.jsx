@@ -309,9 +309,6 @@ function CreatePage() {
           </div>
 
           <div className="create__btns">
-            <button type="button" className="cancel-btn" disabled={isLoading}>
-              Отмена
-            </button>
             <button
               type="submit"
               className="create-btn"

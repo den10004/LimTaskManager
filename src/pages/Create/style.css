@@ -30,6 +30,8 @@
 .create__form {
     padding: 30px;
     background-color: var(--color-background);
+    margin-bottom: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .create__form>.create__block:not(:last-child) {
