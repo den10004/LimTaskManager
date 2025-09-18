@@ -1,5 +1,6 @@
 import AddFiles from "../../components/AddFiles/AddFiles";
 import Toast from "../../components/Toast";
+import { useNavigate } from "react-router-dom";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { getCookie } from "../../utils/getCookies";
@@ -25,6 +26,7 @@ function CreatePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [direction, setDirection] = useState([]);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = getCookie("authTokenPM");
@@ -165,6 +167,9 @@ function CreatePage() {
         text: "Задача успешно создана",
         color: "rgba(33, 197, 140, 1)",
       });
+      setTimeout(() => {
+        navigate("/task");
+      }, 3000);
     } catch (error) {
       console.error("Ошибка сети:", error);
       setToast({
