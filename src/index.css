@@ -157,9 +157,6 @@ select {
   max-width: 1200px;
 }
 
-.lastRow {
-  border: none !important;
-}
 
 
 .container-scroll {
@@ -202,6 +199,11 @@ tr:hover td {
 
 tr:last-child {
   border-bottom: none;
+}
+
+.lastRow>button {
+  display: flex;
+  margin: 0 0 0 auto;
 }
 
 @media screen and (max-width:1240px) {

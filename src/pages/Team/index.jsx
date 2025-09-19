@@ -55,7 +55,6 @@ function TeamPage() {
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Имя</th>
                   <th>Email</th>
                   <th>Телеграм</th>
@@ -67,7 +66,6 @@ function TeamPage() {
               <tbody>
                 {team.map((user) => (
                   <tr key={user.id}>
-                    <td>{user.id}</td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.telegram_id}</td>
