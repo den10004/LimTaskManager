@@ -64,8 +64,22 @@ function CreatePage() {
   const addLink = () => {
     setFormData((prev) => ({
       ...prev,
-      links: [...prev.links, ""],
+      links: [...prev.links, "https://"],
     }));
+  };
+
+  const normalizeUrl = (url) => {
+    if (!url) return "";
+
+    if (url.startsWith("https://") || url.startsWith("http://")) {
+      return url;
+    }
+
+    if (url.startsWith("www.")) {
+      return "https://" + url;
+    }
+
+    return "https://" + url;
   };
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -292,6 +306,13 @@ function CreatePage() {
                   id={`link-${index}`}
                   value={link}
                   onChange={(e) => handleLinkChange(index, e.target.value)}
+                  onBlur={(e) => {
+                    const normalizedUrl = normalizeUrl(e.target.value);
+                    if (normalizedUrl !== e.target.value) {
+                      handleLinkChange(index, normalizedUrl);
+                    }
+                  }}
+                  placeholder="https://example.com"
                 />
               </div>
             ))}
