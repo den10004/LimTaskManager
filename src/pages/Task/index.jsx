@@ -202,7 +202,6 @@ function Task() {
           <table id="dataTable">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Назначил</th>
                 <th>Назначено</th>
                 <th>Дата создания</th>
@@ -234,6 +233,7 @@ function Task() {
                 <th>Направление</th>
                 <th>Название</th>
                 <th>Статус</th>
+                <th>Файлы</th>
               </tr>
             </thead>
             <tbody id="tableBody">

@@ -19,7 +19,6 @@ function TaskTableRow({ task, directions, team }) {
 
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
-      <td>{task.id}</td>
       <td>{createdBy}</td>
       <td>{userName}</td>
       <td>{formatDate(task.created_at, "Не установлен")}</td>
@@ -29,6 +28,7 @@ function TaskTableRow({ task, directions, team }) {
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}{" "}
       </td>
+      <td>{task.files.length}</td>
     </tr>
   );
 }
