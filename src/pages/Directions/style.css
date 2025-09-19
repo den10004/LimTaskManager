@@ -22,3 +22,24 @@
     justify-content: flex-end;
     margin-left: auto;
 }
+
+.btns-direction {
+    display: flex;
+    margin-left: auto
+}
+
+.btns-direction>.change-btn {
+    margin-left: 10px
+}
+
+
+@media screen and (max-width:550px) {
+    .btns-direction {
+        flex-direction: column;
+    }
+
+    .btns-direction>.change-btn {
+        margin-left: 0px;
+        margin-top: 10px;
+    }
+}

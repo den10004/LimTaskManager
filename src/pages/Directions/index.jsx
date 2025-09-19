@@ -109,23 +109,21 @@ function Directions() {
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Направления</th>
                 </tr>
               </thead>
               <tbody>
                 {direction.map((task) => (
                   <tr key={task.id}>
-                    <td>{task.id}</td>
                     <td
                       style={{
                         display: "flex",
                         alignItems: "center",
                       }}
                     >
-                      {task.name}
+                      <div style={{ minWidth: "210px" }}>{task.name}</div>
                       {!restrictedDirections.includes(task.name) && (
-                        <div style={{ display: "flex", marginLeft: "auto" }}>
+                        <div className="btns-direction">
                           {rolesUser === "admin" && (
                             <>
                               <button
@@ -135,7 +133,6 @@ function Directions() {
                                 Удалить
                               </button>
                               <button
-                                style={{ marginLeft: "10px" }}
                                 className="change-btn"
                                 onClick={() => handleEdit(task)}
                               >
