@@ -25,6 +25,8 @@ function Task() {
     overdue: true,
     extended: true,
     assigned: true,
+    work: true,
+    new: true,
   });
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -95,6 +97,9 @@ function Task() {
           return false;
         if (task.status === "Ответственный назначен" && !statusFilters.assigned)
           return false;
+        if (task.status === "Задача принята в работу" && !statusFilters.work)
+          return false;
+        if (task.status === "Новая" && !statusFilters.new) return false;
         return true;
       });
     }
@@ -139,7 +144,6 @@ function Task() {
     setOffset(0);
     setLimit(20);
   };
-  console.log("displayedTasks", displayedTasks);
 
   return (
     <section className="container">
@@ -191,6 +195,22 @@ function Task() {
             onChange={() => handleStatusFilterChange("assigned")}
           />
           Ответственный назначен
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.work}
+            onChange={() => handleStatusFilterChange("work")}
+          />
+          Задача принята в работу
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <input
+            type="checkbox"
+            checked={statusFilters.new}
+            onChange={() => handleStatusFilterChange("new")}
+          />
+          Новая
         </label>
       </div>
 
