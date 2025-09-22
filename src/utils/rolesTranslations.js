@@ -22,14 +22,14 @@ export const taskStatus = [
 ];
 
 export const statusColors = {
-  "Задача просрочена": "red",
-  Новая: "#24c5eeff",
-  "Задача выполнена": "#2eac08ff",
-  "Задача принята в работу": "#0950d3ff",
+  "Задача просрочена": "var(--color-err)",
+  Новая: "var(--color-blue)",
+  "Задача выполнена": "var(--color-green)",
+  "Задача принята в работу": "var(--color-blue)",
 };
 
 export const colorMap = {
-  44247: "#ff6b6b",
-  44086: "#4e96e9ff",
-  43668: "#1bb830ff",
+  44247: "var(--color-err)",
+  44086: "var(--color-blue)",
+  43668: "var(--color-green)",
 };

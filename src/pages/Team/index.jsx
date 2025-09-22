@@ -105,29 +105,31 @@ function TeamPage() {
               Нет данных для отображения
             </div>
           )}
-
-          {rolesUser === "admin" && (
-            <button
-              type="submit"
-              className="create-btn"
-              onClick={openCreateModal}
-            >
-              Создать пользователя
-            </button>
-          )}
-
-          {rolesUser === "admin" && (
-            <button
-              type="submit"
-              style={{ marginTop: "10px" }}
-              className="create-btn"
-              onClick={openRoleModal}
-            >
-              Создать роль
-            </button>
-          )}
         </div>
       )}
+      <>
+        {" "}
+        {rolesUser === "admin" && (
+          <button
+            type="submit"
+            style={{ marginTop: "20px" }}
+            className="create-btn"
+            onClick={openCreateModal}
+          >
+            Создать пользователя
+          </button>
+        )}
+        {rolesUser === "admin" && (
+          <button
+            type="submit"
+            style={{ marginTop: "10px" }}
+            className="create-btn"
+            onClick={openRoleModal}
+          >
+            Создать роль
+          </button>
+        )}
+      </>
       <AddUser
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -136,12 +138,7 @@ function TeamPage() {
         user={selectedUser}
       />
 
-      <AddRole
-        isOpen={roleOpen}
-        onClose={closeModal}
-        mode={modalMode}
-        user={selectedUser}
-      />
+      <AddRole isOpen={roleOpen} onClose={closeModal} mode={modalMode} />
     </section>
   );
 }

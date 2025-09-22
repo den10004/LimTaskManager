@@ -158,24 +158,42 @@ select {
 }
 
 
-
 .container-scroll {
   max-width: 1200px;
   overflow-x: auto;
   white-space: nowrap;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
-
-thead>tr {
-  background-color: #f1f5f9;
-}
-
 
 table {
   border-collapse: collapse;
   background-color: var(--color-background);
   width: 100%;
-  margin: 20px 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background-color: #eff7ff;
+  border-radius: 8px 8px 0 0;
+}
+
+thead tr:first-child th:first-child {
+  border-top-left-radius: 8px;
+}
+
+thead tr:first-child th:last-child {
+  border-top-right-radius: 8px;
+}
+
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
 }
 
 tr {
@@ -184,18 +202,15 @@ tr {
 
 th,
 td {
-
-  padding: 8px;
   text-align: left;
   overflow-wrap: break-word;
   white-space: normal;
-  padding: 8px;
+  padding: 12px 8px;
 }
 
 tr:hover td {
   background-color: #f8fafc;
 }
-
 
 tr:last-child {
   border-bottom: none;

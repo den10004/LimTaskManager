@@ -24,13 +24,18 @@ function Header() {
     logout();
     navigate("/");
   };
+  console.log(userData);
 
   return (
     <>
       <header>
         <div>
           <NavLink to="/">Limaudio Project Management</NavLink>{" "}
-          {userData && <b>{userData.email}</b>}
+          {userData && (
+            <b style={{ fontSize: "16px" }}>
+              {userData.email} &nbsp;&nbsp;{userData.name}
+            </b>
+          )}
         </div>
         <ul>
           {isAuthenticated && (

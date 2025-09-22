@@ -1,19 +1,10 @@
 import { useState } from "react";
 import "./style.css";
 
-function AddRole({
-  isOpen,
-  onClose,
-  onSave,
-  initialDate = "",
-  loading = false,
-}) {
-  const [newDate, setNewDate] = useState(initialDate);
+function AddRole({ isOpen, onClose, loading = false }) {
+  const [roleRus, setRoleRus] = useState("");
+  const [roleLat, setRoleLat] = useState("");
   const [error, setError] = useState("");
-
-  const handleSave = () => {
-    onSave(newDate);
-  };
 
   const handleSubmit = () => {};
 
@@ -29,10 +20,9 @@ function AddRole({
             <input
               type="text"
               required
-              value={handleSave}
-              onChange={(e) => setNewDate(e.target.value)}
+              value={roleRus}
+              onChange={(e) => setRoleRus(e.target.value)}
               disabled={loading}
-              placeholder="Введите название направления"
             />
           </div>
 
@@ -41,10 +31,9 @@ function AddRole({
             <input
               type="text"
               required
-              value={handleSave}
-              onChange={(e) => setNewDate(e.target.value)}
+              value={roleLat}
+              onChange={(e) => setRoleLat(e.target.value)}
               disabled={loading}
-              placeholder="Введите название направления"
             />
           </div>
           {error && <div className="error-message">{error}</div>}

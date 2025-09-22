@@ -4,7 +4,8 @@
     cursor: grab;
     user-select: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 50px
+    margin-bottom: 50px;
+    border-radius: 8px;
 }
 
 .date-header {
