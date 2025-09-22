@@ -257,7 +257,7 @@ function CreatePage() {
           </div>
 
           <div className="create__block">
-            <label htmlFor="assigned_user_id">Выбрать пользователя *</label>
+            <label htmlFor="assigned_user_id">Выбрать ответственного *</label>
             {loading ? (
               <div className="loading">Загрузка пользователей...</div>
             ) : teamError ? (
