@@ -507,11 +507,21 @@ function TaskDetails() {
                     required
                   >
                     <option value="">Выберите статус</option>
-                    {taskStatus.map((status, index) => (
-                      <option key={index} value={status}>
-                        {status}
-                      </option>
-                    ))}
+                    {taskStatus
+                      .filter((status) => {
+                        if (
+                          status === "Задача принята в работу" &&
+                          userData?.name != getUserName(task?.assigned_user_id)
+                        ) {
+                          return false;
+                        }
+                        return true;
+                      })
+                      .map((status, index) => (
+                        <option key={index} value={status}>
+                          {status}
+                        </option>
+                      ))}
                   </select>
                   &nbsp;
                   <button

@@ -4,23 +4,31 @@ import { getTranslatedRole } from "../../utils/rolesTranslations";
 import AddUser from "../../components/Modal/AddUser";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTeam } from "../../contexts/TeamContext";
+import AddRole from "../../components/Modal/AddRole";
 
 function TeamPage() {
   const { userData } = useAuth();
   const { team, loading, error } = useTeam();
   const rolesUser = userData.roles.join("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [roleOpen, setRoleOpen] = useState(false);
   const [modalMode, setModalMode] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setRoleOpen(false);
     setSelectedUser(null);
     setModalMode("");
   };
 
   const openCreateModal = () => {
     setIsModalOpen(true);
+    setModalMode("create");
+  };
+
+  const openRoleModal = () => {
+    setRoleOpen(true);
     setModalMode("create");
   };
 
@@ -107,12 +115,30 @@ function TeamPage() {
               Создать пользователя
             </button>
           )}
+
+          {rolesUser === "admin" && (
+            <button
+              type="submit"
+              style={{ marginTop: "10px" }}
+              className="create-btn"
+              onClick={openRoleModal}
+            >
+              Создать роль
+            </button>
+          )}
         </div>
       )}
       <AddUser
         isOpen={isModalOpen}
         onClose={closeModal}
         onUserCreated={handleUserActionSuccess}
+        mode={modalMode}
+        user={selectedUser}
+      />
+
+      <AddRole
+        isOpen={roleOpen}
+        onClose={closeModal}
         mode={modalMode}
         user={selectedUser}
       />
