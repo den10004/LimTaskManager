@@ -139,7 +139,7 @@ function Task() {
     setOffset(0);
     setLimit(20);
   };
-  console.log(displayedTasks);
+  console.log("displayedTasks", displayedTasks);
 
   return (
     <section className="container">

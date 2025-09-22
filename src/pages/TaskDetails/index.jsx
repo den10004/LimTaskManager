@@ -449,7 +449,7 @@ function TaskDetails() {
                 <b>Статус:</b> {task.status || "Не указано"}
               </li>
               <li>
-                <b>Назначено:</b> {getUserName(task.assigned_user_id)}
+                <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
               </li>
               <li style={{ display: "flex", alignItems: "center" }}>
                 <b>Срок выполнения:&nbsp;</b>
