@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
-import { getTranslatedRole } from "../../utils/rolesTranslations";
+//import { getTranslatedRole } from "../../utils/rolesTranslations";
 import AddUser from "../../components/Modal/AddUser";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTeam } from "../../contexts/TeamContext";
@@ -191,21 +191,14 @@ function TeamPage() {
                     <td>{user.email}</td>
                     <td>{user.telegram_id}</td>
                     <td>{formatDate(user.created_at)}</td>
-                    <td>
-                      {user.roles && user.roles.length > 0
-                        ? user.roles.map((link, index) => {
-                            const translatedRole = getTranslatedRole(link);
-                            return <div key={index}>{translatedRole}</div>;
-                          })
-                        : "-"}
-                    </td>
+                    <td>{user?.roles[0][1]}</td>
                     <td className="lastRow">
                       {rolesUser === "admin" && (
                         <button
                           className="change-btn"
                           onClick={() => openEditModal(user)}
                         >
-                          Редактирование
+                          Редактировать
                         </button>
                       )}
                     </td>
@@ -260,7 +253,7 @@ function TeamPage() {
                       <td>{role.description || "Нет описания"}</td>
                       <td>{role.name}</td>
 
-                      <td className="lastRow">
+                      <td className="lastRow" style={{ display: "flex" }}>
                         {rolesUser === "admin" && !isCurrentUserRole && (
                           <div
                             className="btns-direction"
@@ -276,7 +269,7 @@ function TeamPage() {
                               className="change-btn"
                               onClick={() => openEditRoleModal(role)}
                             >
-                              Редактирование
+                              Редактировать
                             </button>
                           </div>
                         )}
@@ -308,6 +301,7 @@ function TeamPage() {
       <AddUser
         isOpen={isModalOpen}
         onClose={closeModal}
+        rolesList={rolesList}
         onUserCreated={handleUserActionSuccess}
         mode={modalMode}
         user={selectedUser}

@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
-import { roleTranslations } from "../../utils/rolesTranslations";
 import "./style.css";
 
-function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
+function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -261,9 +260,9 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
               disabled={isLoading}
             >
               <option value="">Выберите роль</option>
-              {Object.entries(roleTranslations).map(([key, value]) => (
-                <option key={key} value={key}>
-                  {value}
+              {rolesList.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.description}
                 </option>
               ))}
             </select>

@@ -136,7 +136,7 @@ function Directions() {
                                 className="change-btn"
                                 onClick={() => handleEdit(task)}
                               >
-                                Редактирование
+                                Редактировать
                               </button>
                             </>
                           )}
