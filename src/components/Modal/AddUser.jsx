@@ -11,9 +11,12 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [roles, setRoles] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [canAddRecords, setCanAddRecords] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+
+  console.log(user);
 
   useEffect(() => {
     if (!isOpen) {
@@ -26,6 +29,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles("");
         setIsLoading(false);
         setError("");
+        setCanAddRecords(false);
       }, 300);
 
       return () => clearTimeout(timer);
@@ -41,6 +45,8 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles(user.roles?.[0] || "");
         setPassword("");
         setConfirmPassword("");
+
+        setCanAddRecords(!!user?.permissions?.[0]);
       } else {
         setName("");
         setEmail("");
@@ -48,6 +54,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setPassword("");
         setConfirmPassword("");
         setRoles("");
+        setCanAddRecords(false);
       }
       setIsLoading(false);
       setError("");
@@ -62,6 +69,10 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
     if (error) setError("");
+  };
+
+  const handleCheckboxChange = (e) => {
+    setCanAddRecords(e.target.checked);
   };
 
   const handleUser = async (e) => {
@@ -82,6 +93,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         password,
         telegram_id: telegram,
         roles: [roles],
+        ...(canAddRecords && { permissions: ["add_records"] }),
       };
 
       const response = await fetch(`${API_URL}/users`, {
@@ -134,6 +146,8 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
       if (password) formData.password = password;
       if (telegram !== undefined) formData.telegram_id = telegram;
       if (roles) formData.roles = [roles];
+
+      formData.permissions = canAddRecords ? ["add_records"] : [];
 
       if (Object.keys(formData).length === 0) {
         setError("Нет данных для обновления");
@@ -266,6 +280,20 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label
+              style={{ display: "flex", alignItems: "center", gap: "5px" }}
+            >
+              <input
+                type="checkbox"
+                checked={canAddRecords}
+                onChange={handleCheckboxChange}
+                disabled={isLoading}
+              />
+              Добавление записей
+            </label>
           </div>
 
           {error && <div className="error-message">{error}</div>}

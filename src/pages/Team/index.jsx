@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { formatDate } from "../../utils/dateUtils";
-//import { getTranslatedRole } from "../../utils/rolesTranslations";
 import AddUser from "../../components/Modal/AddUser";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTeam } from "../../contexts/TeamContext";
@@ -162,6 +161,7 @@ function TeamPage() {
     }
   };
 
+  console.log(team);
   return (
     <section className="container">
       <h3 className="h3-mtmb">Команда</h3>
@@ -191,7 +191,8 @@ function TeamPage() {
                     <td>{user.email}</td>
                     <td>{user.telegram_id}</td>
                     <td>{formatDate(user.created_at)}</td>
-                    <td>{user?.roles[0][1]}</td>
+
+                    <td>{user?.roles[0]?.[1]}</td>
                     <td className="lastRow">
                       {rolesUser === "admin" && (
                         <button
