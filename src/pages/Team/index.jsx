@@ -5,6 +5,7 @@ import AddUser from "../../components/Modal/AddUser";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTeam } from "../../contexts/TeamContext";
 import AddRole from "../../components/Modal/AddRole";
+import Toast from "../../components/Toast";
 import { getCookie } from "../../utils/getCookies";
 
 function TeamPage() {
@@ -18,6 +19,11 @@ function TeamPage() {
   const [rolesList, setRolesList] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
+  const [toast, setToast] = useState({
+    show: false,
+    text: "",
+    color: "",
+  });
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
@@ -40,6 +46,7 @@ function TeamPage() {
       }
 
       const data = await response.json();
+
       setRolesList(data.items);
     } catch (error) {
       setRolesError(error.message);
@@ -48,13 +55,50 @@ function TeamPage() {
       setRolesLoading(false);
     }
   };
-  console.log(rolesList);
+
   useEffect(() => {
-    if (rolesUser === "admin") {
-      fetchRoles();
-    }
+    fetchRoles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rolesUser, token]);
+
+  const handleDeleteRole = async (id) => {
+    if (!window.confirm("Вы уверены, что хотите удалить эту роль?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/roles/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      setToast({
+        show: true,
+        text: "Роль успешно удалена",
+        color: "rgba(33, 197, 140, 1)",
+      });
+      if (!response.ok) {
+        setToast({
+          show: true,
+          text: "Ошибка загрузки задачи",
+          color: "red",
+        });
+        throw new Error("Ошибка удаления роли");
+      }
+      setRolesList((prevRoles) => prevRoles.filter((role) => role.id !== id));
+    } catch (error) {
+      console.error("Ошибка при удалении роли:", error);
+      setToast({
+        show: true,
+        text: "Ошибка при удалении роли:",
+        error,
+        color: "red",
+      });
+    }
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -90,11 +134,33 @@ function TeamPage() {
     }
   };
 
+  const handleRoleCreated = (newRole) => {
+    try {
+      setRolesList((prevRoles) => {
+        const roleExists = prevRoles.some(
+          (role) => role.id === newRole.id || role.name === newRole.name
+        );
+
+        if (roleExists) {
+          return prevRoles.map((role) =>
+            role.id === newRole.id || role.name === newRole.name
+              ? newRole
+              : role
+          );
+        } else {
+          return [newRole, ...prevRoles];
+        }
+      });
+    } catch (error) {
+      console.error("Ошибка при добавлении роли в список:", error);
+    }
+  };
+
   return (
     <section className="container">
       <h3 className="h3-mtmb">Команда</h3>
 
-      {rolesLoading ? (
+      {loading ? (
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
         <div className="error error-message">{error}</div>
@@ -162,25 +228,43 @@ function TeamPage() {
 
       <h3 className="h3-mtmb">Роли</h3>
 
-      {loading ? (
+      {rolesLoading ? (
         <div className="loading">Загрузка данных...</div>
       ) : rolesError ? (
-        <div className="error error-message">{error}</div>
+        <div className="error error-message">{rolesError}</div>
       ) : (
         <div className="container-scroll">
-          {team.length > 0 ? (
+          {rolesList.length > 0 ? (
             <table>
               <thead>
                 <tr>
-                  <th>Имя</th>
-                  <th>Имя латиницей</th>
+                  <th>Имя (рус)</th>
+                  <th>Имя (лат)</th>
+                  <th className="lastRow"></th>
                 </tr>
               </thead>
               <tbody>
-                {team.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
+                {rolesList.map((role) => (
+                  <tr key={role.id}>
+                    <td>{role.description || "Нет описания"}</td>
+                    <td>{role.name}</td>
+
+                    <td className="lastRow">
+                      {rolesUser === "admin" && (
+                        <div
+                          className="btns-direction"
+                          style={{ flexDirection: "end" }}
+                        >
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteRole(role.id)}
+                          >
+                            Удалить
+                          </button>
+                          <button className="change-btn">Редактирование</button>
+                        </div>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -212,7 +296,20 @@ function TeamPage() {
         user={selectedUser}
       />
 
-      <AddRole isOpen={roleOpen} onClose={closeModal} mode={modalMode} />
+      <AddRole
+        isOpen={roleOpen}
+        onClose={closeModal}
+        mode={modalMode}
+        onRoleCreated={handleRoleCreated}
+      />
+
+      {toast.show && (
+        <Toast
+          text={toast.text}
+          color={toast.color}
+          onClose={() => setToast({ show: false, text: "", color: "" })}
+        />
+      )}
     </section>
   );
 }
