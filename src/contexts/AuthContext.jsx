@@ -99,8 +99,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkAuthStatus();
-
-    // Добавляем глобальный перехватчик ошибок
     setupErrorInterceptor();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,8 +129,6 @@ export function AuthProvider({ children }) {
     window.fetch = async (...args) => {
       try {
         const response = await originalFetch(...args);
-
-        // Если получили 401 Unauthorized - разлогиниваем
         if (response.status === 401) {
           logout();
           throw new Error("Сессия истекла. Пожалуйста, войдите снова.");

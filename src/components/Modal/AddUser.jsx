@@ -219,12 +219,14 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
               value={password}
               onChange={handlePasswordChange}
               disabled={isLoading}
-              placeholder={
-                mode === "create"
-                  ? "Введите пароль"
-                  : "Оставьте пустым, если не меняете"
-              }
+              placeholder={"Введите пароль (минимум 6 символов)"}
+              minLength={6}
             />
+            {password.length > 0 && password.length < 6 && (
+              <small className="error-message">
+                Пароль слишком короткий. Минимальная длина: 6 символов
+              </small>
+            )}
           </div>
 
           <div className="form-group">
@@ -235,11 +237,7 @@ function AddUser({ isOpen, onClose, onUserCreated, mode, user }) {
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
               disabled={isLoading}
-              placeholder={
-                mode === "create"
-                  ? "Повторите пароль"
-                  : "Оставьте пустым, если не меняете"
-              }
+              placeholder={"Повторите пароль"}
             />
           </div>
 
