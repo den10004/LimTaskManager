@@ -24,7 +24,6 @@ function TeamPage() {
     text: "",
     color: "",
   });
-
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
@@ -244,29 +243,38 @@ function TeamPage() {
                 </tr>
               </thead>
               <tbody>
-                {rolesList.map((role) => (
-                  <tr key={role.id}>
-                    <td>{role.description || "Нет описания"}</td>
-                    <td>{role.name}</td>
+                {rolesList.map((role) => {
+                  // Проверяем, есть ли текущая роль пользователя в массиве roles
+                  const isCurrentUserRole = userData?.roles?.includes(
+                    role.name
+                  );
 
-                    <td className="lastRow">
-                      {rolesUser === "admin" && (
-                        <div
-                          className="btns-direction"
-                          style={{ flexDirection: "end" }}
-                        >
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDeleteRole(role.id)}
+                  return (
+                    <tr key={role.id}>
+                      <td>{role.description || "Нет описания"}</td>
+                      <td>{role.name}</td>
+
+                      <td className="lastRow">
+                        {rolesUser === "admin" && !isCurrentUserRole && (
+                          <div
+                            className="btns-direction"
+                            style={{ flexDirection: "end" }}
                           >
-                            Удалить
-                          </button>
-                          <button className="change-btn">Редактирование</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                            <button
+                              className="delete-btn"
+                              onClick={() => handleDeleteRole(role.id)}
+                            >
+                              Удалить
+                            </button>
+                            <button className="change-btn">
+                              Редактирование
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           ) : (
