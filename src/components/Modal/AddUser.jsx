@@ -11,12 +11,9 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [roles, setRoles] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [canAddRecords, setCanAddRecords] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
-
-  console.log(user);
 
   useEffect(() => {
     if (!isOpen) {
@@ -29,7 +26,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles("");
         setIsLoading(false);
         setError("");
-        setCanAddRecords(false);
       }, 300);
 
       return () => clearTimeout(timer);
@@ -45,8 +41,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles(user.roles?.[0] || "");
         setPassword("");
         setConfirmPassword("");
-
-        setCanAddRecords(!!user?.permissions?.[0]);
       } else {
         setName("");
         setEmail("");
@@ -54,7 +48,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setPassword("");
         setConfirmPassword("");
         setRoles("");
-        setCanAddRecords(false);
       }
       setIsLoading(false);
       setError("");
@@ -71,10 +64,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
     if (error) setError("");
   };
 
-  const handleCheckboxChange = (e) => {
-    setCanAddRecords(e.target.checked);
-  };
-
   const handleUser = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -87,13 +76,16 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
     }
 
     try {
+      const selectedRole = rolesList.find((role) => role.name === roles);
+
       const formData = {
         name,
         email,
         password,
         telegram_id: telegram,
-        roles: [roles],
-        ...(canAddRecords && { permissions: ["add_records"] }),
+        roles: selectedRole
+          ? [selectedRole.name, selectedRole.description]
+          : [],
       };
 
       const response = await fetch(`${API_URL}/users`, {
@@ -140,14 +132,15 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
     }
 
     try {
+      const selectedRole = rolesList.find((role) => role.name === roles);
+
       const formData = {};
 
       if (name) formData.name = name;
       if (password) formData.password = password;
       if (telegram !== undefined) formData.telegram_id = telegram;
-      if (roles) formData.roles = [roles];
-
-      formData.permissions = canAddRecords ? ["add_records"] : [];
+      if (selectedRole)
+        formData.roles = [selectedRole.name, selectedRole.description];
 
       if (Object.keys(formData).length === 0) {
         setError("Нет данных для обновления");
@@ -275,7 +268,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
             >
               <option value="">Выберите роль</option>
               {rolesList.map((role) => (
-                <option key={role.id} value={role.id}>
+                <option key={role.id} value={role.name}>
                   {role.description}
                 </option>
               ))}
@@ -286,12 +279,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
             <label
               style={{ display: "flex", alignItems: "center", gap: "5px" }}
             >
-              <input
-                type="checkbox"
-                checked={canAddRecords}
-                onChange={handleCheckboxChange}
-                disabled={isLoading}
-              />
+              <input type="checkbox" />
               Добавление записей
             </label>
           </div>
