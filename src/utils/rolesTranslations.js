@@ -18,14 +18,14 @@ export const taskStatus = [
   "Задача выполнена",
   "Ответственный назначен",
   "Новая",
-  "Задача принята в работу",
+  "Задача в работе",
 ];
 
 export const statusColors = {
   "Задача просрочена": "var(--color-err)",
   Новая: "var(--color-blue)",
   "Задача выполнена": "var(--color-green)",
-  "Задача принята в работу": "var(--color-blue)",
+  "Задача в работе": "var(--color-blue)",
 };
 
 export const colorMap = {

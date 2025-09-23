@@ -24,7 +24,6 @@ function Header() {
     logout();
     navigate("/");
   };
-  console.log(userData);
 
   return (
     <>

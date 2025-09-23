@@ -23,6 +23,7 @@ function AddRole({ isOpen, onClose, loading = false }) {
               value={roleRus}
               onChange={(e) => setRoleRus(e.target.value)}
               disabled={loading}
+              minLength={2}
             />
           </div>
 
@@ -34,6 +35,7 @@ function AddRole({ isOpen, onClose, loading = false }) {
               value={roleLat}
               onChange={(e) => setRoleLat(e.target.value)}
               disabled={loading}
+              minLength={2}
             />
           </div>
           {error && <div className="error-message">{error}</div>}
