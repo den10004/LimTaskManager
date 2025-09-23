@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 
-function AddRole({ isOpen, onClose, loading = false, mode, onRoleCreated }) {
+function AddRole({
+  isOpen,
+  onClose,
+  loading = false,
+  mode,
+  role,
+  onRoleCreated,
+}) {
   const [roleRus, setRoleRus] = useState("");
   const [roleLat, setRoleLat] = useState("");
   const [error, setError] = useState("");
@@ -10,6 +17,19 @@ function AddRole({ isOpen, onClose, loading = false, mode, onRoleCreated }) {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+
+  useEffect(() => {
+    if (isOpen) {
+      if (mode === "edit" && role) {
+        setRoleRus(role.description || "");
+        setRoleLat(role.name || "");
+      } else {
+        setRoleRus("");
+        setRoleLat("");
+      }
+      setError("");
+    }
+  }, [isOpen, mode, role]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +53,16 @@ function AddRole({ isOpen, onClose, loading = false, mode, onRoleCreated }) {
         description: roleRus.trim(),
       };
 
-      const response = await fetch(`${API_URL}/roles`, {
-        method: "POST",
+      let url = `${API_URL}/roles`;
+      let method = "POST";
+
+      if (mode === "edit" && role) {
+        url = `${API_URL}/roles/${role.id}`;
+        method = "PATCH";
+      }
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -44,27 +72,38 @@ function AddRole({ isOpen, onClose, loading = false, mode, onRoleCreated }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Ошибка при создании роли");
+        throw new Error(
+          errorData.message ||
+            `Ошибка при ${mode === "edit" ? "редактировании" : "создании"} роли`
+        );
       }
 
-      const createdRole = await response.json();
+      const result = await response.json();
 
-      const roleData = createdRole.item || createdRole.role || createdRole;
+      const roleData = result.item || result.role || result;
 
-      const newRole = {
-        id: roleData.id || Date.now(),
+      const updatedRole = {
+        id: roleData.id || (mode === "edit" ? role.id : Date.now()),
         name: roleData.name || roleLat.trim(),
         description: roleData.description || roleRus.trim(),
       };
 
       if (onRoleCreated) {
-        onRoleCreated(newRole);
+        onRoleCreated(updatedRole);
       }
 
       handleClose();
     } catch (error) {
-      setError(error.message || "Произошла ошибка при создании роли");
-      console.error("Ошибка при создании роли:", error);
+      setError(
+        error.message ||
+          `Произошла ошибка при ${
+            mode === "edit" ? "редактировании" : "создании"
+          } роли`
+      );
+      console.error(
+        `Ошибка при ${mode === "edit" ? "редактировании" : "создании"} роли:`,
+        error
+      );
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +157,13 @@ function AddRole({ isOpen, onClose, loading = false, mode, onRoleCreated }) {
               className="create-btn modal-button"
               disabled={isLoading || loading}
             >
-              {isLoading ? "Создание..." : "Сохранить"}
+              {isLoading
+                ? mode === "edit"
+                  ? "Сохранение..."
+                  : "Создание..."
+                : mode === "edit"
+                ? "Сохранить изменения"
+                : "Сохранить"}
             </button>
           </div>
         </form>

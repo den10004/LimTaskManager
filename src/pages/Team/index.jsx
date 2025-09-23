@@ -116,6 +116,13 @@ function TeamPage() {
     setModalMode("create");
   };
 
+  const openEditRoleModal = (role) => {
+    setSelectedUser(role);
+    console.log(role);
+    setModalMode("edit");
+    setRoleOpen(true);
+  };
+
   const openEditModal = (user) => {
     setSelectedUser(user);
     setModalMode("edit");
@@ -244,7 +251,6 @@ function TeamPage() {
               </thead>
               <tbody>
                 {rolesList.map((role) => {
-                  // Проверяем, есть ли текущая роль пользователя в массиве roles
                   const isCurrentUserRole = userData?.roles?.includes(
                     role.name
                   );
@@ -266,7 +272,10 @@ function TeamPage() {
                             >
                               Удалить
                             </button>
-                            <button className="change-btn">
+                            <button
+                              className="change-btn"
+                              onClick={() => openEditRoleModal(role)}
+                            >
                               Редактирование
                             </button>
                           </div>
@@ -308,6 +317,7 @@ function TeamPage() {
         isOpen={roleOpen}
         onClose={closeModal}
         mode={modalMode}
+        role={selectedUser}
         onRoleCreated={handleRoleCreated}
       />
 
