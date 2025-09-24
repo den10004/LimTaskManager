@@ -15,6 +15,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+  const isAdmin = user?.roles?.flat().includes("admin");
 
   useEffect(() => {
     if (!isOpen) {
@@ -71,7 +72,9 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   };
 
   const handleCheckboxChange = (e) => {
-    setCanAddRecords(e.target.checked);
+    if (!isAdmin) {
+      setCanAddRecords(e.target.checked);
+    }
   };
 
   const handleUser = async (e) => {
@@ -96,7 +99,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         roles: selectedRole
           ? [selectedRole.name, selectedRole.description]
           : [],
-        permissions: canAddRecords ? ["Добавление записей"] : [],
+        permissions: isAdmin || canAddRecords ? ["Добавление записей"] : [],
       };
 
       const response = await fetch(`${API_URL}/users`, {
@@ -153,8 +156,8 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
       if (selectedRole)
         formData.roles = [selectedRole.name, selectedRole.description];
 
-      // Добавляем permissions как массив
-      formData.permissions = canAddRecords ? ["Добавление записей"] : [];
+      formData.permissions =
+        isAdmin || canAddRecords ? ["Добавление записей"] : [];
 
       if (Object.keys(formData).length === 0) {
         setError("Нет данных для обновления");
@@ -170,7 +173,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         },
         body: JSON.stringify(formData),
       });
-
+      console.log(formData);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -295,11 +298,16 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
             >
               <input
                 type="checkbox"
-                checked={canAddRecords}
+                checked={isAdmin ? true : canAddRecords}
                 onChange={handleCheckboxChange}
-                disabled={isLoading}
+                disabled={isAdmin || isLoading}
               />
               Добавление записей
+              {isAdmin && (
+                <span
+                  style={{ color: "#666", fontSize: "12px", marginLeft: "5px" }}
+                ></span>
+              )}
             </label>
           </div>
 

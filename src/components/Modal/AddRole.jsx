@@ -158,12 +158,12 @@ function AddRole({
               disabled={isLoading || loading}
             >
               {isLoading
-                ? mode === "edit"
+                ? mode === "create"
                   ? "Сохранение..."
                   : "Создание..."
                 : mode === "edit"
-                ? "Сохранить изменения"
-                : "Сохранить"}
+                ? "Сохранить"
+                : "Создать"}
             </button>
           </div>
         </form>

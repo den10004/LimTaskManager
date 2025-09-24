@@ -5,8 +5,9 @@ function MainPage() {
         <svg
           version="1.1"
           viewBox="0 0 1400 222"
-          width="200"
-          height="50"
+          width="800"
+          height="200"
+          style={{ display: "flex", margin: "0 auto" }}
           xmlns="http://www.w3.org/2000/svg"
         >
           <g id="g7" transform="translate(-307.62,-889.08)">
