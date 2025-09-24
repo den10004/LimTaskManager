@@ -45,8 +45,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles(user.roles?.[0] || "");
         setPassword("");
         setConfirmPassword("");
-
-        // Проверяем, есть ли "Добавление записей" в массиве permissions
         setCanAddRecords(
           user.permissions?.includes("Добавление записей") || false
         );
@@ -100,7 +98,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         roles: selectedRole
           ? [selectedRole.name, selectedRole.description]
           : [],
-        permissions: canAddRecords ? ["Добавление записей"] : [], // Теперь это массив
+        permissions: canAddRecords ? ["Добавление записей"] : [],
       };
 
       const response = await fetch(`${API_URL}/users`, {

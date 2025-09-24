@@ -86,7 +86,9 @@ function Task() {
       !statusFilters.completed ||
       !statusFilters.overdue ||
       !statusFilters.extended ||
-      !statusFilters.assigned
+      !statusFilters.assigned ||
+      !statusFilters.work ||
+      !statusFilters.new
     ) {
       result = result.filter((task) => {
         if (task.status === "Задача выполнена" && !statusFilters.completed)
@@ -97,7 +99,7 @@ function Task() {
           return false;
         if (task.status === "Ответственный назначен" && !statusFilters.assigned)
           return false;
-        if (task.status === "Задача принята в работу" && !statusFilters.work)
+        if (task.status === "Задача в работе" && !statusFilters.work)
           return false;
         if (task.status === "Новая" && !statusFilters.new) return false;
         return true;
@@ -202,7 +204,7 @@ function Task() {
             checked={statusFilters.work}
             onChange={() => handleStatusFilterChange("work")}
           />
-          Задача принята в работу
+          Задача в работе
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
           <input
