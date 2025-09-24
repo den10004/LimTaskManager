@@ -1,7 +1,7 @@
 function MainPage() {
   return (
-    <section className="calendar container">
-      <h3 className="h3-mtmb">
+    <section className="container">
+      <div className="mainLogo">
         <svg
           version="1.1"
           viewBox="0 0 1400 222"
@@ -53,7 +53,7 @@ function MainPage() {
             ></path>
           </g>
         </svg>
-      </h3>
+      </div>
     </section>
   );
 }
