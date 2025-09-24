@@ -155,6 +155,7 @@ select {
 
 .container {
   max-width: 1200px;
+  margin-bottom: 50px;
 }
 
 
@@ -225,6 +226,7 @@ tr:last-child {
 @media screen and (max-width:1240px) {
   .container {
     padding: 0 20px;
+    margin-bottom: 30px;
   }
 }
 
@@ -239,5 +241,9 @@ tr:last-child {
   button {
     padding: 8px;
     font-size: 14px;
+  }
+
+  .select-status {
+    width: 100%;
   }
 }

@@ -10,12 +10,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 
 const formStyle = {
-  marginTop: "10px",
   width: "100%",
 };
-const formtext = {
-  width: "100%",
-};
+
 const commentsWrap = {
   marginBottom: "15px",
   padding: "10px",
@@ -423,7 +420,7 @@ function TaskDetails() {
   };
 
   return (
-    <div>
+    <div className="container">
       <button style={{ background: "transparent" }} onClick={handleBack}>
         ← Назад
       </button>
@@ -451,7 +448,14 @@ function TaskDetails() {
               <li>
                 <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
               </li>
-              <li style={{ display: "flex", alignItems: "center" }}>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "10px",
+                }}
+              >
                 <b>Срок выполнения:&nbsp;</b>
                 {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
                 <button
@@ -494,12 +498,15 @@ function TaskDetails() {
                     ...formStyle,
                     display: "flex",
                     alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "10px",
                   }}
                 >
                   <label htmlFor="status">
                     <b>Статус:&nbsp;</b>
                   </label>
                   <select
+                    className="select-status"
                     id="status"
                     name="status"
                     value={selectedStatus}
@@ -523,9 +530,8 @@ function TaskDetails() {
                         </option>
                       ))}
                   </select>
-                  &nbsp;
                   <button
-                    className="create-btn modal-button"
+                    className="create-btn"
                     style={{ width: "200px" }}
                     disabled={statusLoading || !selectedStatus}
                   >
@@ -576,7 +582,7 @@ function TaskDetails() {
 
             <form onSubmit={AddComments} style={formStyle}>
               <textarea
-                style={formtext}
+                style={formStyle}
                 type="text"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -584,8 +590,8 @@ function TaskDetails() {
                 required
               />
               <button
-                className="create-btn modal-button"
-                style={{ width: "200px" }}
+                className="create-btn"
+                style={{ width: "250px" }}
                 disabled={commentLoading || comment.length === 0}
               >
                 {commentLoading ? "Отправка..." : "Создать комментарий"}
@@ -655,7 +661,7 @@ function TaskDetails() {
                 )}
               </div>
               <button
-                className="create-btn modal-button"
+                className="create-btn"
                 style={{ width: "200px", marginTop: "10px" }}
                 disabled={fileLoading || files.length === 0}
               >

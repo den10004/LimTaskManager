@@ -85,23 +85,18 @@ function Task() {
     if (
       !statusFilters.completed ||
       !statusFilters.overdue ||
-      !statusFilters.extended ||
       !statusFilters.assigned ||
       !statusFilters.work ||
       !statusFilters.new
     ) {
       result = result.filter((task) => {
-        if (task.status === "Задача выполнена" && !statusFilters.completed)
+        if (task.status === "Выполнена" && !statusFilters.completed)
           return false;
-        if (task.status === "Задача просрочена" && !statusFilters.overdue)
-          return false;
-        if (task.status === "Задача продлена" && !statusFilters.extended)
+        if (task.status === "Просрочена" && !statusFilters.overdue)
           return false;
         if (task.status === "Ответственный назначен" && !statusFilters.assigned)
           return false;
-        if (task.status === "Задача в работе" && !statusFilters.work)
-          return false;
-        if (task.status === "Новая" && !statusFilters.new) return false;
+        if (task.status === "В работе" && !statusFilters.work) return false;
         return true;
       });
     }
@@ -172,7 +167,7 @@ function Task() {
             checked={statusFilters.completed}
             onChange={() => handleStatusFilterChange("completed")}
           />
-          Задача выполнена
+          Выполнена
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
           <input
@@ -180,15 +175,7 @@ function Task() {
             checked={statusFilters.overdue}
             onChange={() => handleStatusFilterChange("overdue")}
           />
-          Задача просрочена
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.extended}
-            onChange={() => handleStatusFilterChange("extended")}
-          />
-          Задача продлена
+          Просрочена
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
           <input
@@ -204,15 +191,7 @@ function Task() {
             checked={statusFilters.work}
             onChange={() => handleStatusFilterChange("work")}
           />
-          Задача в работе
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.new}
-            onChange={() => handleStatusFilterChange("new")}
-          />
-          Новая
+          В работе
         </label>
       </div>
 

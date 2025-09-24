@@ -1,13 +1,3 @@
-/*
-export const roleTranslations = {
-  admin: "администратор",
-  sales_manager: "менеджер продаж",
-};
-
-export const getTranslatedRole = (role) => {
-  return roleTranslations[role] || role;
-};
-*/
 export const restrictedDirections = [
   "Дистрибуция",
   "Партнерская программа",
@@ -15,18 +5,18 @@ export const restrictedDirections = [
 ];
 
 export const taskStatus = [
-  "Задача просрочена",
-  "Задача выполнена",
+  "Просрочена",
+  "Выполнена",
   "Ответственный назначен",
-  "Новая",
-  "Задача в работе",
+  // "Новая",
+  "В работе",
 ];
 
 export const statusColors = {
-  "Задача просрочена": "var(--color-err)",
-  Новая: "var(--color-blue)",
-  "Задача выполнена": "var(--color-green)",
-  "Задача в работе": "var(--color-blue)",
+  Просрочена: "var(--color-err)",
+  // Новая: "var(--color-blue)",
+  Выполнена: "var(--color-green)",
+  "В работе": "var(--color-blue)",
 };
 
 export const colorMap = {
