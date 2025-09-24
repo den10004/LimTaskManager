@@ -16,8 +16,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
-  console.log(user);
-
   useEffect(() => {
     if (!isOpen) {
       const timer = setTimeout(() => {

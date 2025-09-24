@@ -33,7 +33,6 @@ function Modal({ onCancel, onLoginSuccess }) {
       }
 
       const data = await response.json();
-
       if (data.token) {
         const userData = {
           email: data.user.email,
