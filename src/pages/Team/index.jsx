@@ -161,7 +161,6 @@ function TeamPage() {
     }
   };
 
-  console.log(team);
   return (
     <section className="container">
       <h3 className="h3-mtmb">Команда</h3>

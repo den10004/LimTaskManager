@@ -11,9 +11,12 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [roles, setRoles] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [canAddRecords, setCanAddRecords] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+
+  console.log(user);
 
   useEffect(() => {
     if (!isOpen) {
@@ -26,6 +29,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles("");
         setIsLoading(false);
         setError("");
+        setCanAddRecords(false);
       }, 300);
 
       return () => clearTimeout(timer);
@@ -41,6 +45,11 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setRoles(user.roles?.[0] || "");
         setPassword("");
         setConfirmPassword("");
+
+        // Проверяем, есть ли "Добавление записей" в массиве permissions
+        setCanAddRecords(
+          user.permissions?.includes("Добавление записей") || false
+        );
       } else {
         setName("");
         setEmail("");
@@ -48,6 +57,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         setPassword("");
         setConfirmPassword("");
         setRoles("");
+        setCanAddRecords(false);
       }
       setIsLoading(false);
       setError("");
@@ -62,6 +72,10 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const handleConfirmPasswordChange = (e) => {
     setConfirmPassword(e.target.value);
     if (error) setError("");
+  };
+
+  const handleCheckboxChange = (e) => {
+    setCanAddRecords(e.target.checked);
   };
 
   const handleUser = async (e) => {
@@ -86,6 +100,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         roles: selectedRole
           ? [selectedRole.name, selectedRole.description]
           : [],
+        permissions: canAddRecords ? ["Добавление записей"] : [], // Теперь это массив
       };
 
       const response = await fetch(`${API_URL}/users`, {
@@ -141,6 +156,9 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
       if (telegram !== undefined) formData.telegram_id = telegram;
       if (selectedRole)
         formData.roles = [selectedRole.name, selectedRole.description];
+
+      // Добавляем permissions как массив
+      formData.permissions = canAddRecords ? ["Добавление записей"] : [];
 
       if (Object.keys(formData).length === 0) {
         setError("Нет данных для обновления");
@@ -279,7 +297,12 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
             <label
               style={{ display: "flex", alignItems: "center", gap: "5px" }}
             >
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                checked={canAddRecords}
+                onChange={handleCheckboxChange}
+                disabled={isLoading}
+              />
               Добавление записей
             </label>
           </div>
