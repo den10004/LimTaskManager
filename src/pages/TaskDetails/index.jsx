@@ -517,8 +517,8 @@ function TaskDetails() {
                     {taskStatus
                       .filter((status) => {
                         if (
-                          status === "Задача принята в работу" &&
-                          userData?.name != getUserName(task?.assigned_user_id)
+                          status === "В работе" &&
+                          userData?.id != task?.assigned_user_id
                         ) {
                           return false;
                         }
