@@ -1,4 +1,4 @@
-import logo from "/logo-white.png";
+import logo from "/logo-white.webp";
 
 function MainPage() {
   return (

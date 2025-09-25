@@ -371,7 +371,7 @@ function TaskDetails() {
       setToast({
         show: true,
         text: "Важность обновлена",
-        color: "green",
+        color: "rgba(33, 197, 140, 1)",
       });
     } catch (err) {
       console.error(err);
@@ -571,17 +571,6 @@ function TaskDetails() {
                       {star <= task.urgency ? "★" : "☆"}
                     </span>
                   ))}
-                  {urgencyLoading && (
-                    <span
-                      style={{
-                        marginLeft: "10px",
-                        fontSize: "14px",
-                        color: "#666",
-                      }}
-                    >
-                      Обновление...
-                    </span>
-                  )}
                 </div>
               </li>
 
