@@ -471,6 +471,9 @@ function TaskDetails() {
               <li>
                 <b>Описание:</b> {task.description || "Не указано"}
               </li>
+              <li>
+                <b>Важность:</b> {"Не указано"}
+              </li>
 
               {task.links && (
                 <li style={{ display: "flex" }}>

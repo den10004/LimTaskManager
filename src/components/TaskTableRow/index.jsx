@@ -17,6 +17,7 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
+  const rating = 1;
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>
@@ -27,6 +28,18 @@ function TaskTableRow({ task, directions, team }) {
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}{" "}
+      </td>
+      <td
+        style={{
+          color:
+            rating <= 2
+              ? "var(--color-green)"
+              : rating === 3
+              ? "orange"
+              : "var(--color-err)",
+        }}
+      >
+        {"★".repeat(rating) + "☆".repeat(5 - rating)}
       </td>
       <td>{task.files.length}</td>
     </tr>

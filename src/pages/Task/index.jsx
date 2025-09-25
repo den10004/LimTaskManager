@@ -235,6 +235,7 @@ function Task() {
                 <th>Направление</th>
                 <th>Название</th>
                 <th>Статус</th>
+                <th>Важность</th>
                 <th>Файлы</th>
               </tr>
             </thead>
