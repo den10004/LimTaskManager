@@ -236,7 +236,6 @@ function Task() {
                 <th>Название</th>
                 <th>Статус</th>
                 <th>Важность</th>
-                <th>Файлы</th>
               </tr>
             </thead>
             <tbody id="tableBody">

@@ -17,6 +17,12 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
+  //просрочка**30 минут********
+  const deadline = new Date(Date.parse(task.created_at) + 1800000)
+    .toISOString()
+    .replace("Z", "+00:00");
+
+  /************************************************************************** */
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>
@@ -27,6 +33,9 @@ function TaskTableRow({ task, directions, team }) {
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}{" "}
+        {task.status === "Ответственный назначен" &&
+          new Date() > new Date(deadline) &&
+          " ⌛"}
       </td>
       <td
         style={{
@@ -40,7 +49,6 @@ function TaskTableRow({ task, directions, team }) {
       >
         {"★".repeat(task.urgency) + "☆".repeat(5 - task.urgency)}
       </td>
-      <td>{task.files.length}</td>
     </tr>
   );
 }
