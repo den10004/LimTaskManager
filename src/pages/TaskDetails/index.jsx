@@ -46,6 +46,7 @@ function TaskDetails() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
   const [dateLoading, setDateLoading] = useState(false);
+  const [urgencyLoading, setUrgencyLoading] = useState(false);
   const fileInputRef = useRef(null);
   const [toast, setToast] = useState({
     show: false,
@@ -337,6 +338,61 @@ function TaskDetails() {
     updateStatus(id);
   };
 
+  const updateUrgency = async (newUrgency) => {
+    setError("");
+    setUrgencyLoading(true);
+
+    if (!token) {
+      setError("Токен авторизации отсутствует");
+      setUrgencyLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/task/${id}/urgency`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ urgency: newUrgency }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Ошибка обновления важности");
+      }
+
+      const updatedTask = await response.json();
+      setTask((prevTask) => ({
+        ...prevTask,
+        urgency: updatedTask.urgency,
+      }));
+
+      setToast({
+        show: true,
+        text: "Важность обновлена",
+        color: "green",
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Ошибка обновления важности: " + err.message);
+      setToast({
+        show: true,
+        text: "Ошибка обновления важности",
+        color: "red",
+      });
+    } finally {
+      setUrgencyLoading(false);
+    }
+  };
+
+  const handleStarClick = (starIndex) => {
+    if (urgencyLoading) return;
+
+    const newUrgency = starIndex + 1;
+    updateUrgency(newUrgency);
+  };
+
   const updateDueDate = async (newDueDate) => {
     if (!newDueDate) {
       setError("Выберите дату и время");
@@ -420,6 +476,9 @@ function TaskDetails() {
     }
   };
 
+  console.log(task?.created_by);
+  console.log(userData.id);
+
   return (
     <div className="container">
       <button style={{ background: "transparent" }} onClick={handleBack}>
@@ -447,6 +506,9 @@ function TaskDetails() {
                 <b>Статус:</b> {task.status || "Не указано"}
               </li>
               <li>
+                <b>Задача создана:</b> {getUserName(task.created_by)}
+              </li>
+              <li>
                 <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
               </li>
               <li
@@ -472,19 +534,57 @@ function TaskDetails() {
               <li>
                 <b>Описание:</b> {task.description || "Не указано"}
               </li>
-              <li style={{ display: "flex" }}>
+              <li style={{ display: "flex", alignItems: "center" }}>
                 <b>Важность:&nbsp;</b>
-                <div
-                  style={{
-                    color:
-                      task.urgency <= 2
-                        ? "var(--color-green)"
-                        : task.urgency === 3
-                        ? "orange"
-                        : "var(--color-err)",
-                  }}
-                >
-                  {"★".repeat(task.urgency) + "☆".repeat(5 - task.urgency)}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      onClick={() =>
+                        task?.created_by === userData.id &&
+                        handleStarClick(star - 1)
+                      }
+                      style={{
+                        cursor:
+                          task?.created_by === userData.id
+                            ? urgencyLoading
+                              ? "not-allowed"
+                              : "pointer"
+                            : "not-allowed",
+                        color:
+                          star <= task.urgency
+                            ? task.urgency <= 2
+                              ? "var(--color-green)"
+                              : task.urgency === 3
+                              ? "orange"
+                              : "var(--color-err)"
+                            : "#ddd",
+                        fontSize: "20px",
+                        marginRight: "2px",
+                        opacity:
+                          task?.created_by === userData.id
+                            ? urgencyLoading
+                              ? 0.6
+                              : 1
+                            : 0.6,
+                        transition: "all 0.2s ease",
+                      }}
+                      title={`Установить важность: ${star}`}
+                    >
+                      {star <= task.urgency ? "★" : "☆"}
+                    </span>
+                  ))}
+                  {urgencyLoading && (
+                    <span
+                      style={{
+                        marginLeft: "10px",
+                        fontSize: "14px",
+                        color: "#666",
+                      }}
+                    >
+                      Обновление...
+                    </span>
+                  )}
                 </div>
               </li>
 
@@ -648,18 +748,7 @@ function TaskDetails() {
                     >
                       загрузите
                     </a>
-                  </div>{" "}
-                  {/*
-                  <span
-                    style={{
-                      margin: "0 auto",
-                      color: "rgba(156, 163, 175, 1)",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Поддержка нескольких типов файлов
-                  </span>
-*/}
+                  </div>
                   <input
                     ref={fileInputRef}
                     type="file"
