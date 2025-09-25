@@ -476,9 +476,6 @@ function TaskDetails() {
     }
   };
 
-  console.log(task?.created_by);
-  console.log(userData.id);
-
   return (
     <div className="container">
       <button style={{ background: "transparent" }} onClick={handleBack}>
