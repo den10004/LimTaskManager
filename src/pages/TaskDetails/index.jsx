@@ -11,6 +11,7 @@ import Toast from "../../components/Toast";
 
 const formStyle = {
   width: "100%",
+  marginTop: "10px",
 };
 
 const commentsWrap = {
@@ -471,8 +472,20 @@ function TaskDetails() {
               <li>
                 <b>Описание:</b> {task.description || "Не указано"}
               </li>
-              <li>
-                <b>Важность:</b> {"Не указано"}
+              <li style={{ display: "flex" }}>
+                <b>Важность:&nbsp;</b>
+                <div
+                  style={{
+                    color:
+                      task.urgency <= 2
+                        ? "var(--color-green)"
+                        : task.urgency === 3
+                        ? "orange"
+                        : "var(--color-err)",
+                  }}
+                >
+                  {"★".repeat(task.urgency) + "☆".repeat(5 - task.urgency)}
+                </div>
               </li>
 
               {task.links && (
@@ -564,7 +577,7 @@ function TaskDetails() {
               )}
               <li style={{ display: "flex", flexDirection: "column" }}>
                 <b>Комментарии: </b>
-                <div style={{ marginLeft: "5px", marginTop: "10px" }}>
+                <div style={{ margin: "10px 0 10px 0" }}>
                   {task.comments && task.comments.length > 0 ? (
                     task.comments.map((comment, index) => (
                       <div key={index} style={commentsWrap}>
@@ -594,7 +607,7 @@ function TaskDetails() {
               />
               <button
                 className="create-btn"
-                style={{ width: "250px" }}
+                style={{ width: "250px", marginTop: "10px" }}
                 disabled={commentLoading || comment.length === 0}
               >
                 {commentLoading ? "Отправка..." : "Создать комментарий"}

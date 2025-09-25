@@ -17,7 +17,6 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
-  const rating = 2;
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>
@@ -32,14 +31,14 @@ function TaskTableRow({ task, directions, team }) {
       <td
         style={{
           color:
-            rating <= 2
+            task.urgency <= 2
               ? "var(--color-green)"
-              : rating === 3
+              : task.urgency === 3
               ? "orange"
               : "var(--color-err)",
         }}
       >
-        {"★".repeat(rating) + "☆".repeat(5 - rating)}
+        {"★".repeat(task.urgency) + "☆".repeat(5 - task.urgency)}
       </td>
       <td>{task.files.length}</td>
     </tr>

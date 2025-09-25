@@ -12,8 +12,10 @@ function CreatePage() {
     title: "",
     due_at: "",
     assigned_user_id: "",
+    urgency: 0,
     description: "",
     direction_id: "",
+
     files: [],
     links: [""],
   });
@@ -101,9 +103,9 @@ function CreatePage() {
           title: formData.title,
           description: formData.description,
           direction_id: formData.direction_id,
-          importance: formData.importance,
           due_at: formData.due_at,
           assigned_user_id: formData.assigned_user_id,
+          urgency: formData.urgency,
           links: formData.links.filter((link) => link.trim() !== ""),
           files: [],
         }),
@@ -283,11 +285,11 @@ function CreatePage() {
           </div>
 
           <div className="create__block">
-            <label htmlFor="importance">Важность задачи</label>
+            <label htmlFor="urgency">Важность задачи *</label>
             <select
-              id="importance"
-              name="importance"
-              value={formData.importance}
+              id="urgency"
+              name="urgency"
+              value={formData.urgency}
               onChange={handleInputChange}
               required
             >
