@@ -17,7 +17,7 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
-  const rating = 1;
+  const rating = 2;
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>

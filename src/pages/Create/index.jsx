@@ -101,6 +101,7 @@ function CreatePage() {
           title: formData.title,
           description: formData.description,
           direction_id: formData.direction_id,
+          importance: formData.importance,
           due_at: formData.due_at,
           assigned_user_id: formData.assigned_user_id,
           links: formData.links.filter((link) => link.trim() !== ""),
@@ -279,6 +280,24 @@ function CreatePage() {
                 ))}
               </select>
             )}
+          </div>
+
+          <div className="create__block">
+            <label htmlFor="importance">Важность задачи</label>
+            <select
+              id="importance"
+              name="importance"
+              value={formData.importance}
+              onChange={handleInputChange}
+              required
+            >
+              <option value=""></option>
+              {[1, 2, 3, 4, 5]?.map((number) => (
+                <option key={number} value={number}>
+                  {number}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="create__block">
