@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Modal from "./../Modal";
 import { useAuth } from "../../contexts/AuthContext";
-import "./style.css";
 import { useUser } from "../../contexts/UserContext";
+import "./style.css";
 
 function Header() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ function Header() {
   const hasAddPermission =
     userInfo?.permissions?.includes("Добавление записей");
 
-  // Массив с навигационными ссылками
   const navLinks = [
     { to: "/kanban", label: "Доска" },
     { to: "/calendar", label: "Календарь" },
@@ -24,7 +23,6 @@ function Header() {
     { to: "/team", label: "Команда" },
   ];
 
-  // Добавляем ссылку "Постановка задач" только если есть права
   if (hasAddPermission) {
     navLinks.splice(4, 0, { to: "/create", label: "Постановка задач" });
   }
