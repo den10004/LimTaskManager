@@ -1,106 +1,42 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header/Header";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import TeamPage from "./pages/Team";
-import CreatePage from "./pages/Create";
-import MainPage from "./pages/Main";
-import TaskDetails from "./pages/TaskDetails";
-import Directions from "./pages/Directions";
-import Calendar from "./pages/Calendar";
-import Task from "./pages/Task";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { TeamProvider } from "./contexts/TeamContext";
-import Kanban from "./pages/Kanban";
-import { UserProvider } from "./contexts/UserContext";
-
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <div className="loading">Загрузка...</div>;
-  }
-
-  return isAuthenticated ? children : <Navigate to="/" replace />;
-}
+import { AppProviders } from "./AppProviders";
+import { routes } from "./routesConfig";
+import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
   return (
-    <AuthProvider>
-      <UserProvider>
-        <TeamProvider>
-          <Router>
-            <div className="App">
-              <Header />
-              <Routes>
-                <Route path="/" element={<MainPage />} />
-
+    <AppProviders>
+      <Router>
+        <div className="App">
+          <Header />
+          <Routes>
+            {routes.map((route) => {
+              const {
+                path,
+                component: Component,
+                protected: isProtected,
+              } = route;
+              return (
                 <Route
-                  path="/kanban"
+                  key={path}
+                  path={path}
                   element={
-                    <ProtectedRoute>
-                      <Kanban />
-                    </ProtectedRoute>
+                    isProtected ? (
+                      <ProtectedRoute>
+                        <Component />
+                      </ProtectedRoute>
+                    ) : (
+                      <Component />
+                    )
                   }
                 />
-
-                <Route
-                  path="/calendar"
-                  element={
-                    <ProtectedRoute>
-                      <Calendar />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/task"
-                  element={
-                    <ProtectedRoute>
-                      <Task />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/team"
-                  element={
-                    <ProtectedRoute>
-                      <TeamPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/tasks/:id"
-                  element={
-                    <ProtectedRoute>
-                      <TaskDetails />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/directions"
-                  element={
-                    <ProtectedRoute>
-                      <Directions />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/create"
-                  element={
-                    <ProtectedRoute>
-                      <CreatePage />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </div>
-          </Router>
-        </TeamProvider>
-      </UserProvider>
-    </AuthProvider>
+              );
+            })}
+          </Routes>
+        </div>
+      </Router>
+    </AppProviders>
   );
 }
 
