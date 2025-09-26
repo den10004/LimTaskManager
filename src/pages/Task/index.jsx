@@ -82,18 +82,9 @@ function Task() {
     fetchAllTasks();
   }, [fetchAllTasks]);
 
-  const filteredAndSortedTasks = useMemo(() => {
-    let result = [...allTasks];
-
-    if (searchName.trim()) {
-      const lowerSearch = searchName.toLowerCase();
-      result = result.filter((task) => {
-        const user = team.find((m) => m.id === task.assigned_user_id);
-        return user?.name.toLowerCase().includes(lowerSearch);
-      });
-    }
-
-    result = result.filter((task) => {
+  // Фильтрация по статусу
+  const statusFilteredTasks = useMemo(() => {
+    return allTasks.filter((task) => {
       if (task.status === "Выполнена" && !statusFilters.completed) return false;
       if (task.status === "Просрочена" && !statusFilters.overdue) return false;
       if (task.status === "Ответственный назначен" && !statusFilters.assigned)
@@ -101,23 +92,34 @@ function Task() {
       if (task.status === "В работе" && !statusFilters.work) return false;
       return true;
     });
+  }, [allTasks, statusFilters]);
 
-    if (sortDirection) {
-      result.sort((a, b) => {
-        const dateA = new Date(a.due_at || 0);
-        const dateB = new Date(b.due_at || 0);
-        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
-      });
-    }
+  // Фильтрация по поиску
+  const searchFilteredTasks = useMemo(() => {
+    if (!searchName.trim()) return statusFilteredTasks;
+    const lowerSearch = searchName.toLowerCase();
+    return statusFilteredTasks.filter((task) => {
+      const user = team.find((m) => m.id === task.assigned_user_id);
+      return user?.name.toLowerCase().includes(lowerSearch);
+    });
+  }, [statusFilteredTasks, searchName, team]);
 
-    return result;
-  }, [allTasks, team, searchName, statusFilters, sortDirection]);
+  // Сортировка
+  const sortedTasks = useMemo(() => {
+    if (!sortDirection) return searchFilteredTasks;
+    return [...searchFilteredTasks].sort((a, b) => {
+      const dateA = new Date(a.due_at || 0);
+      const dateB = new Date(b.due_at || 0);
+      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  }, [searchFilteredTasks, sortDirection]);
 
+  // Пагинация
   const displayedTasks = useMemo(() => {
-    const result = filteredAndSortedTasks.slice(0, offset + limit);
-    setHasMore(filteredAndSortedTasks.length > result.length);
+    const result = sortedTasks.slice(0, offset + limit);
+    setHasMore(sortedTasks.length > result.length);
     return result;
-  }, [filteredAndSortedTasks, offset, limit]);
+  }, [sortedTasks, offset, limit]);
 
   const handleLoadMore = () => {
     setOffset((prev) => prev + 10);

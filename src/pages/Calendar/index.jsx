@@ -3,7 +3,7 @@ import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 
 const statusColorMap = {
-  "Задача просрочена": "var(--color-err)",
+  Просрочена: "var(--color-err)",
   default: "var(--color-blue)",
 };
 

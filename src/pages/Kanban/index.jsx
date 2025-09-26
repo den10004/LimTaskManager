@@ -160,7 +160,7 @@ function Kanban() {
                   key={task.id}
                   href={`/tasks/${task.id}`}
                   className={`task-bar ${
-                    task.status === "Задача просрочена"
+                    task.status === "Просрочена"
                       ? "bg-red-500 text-white"
                       : "bg-gray-200 text-black"
                   }`}
