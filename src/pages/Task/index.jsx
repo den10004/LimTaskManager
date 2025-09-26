@@ -1,198 +1,186 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 
-const addBtn = {
-  display: "flex",
-  margin: "30px auto",
+const INITIAL_LIMIT = 20;
+const addBtnStyle = { display: "flex", margin: "30px auto" };
+const searchInputStyle = {
+  marginBottom: "20px",
+  padding: "8px",
+  width: "100%",
 };
+const filtersContainerStyle = {
+  marginBottom: "20px",
+  display: "flex",
+  gap: "15px",
+  flexWrap: "wrap",
+};
+const filterLabelStyle = { display: "flex", alignItems: "center", gap: "5px" };
+const sortButtonStyle = (active) => ({
+  marginLeft: "5px",
+  padding: "0",
+  background: active ? "#ddd" : "transparent",
+  border: "none",
+  cursor: "pointer",
+});
 
 function Task() {
   const [allTasks, setAllTasks] = useState([]);
-  const [displayedTasks, setDisplayedTasks] = useState([]);
   const [directions, setDirections] = useState([]);
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(20);
+  const [limit, setLimit] = useState(INITIAL_LIMIT);
   const [hasMore, setHasMore] = useState(true);
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
   const [statusFilters, setStatusFilters] = useState({
     completed: true,
     overdue: true,
-    extended: true,
     assigned: true,
     work: true,
-    new: true,
   });
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
 
-  const fetchAllTasks = async () => {
+  const resetPagination = useCallback(() => {
+    setOffset(0);
+    setLimit(INITIAL_LIMIT);
+  }, []);
+
+  const fetchAllTasks = useCallback(async () => {
     try {
       const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
+      if (!token) throw new Error("Токен авторизации отсутствует");
 
-      const url = `${API_URL}/task`;
-
-      const response = await fetch(url, {
-        method: "GET",
+      const response = await fetch(`${API_URL}/task`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTPS: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
 
       const data = await response.json();
       setAllTasks(data.items || []);
-      setIsLoading(false);
       setHasMore(false);
     } catch (err) {
-      console.error("Fetch error:", err.message);
+      console.error("Fetch error:", err);
       setError(`Ошибка загрузки данных: ${err.message}`);
-      setIsLoading(false);
       setHasMore(false);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [API_URL]);
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
     fetchAllTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchAllTasks]);
 
-  useEffect(() => {
-    let result = allTasks;
+  const filteredAndSortedTasks = useMemo(() => {
+    let result = [...allTasks];
 
-    if (searchName.trim() !== "") {
-      const lowerSearchName = searchName.toLowerCase();
+    if (searchName.trim()) {
+      const lowerSearch = searchName.toLowerCase();
       result = result.filter((task) => {
-        const user = team.find((member) => member.id === task.assigned_user_id);
-        return user?.name.toLowerCase().includes(lowerSearchName);
+        const user = team.find((m) => m.id === task.assigned_user_id);
+        return user?.name.toLowerCase().includes(lowerSearch);
       });
     }
 
-    if (
-      !statusFilters.completed ||
-      !statusFilters.overdue ||
-      !statusFilters.assigned ||
-      !statusFilters.work ||
-      !statusFilters.new
-    ) {
-      result = result.filter((task) => {
-        if (task.status === "Выполнена" && !statusFilters.completed)
-          return false;
-        if (task.status === "Просрочена" && !statusFilters.overdue)
-          return false;
-        if (task.status === "Ответственный назначен" && !statusFilters.assigned)
-          return false;
-        if (task.status === "В работе" && !statusFilters.work) return false;
-        return true;
-      });
-    }
+    result = result.filter((task) => {
+      if (task.status === "Выполнена" && !statusFilters.completed) return false;
+      if (task.status === "Просрочена" && !statusFilters.overdue) return false;
+      if (task.status === "Ответственный назначен" && !statusFilters.assigned)
+        return false;
+      if (task.status === "В работе" && !statusFilters.work) return false;
+      return true;
+    });
 
     if (sortDirection) {
-      result = [...result].sort((a, b) => {
+      result.sort((a, b) => {
         const dateA = new Date(a.due_at || 0);
         const dateB = new Date(b.due_at || 0);
         return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
       });
     }
 
-    const paginatedResult = result.slice(0, offset + limit);
-    setDisplayedTasks(paginatedResult);
+    return result;
+  }, [allTasks, team, searchName, statusFilters, sortDirection]);
 
-    setHasMore(result.length > paginatedResult.length);
-  }, [allTasks, searchName, team, sortDirection, offset, limit, statusFilters]);
+  const displayedTasks = useMemo(() => {
+    const result = filteredAndSortedTasks.slice(0, offset + limit);
+    setHasMore(filteredAndSortedTasks.length > result.length);
+    return result;
+  }, [filteredAndSortedTasks, offset, limit]);
 
   const handleLoadMore = () => {
-    setOffset((prevOffset) => prevOffset + 10);
-    setLimit((prevLimit) => prevLimit + 20);
+    setOffset((prev) => prev + 10);
+    setLimit((prev) => prev + 20);
   };
 
   const handleSearch = (e) => {
-    const newSearchName = e.target.value;
-    setSearchName(newSearchName);
-    setOffset(0);
-    setLimit(20);
+    setSearchName(e.target.value);
+    resetPagination();
   };
 
   const handleSort = (direction) => {
     setSortDirection(direction);
-    setOffset(0);
-    setLimit(20);
+    resetPagination();
   };
 
   const handleStatusFilterChange = (status) => {
-    setStatusFilters((prev) => ({
-      ...prev,
-      [status]: !prev[status],
-    }));
-    setOffset(0);
-    setLimit(20);
+    setStatusFilters((prev) => ({ ...prev, [status]: !prev[status] }));
+    resetPagination();
   };
 
   return (
     <section className="container">
       <h3 className="h3-mtmb">Список задач</h3>
+
       <input
         type="text"
         placeholder="Поиск по имени назначенного пользователя"
         value={searchName}
         onChange={handleSearch}
-        style={{ marginBottom: "20px", padding: "8px", width: "100%" }}
+        style={searchInputStyle}
       />
 
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          gap: "15px",
-          flexWrap: "wrap",
-        }}
-      >
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.completed}
-            onChange={() => handleStatusFilterChange("completed")}
-          />
-          Выполнена
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.overdue}
-            onChange={() => handleStatusFilterChange("overdue")}
-          />
-          Просрочена
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.assigned}
-            onChange={() => handleStatusFilterChange("assigned")}
-          />
-          Ответственный назначен
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <input
-            type="checkbox"
-            checked={statusFilters.work}
-            onChange={() => handleStatusFilterChange("work")}
-          />
-          В работе
-        </label>
+      <div style={filtersContainerStyle}>
+        {Object.entries(statusFilters).map(([key, value]) => {
+          let label = "";
+          switch (key) {
+            case "completed":
+              label = "Выполнена";
+              break;
+            case "overdue":
+              label = "Просрочена";
+              break;
+            case "assigned":
+              label = "Ответственный назначен";
+              break;
+            case "work":
+              label = "В работе";
+              break;
+            default:
+              break;
+          }
+          return (
+            <label key={key} style={filterLabelStyle}>
+              <input
+                type="checkbox"
+                checked={value}
+                onChange={() => handleStatusFilterChange(key)}
+              />
+              {label}
+            </label>
+          );
+        })}
       </div>
 
       {loading ? (
@@ -211,23 +199,13 @@ function Task() {
                   Срок выполнения
                   <button
                     onClick={() => handleSort("asc")}
-                    style={{
-                      marginLeft: "5px",
-                      padding: "0px 0px 0px 0px",
-                      background:
-                        sortDirection === "asc" ? "#ddd" : "transparent",
-                    }}
+                    style={sortButtonStyle(sortDirection === "asc")}
                   >
                     ↑
                   </button>
                   <button
                     onClick={() => handleSort("desc")}
-                    style={{
-                      marginLeft: "5px",
-                      padding: "0px 0px 0px 0px",
-                      background:
-                        sortDirection === "desc" ? "#ddd" : "transparent",
-                    }}
+                    style={sortButtonStyle(sortDirection === "desc")}
                   >
                     ↓
                   </button>
@@ -238,7 +216,7 @@ function Task() {
                 <th>Важность</th>
               </tr>
             </thead>
-            <tbody id="tableBody">
+            <tbody>
               {displayedTasks.length > 0 ? (
                 displayedTasks.map((task) => (
                   <TaskTableRow
@@ -259,8 +237,9 @@ function Task() {
           </table>
         </div>
       )}
+
       {hasMore && !loading && !error && (
-        <button className="create-btn" style={addBtn} onClick={handleLoadMore}>
+        <button style={addBtnStyle} onClick={handleLoadMore}>
           Загрузить ещё
         </button>
       )}
