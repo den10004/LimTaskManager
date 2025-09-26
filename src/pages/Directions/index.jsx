@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { restrictedDirections } from "../../utils/rolesTranslations";
-import "./style.css";
 import { useAuth } from "../../contexts/AuthContext";
+import "./style.css";
 
 function Directions() {
   const { userData } = useAuth();
   const rolesUser = userData.roles.join("");
 
-  const [direction, setDirection] = useState([]);
+  const [directions, setDirections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(null);
@@ -19,19 +19,17 @@ function Directions() {
 
   const API_URL = import.meta.env.VITE_API_KEY;
 
+  const loadDirections = useCallback(() => {
+    fetchDirections(setDirections, setLoading, setError);
+  }, []);
+
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Вы уверены, что хотите удалить это направление?"
-    );
-    if (!confirmDelete) {
+    if (!window.confirm("Вы уверены, что хотите удалить это направление?"))
       return;
-    }
 
     try {
       const token = getCookie("authTokenPM");
-      if (!token) {
-        throw new Error("Токен авторизации отсутствует");
-      }
+      if (!token) throw new Error("Токен авторизации отсутствует");
 
       const response = await fetch(`${API_URL}/directions/${id}`, {
         method: "DELETE",
@@ -41,15 +39,14 @@ function Directions() {
         },
       });
 
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`Ошибка при удалении: ${response.status}`);
-      }
 
-      setDirection((prev) => prev.filter((task) => task.id !== id));
+      setDirections((prev) => prev.filter((task) => task.id !== id));
     } catch (err) {
-      setError("Ошибка при удалении направления");
       console.error(err.message);
-      fetchDirections(setDirection, setLoading, setError);
+      setError("Ошибка при удалении направления");
+      loadDirections();
     }
   };
 
@@ -58,10 +55,6 @@ function Directions() {
     setDirectionToEdit(direction);
     setIsModalOpen(true);
   };
-
-  useEffect(() => {
-    fetchDirections(setDirection, setLoading, setError);
-  }, []);
 
   const openModal = () => {
     setModalMode("add");
@@ -76,83 +69,74 @@ function Directions() {
 
   const handleDirectionAdded = (newDirection, isOptimistic) => {
     if (isOptimistic && newDirection) {
-      setDirection((prev) => [...prev, newDirection]);
-    } else if (!isOptimistic && newDirection) {
-      fetchDirections(setDirection, setLoading, setError);
-    } else if (!isOptimistic && !newDirection) {
-      fetchDirections(setDirection, setLoading, setError);
+      setDirections((prev) => [...prev, newDirection]);
+    } else {
+      loadDirections();
     }
   };
 
   const handleDirectionEdited = (updatedDirection) => {
     if (updatedDirection) {
-      setDirection((prev) =>
+      setDirections((prev) =>
         prev.map((dir) =>
           dir.id === updatedDirection.id ? updatedDirection : dir
         )
       );
     } else {
-      fetchDirections(setDirection, setLoading, setError);
+      loadDirections();
     }
   };
+
+  useEffect(() => {
+    loadDirections();
+  }, [loadDirections]);
 
   return (
     <section className="container">
       <h3 className="h3-mtmb">Направления</h3>
+
       {loading ? (
         <div className="loading">Загрузка данных...</div>
       ) : error ? (
         <div className="error error-message">{error}</div>
-      ) : (
+      ) : directions.length > 0 ? (
         <div className="container-scroll">
-          {direction.length > 0 ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>Направления</th>
-                </tr>
-              </thead>
-              <tbody>
-                {direction.map((task) => (
-                  <tr key={task.id}>
-                    <td
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <div style={{ minWidth: "210px" }}>{task.name}</div>
-                      {!restrictedDirections.includes(task.name) && (
+          <table>
+            <thead>
+              <tr>
+                <th>Направления</th>
+              </tr>
+            </thead>
+            <tbody>
+              {directions.map((task) => (
+                <tr key={task.id}>
+                  <td style={{ display: "flex", alignItems: "center" }}>
+                    <div style={{ minWidth: "210px" }}>{task.name}</div>
+                    {!restrictedDirections.includes(task.name) &&
+                      rolesUser === "admin" && (
                         <div className="btns-direction">
-                          {rolesUser === "admin" && (
-                            <>
-                              <button
-                                className="delete-btn"
-                                onClick={() => handleDelete(task.id)}
-                              >
-                                Удалить
-                              </button>
-                              <button
-                                className="change-btn"
-                                onClick={() => handleEdit(task)}
-                              >
-                                Редактировать
-                              </button>
-                            </>
-                          )}
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(task.id)}
+                          >
+                            Удалить
+                          </button>
+                          <button
+                            className="change-btn"
+                            onClick={() => handleEdit(task)}
+                          >
+                            Редактировать
+                          </button>
                         </div>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="error error-message">
-              Нет данных для отображения
-            </div>
-          )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      ) : (
+        <div className="error error-message">Нет данных для отображения</div>
       )}
 
       {rolesUser === "admin" && (
