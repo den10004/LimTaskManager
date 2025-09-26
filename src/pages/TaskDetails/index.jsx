@@ -1,5 +1,5 @@
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
@@ -9,365 +9,382 @@ import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 
-const formStyle = {
-  width: "100%",
-  marginTop: "10px",
+const styles = {
+  container: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    padding: "20px",
+  },
+  backButton: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "16px",
+    marginBottom: "20px",
+  },
+  taskTitle: {
+    margin: "30px 0",
+    color: "#333",
+  },
+  taskHeader: {
+    margin: "30px 0",
+  },
+  form: {
+    width: "100%",
+    marginTop: "10px",
+  },
+  commentsWrap: {
+    marginBottom: "15px",
+    padding: "10px",
+    backgroundColor: "#f5f5f5",
+    borderRadius: "5px",
+  },
+  comments: {
+    fontSize: "12px",
+    color: "#666",
+    marginTop: "5px",
+  },
+  flexColumn: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+  flexAlignCenter: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "10px",
+  },
+  flexCenter: {
+    display: "flex",
+    alignItems: "center",
+  },
+  taskInfoList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+  },
+  statusForm: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "10px",
+  },
+  commentsSection: {
+    margin: "10px 0",
+  },
+  commentsList: {
+    margin: "10px 0",
+  },
+  fileUploadArea: {
+    marginBottom: "15px",
+  },
+  fileDropZone: (isDragging) => ({
+    cursor: "pointer",
+    border: isDragging ? "2px dashed #3b82f6" : "2px dashed #d1d5db",
+    backgroundColor: isDragging ? "#f0f9ff" : "transparent",
+    transition: "all 0.2s ease",
+    padding: "40px 20px",
+    textAlign: "center",
+    borderRadius: "8px",
+  }),
+  linksContainer: {
+    marginLeft: "5px",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+  },
+  filesContainer: {
+    marginLeft: "5px",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+  },
+  urgencyStars: {
+    display: "flex",
+    alignItems: "center",
+  },
+  loading: {
+    textAlign: "center",
+    padding: "40px",
+    fontSize: "18px",
+  },
+  error: {
+    color: "#dc2626",
+    padding: "20px",
+    background: "#fef2f2",
+    borderRadius: "4px",
+    margin: "20px 0",
+  },
 };
 
-const commentsWrap = {
-  marginBottom: "15px",
-  padding: "10px",
-  backgroundColor: "#f5f5f5",
-  borderRadius: "5px",
-};
-const comments = {
-  fontSize: "12px",
-  color: "#666",
-  marginTop: "5px",
-};
-const taskHeader = {
-  margin: "30px 0",
+const MAX_URGENCY_STARS = 5;
+const URGENCY_COLORS = {
+  low: "var(--color-green)",
+  medium: "orange",
+  high: "var(--color-err)",
 };
 
-function TaskDetails() {
-  const { id } = useParams();
+const TaskDetails = () => {
+  const { id: taskId } = useParams();
   const navigate = useNavigate();
+  const { team } = useTeam();
+  const { userData } = useAuth();
+
   const [task, setTask] = useState(null);
   const [comment, setComment] = useState("");
   const [files, setFiles] = useState([]);
-  const [loading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [commentLoading, setCommentLoading] = useState(false);
-  const [fileLoading, setFileLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [direction, setDirection] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [statusLoading, setStatusLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
-  const [dateLoading, setDateLoading] = useState(false);
-  const [urgencyLoading, setUrgencyLoading] = useState(false);
-  const fileInputRef = useRef(null);
-  const [toast, setToast] = useState({
-    show: false,
-    text: "",
-    color: "",
+  const [toast, setToast] = useState({ show: false, text: "", color: "" });
+
+  const [loadings, setLoadings] = useState({
+    comment: false,
+    file: false,
+    status: false,
+    date: false,
+    urgency: false,
   });
 
+  const fileInputRef = useRef(null);
   const API_URL = import.meta.env.VITE_API_KEY;
-  const { team } = useTeam();
-  const { userData } = useAuth();
   const token = getCookie("authTokenPM");
 
-  const getUserName = (userId) => {
-    const foundUser = team.find((user) => user.id === userId);
-    return foundUser ? foundUser.name : "Неизвестный пользователь";
-  };
+  const isAdmin = userData?.roles?.includes("admin");
 
-  const fetchTaskById = async (id) => {
-    if (!token) {
-      throw new Error("Токен авторизации отсутствует");
-    }
+  const userPermissions = useMemo(
+    () => ({
+      canEditUrgency: task?.created_by === userData?.id,
+      canChangeStatus: userData?.id === task?.assigned_user_id,
+      isAdmin: userData?.roles?.includes("admin"),
+    }),
+    [task, userData]
+  );
 
-    try {
-      const response = await fetch(`${API_URL}/task/${id}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+  const filteredStatuses = useMemo(
+    () =>
+      taskStatus.filter(
+        (status) =>
+          status !== "В работе" || userData?.id === task?.assigned_user_id
+      ),
+    [task, userData]
+  );
 
-      if (!response.ok) {
-        setToast({
-          show: true,
-          text: "Ошибка загрузки задачи",
-          color: "red",
-        });
+  const getUserName = useCallback(
+    (userId) => {
+      const user = team.find((user) => user.id === userId);
+      return user?.name || "Неизвестный пользователь";
+    },
+    [team]
+  );
 
-        throw new Error("Ошибка загрузки задачи");
-      }
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      setToast({
-        show: true,
-        text: `Ошибка загрузки задачи: ${err.message}`,
-        color: "red",
-      });
-      throw new Error(`Ошибка загрузки задачи: ${err.message}`);
-    }
-  };
+  const getDirectionName = useCallback(
+    (directionId) => {
+      const directionItem = direction.find((dir) => dir.id === directionId);
+      return directionItem?.name || "Не указано";
+    },
+    [direction]
+  );
 
-  useEffect(() => {
-    fetchDirections(setDirection, setIsLoading, setError);
+  const getUrgencyColor = useCallback((urgency) => {
+    if (urgency <= 2) return URGENCY_COLORS.low;
+    if (urgency === 3) return URGENCY_COLORS.medium;
+    return URGENCY_COLORS.high;
   }, []);
 
-  useEffect(() => {
-    const loadTask = async () => {
-      try {
-        setIsLoading(true);
-        const taskData = await fetchTaskById(id);
-        setTask(taskData);
-        setSelectedStatus(
-          taskData.status && taskStatus.includes(taskData.status)
-            ? taskData.status
-            : ""
-        );
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (id) {
-      loadTask();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
-
-  const handleDragOver = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      setFiles(Array.from(droppedFiles));
-    }
-  }, []);
-
-  const handleAreaClick = useCallback(() => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  }, []);
-
-  const AddComments = async (e) => {
-    e.preventDefault();
-    setCommentLoading(true);
-    setError("");
-
-    if (!token) {
-      setError("Токен авторизации отсутствует");
-      setCommentLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/task/${id}/comments`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: comment }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Ошибка добавления комментария");
-      }
-
-      const newComment = await response.json();
-
-      setTask((prevTask) => ({
-        ...prevTask,
-        comments: [...(prevTask?.comments || []), newComment],
-      }));
-
-      setComment("");
-    } catch (err) {
-      console.error(err);
-      setError("Ошибка добавления комментария");
-    } finally {
-      setCommentLoading(false);
-    }
-  };
-
-  const uploadFiles = async (e) => {
-    e.preventDefault();
-    if (files.length === 0) return;
-
-    setFileLoading(true);
-    setError("");
-
-    if (!token) {
-      setError("Токен авторизации отсутствует");
-      setFileLoading(false);
-      return;
-    }
-
-    try {
-      const formDataToSend = new FormData();
-      files.forEach((file) => {
-        formDataToSend.append("file", file);
-      });
-
-      const fileResponse = await fetch(`${API_URL}/task/${id}/files`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formDataToSend,
-      });
-
-      if (!fileResponse.ok) {
-        throw new Error("Ошибка загрузки файлов");
-      }
-
-      const newFiles = await fileResponse.json();
-
-      const normalizedFiles = Array.isArray(newFiles)
-        ? newFiles
-        : newFiles && newFiles.file
-        ? [newFiles.file]
-        : newFiles
-        ? [newFiles]
-        : [];
-
-      setTask((prevTask) => ({
-        ...prevTask,
-        files: [...(prevTask?.files || []), ...normalizedFiles],
-      }));
-
-      setFiles([]);
-    } catch (err) {
-      console.error(err);
-      setError("Ошибка загрузки файлов");
-    } finally {
-      setFileLoading(false);
-    }
-  };
-
-  const handleBack = () => {
-    navigate("/task");
-  };
-
-  const handleFileChange = (e) => {
-    setFiles(Array.from(e.target.files));
-  };
-
-  const normalizeLinks = (links) => {
+  const normalizeLinks = useCallback((links) => {
     if (!links) return [];
 
-    if (Array.isArray(links)) {
-      return links;
-    }
+    if (Array.isArray(links)) return links;
 
     if (typeof links === "string") {
       try {
         const parsed = JSON.parse(links);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      } catch (e) {
-        console.error(e);
+        return Array.isArray(parsed) ? parsed : [links];
+      } catch {
         return links.split(",").map((link) => link.trim());
       }
     }
 
     return [String(links)];
-  };
+  }, []);
 
-  const getDirectionName = (direction_id) => {
-    const foundDirection = direction.find((dir) => dir.id === direction_id);
-    return foundDirection ? foundDirection.name : "Не указано";
-  };
+  const apiRequest = useCallback(
+    async (endpoint, options = {}) => {
+      if (!token) {
+        throw new Error("Токен авторизации отсутствует");
+      }
 
-  const updateStatus = async (id) => {
-    if (!selectedStatus) {
-      setError("Выберите статус");
-      return;
-    }
-
-    setError("");
-    setStatusLoading(true);
-
-    if (!token) {
-      setError("Токен авторизации отсутствует");
-      setStatusLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/task/${id}/status`, {
-        method: "PATCH",
+      const response = await fetch(`${API_URL}${endpoint}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
+          ...options.headers,
         },
+        ...options,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.json();
+    },
+    [API_URL, token]
+  );
+
+  const fetchTask = useCallback(
+    async (id) => {
+      try {
+        const taskData = await apiRequest(`/task/${id}`);
+        setTask(taskData);
+        setSelectedStatus(
+          taskStatus.includes(taskData.status) ? taskData.status : ""
+        );
+      } catch (err) {
+        console.error("Ошибка загрузки задачи:", err);
+        setToast({ show: true, text: "Ошибка загрузки задачи", color: "red" });
+        setError(err.message);
+      }
+    },
+    [apiRequest]
+  );
+
+  const handleFileInteraction = {
+    onDragOver: useCallback((e) => {
+      e.preventDefault();
+      setIsDragging(true);
+    }, []),
+
+    onDragLeave: useCallback((e) => {
+      e.preventDefault();
+      setIsDragging(false);
+    }, []),
+
+    onDrop: useCallback((e) => {
+      e.preventDefault();
+      setIsDragging(false);
+      setFiles(Array.from(e.dataTransfer.files));
+    }, []),
+
+    onClick: useCallback(() => {
+      fileInputRef.current?.click();
+    }, []),
+
+    onChange: useCallback((e) => {
+      setFiles(Array.from(e.target.files));
+    }, []),
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!comment.trim()) return;
+
+    setLoadings((prev) => ({ ...prev, comment: true }));
+
+    try {
+      const newComment = await apiRequest(`/task/${taskId}/comments`, {
+        method: "POST",
+        body: JSON.stringify({ text: comment.trim() }),
+      });
+
+      setTask((prev) => ({
+        ...prev,
+        comments: [...(prev?.comments || []), newComment],
+      }));
+      setComment("");
+    } catch (err) {
+      console.error(err);
+      setToast({
+        show: true,
+        text: "Ошибка добавления комментария",
+        color: "red",
+      });
+    } finally {
+      setLoadings((prev) => ({ ...prev, comment: false }));
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (files.length === 0) return;
+
+    setLoadings((prev) => ({ ...prev, file: true }));
+
+    try {
+      const formData = new FormData();
+      files.forEach((file) => formData.append("file", file));
+
+      const response = await fetch(`${API_URL}/task/${taskId}/files`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Ошибка загрузки файлов");
+
+      const newFiles = await response.json();
+      const normalizedFiles = Array.isArray(newFiles)
+        ? newFiles
+        : newFiles?.file
+        ? [newFiles.file]
+        : newFiles
+        ? [newFiles]
+        : [];
+
+      setTask((prev) => ({
+        ...prev,
+        files: [...(prev?.files || []), ...normalizedFiles],
+      }));
+      setFiles([]);
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, text: "Ошибка загрузки файлов", color: "red" });
+    } finally {
+      setLoadings((prev) => ({ ...prev, file: false }));
+    }
+  };
+
+  const handleStatusUpdate = async (e) => {
+    e.preventDefault();
+    if (!selectedStatus) return;
+
+    setLoadings((prev) => ({ ...prev, status: true }));
+
+    try {
+      const updatedTask = await apiRequest(`/task/${taskId}/status`, {
+        method: "PATCH",
         body: JSON.stringify({ status: selectedStatus }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ошибка обновления статуса");
-      }
-
-      const updatedTask = await response.json();
-      setTask((prevTask) => ({
-        ...prevTask,
-        status: updatedTask.status,
-      }));
+      setTask((prev) => ({ ...prev, status: updatedTask.status }));
     } catch (err) {
       console.error(err);
-      setError("Ошибка обновления статуса: " + err.message);
+      setToast({ show: true, text: "Ошибка обновления статуса", color: "red" });
     } finally {
-      setStatusLoading(false);
+      setLoadings((prev) => ({ ...prev, status: false }));
     }
   };
 
-  const handleInputChange = (event) => {
-    setSelectedStatus(event.target.value);
-  };
-
-  const handleStatusSubmit = (e) => {
-    e.preventDefault();
-    updateStatus(id);
-  };
-
-  const updateUrgency = async (newUrgency) => {
-    setError("");
-    setUrgencyLoading(true);
-
-    if (!token) {
-      setError("Токен авторизации отсутствует");
-      setUrgencyLoading(false);
-      return;
-    }
+  const handleUrgencyUpdate = async (newUrgency) => {
+    setLoadings((prev) => ({ ...prev, urgency: true }));
 
     try {
-      const response = await fetch(`${API_URL}/task/${id}/urgency`, {
+      const updatedTask = await apiRequest(`/task/${taskId}/urgency`, {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ urgency: newUrgency }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ошибка обновления важности");
-      }
-
-      const updatedTask = await response.json();
-      setTask((prevTask) => ({
-        ...prevTask,
-        urgency: updatedTask.urgency,
-      }));
-
+      setTask((prev) => ({ ...prev, urgency: updatedTask.urgency }));
       setToast({
         show: true,
         text: "Важность обновлена",
@@ -375,58 +392,33 @@ function TaskDetails() {
       });
     } catch (err) {
       console.error(err);
-      setError("Ошибка обновления важности: " + err.message);
       setToast({
         show: true,
         text: "Ошибка обновления важности",
         color: "red",
       });
     } finally {
-      setUrgencyLoading(false);
+      setLoadings((prev) => ({ ...prev, urgency: false }));
     }
   };
 
-  const handleStarClick = (starIndex) => {
-    if (urgencyLoading) return;
+  const handleDateUpdate = async (date) => {
+    if (!date) return;
 
-    const newUrgency = starIndex + 1;
-    updateUrgency(newUrgency);
-  };
-
-  const updateDueDate = async (newDueDate) => {
-    if (!newDueDate) {
-      setError("Выберите дату и время");
-      return;
-    }
-    setError("");
-    setDateLoading(true);
-
-    if (!token) {
-      setError("Токен авторизации отсутствует");
-      setDateLoading(false);
-      return;
-    }
+    setLoadings((prev) => ({ ...prev, date: true }));
 
     try {
-      const response = await fetch(`${API_URL}/task/${id}`, {
+      const updatedTask = await apiRequest(`/task/${taskId}`, {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ deadline: newDueDate }),
+        body: JSON.stringify({ deadline: date }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ошибка обновления срока выполнения");
-      }
-
-      const updatedTask = await response.json();
-      setTask((prevTask) => ({
-        ...prevTask,
+      setTask((prev) => ({
+        ...prev,
         due_at: updatedTask.due_at || updatedTask.deadline,
-        status: updatedTask.status,
+        status: updatedTask.status || prev.status,
       }));
+
       if (updatedTask.status) {
         setSelectedStatus(updatedTask.status);
       }
@@ -435,363 +427,409 @@ function TaskDetails() {
       setNewDueDate("");
     } catch (err) {
       console.error(err);
-      setError("Ошибка обновления срока выполнения: " + err.message);
+      setToast({ show: true, text: "Ошибка обновления срока", color: "red" });
     } finally {
-      setDateLoading(false);
+      setLoadings((prev) => ({ ...prev, date: false }));
     }
   };
 
-  const handleDeleteTask = async (taskId) => {
+  const handleDeleteTask = async () => {
     const isConfirmed = window.confirm(
-      `Вы уверены, что хотите удалить задачу "${task.title || "без названия"}"?`
+      `Удалить задачу "${task.title || "без названия"}"?`
     );
 
-    if (isConfirmed) {
-      try {
-        const token = getCookie("authTokenPM");
-        if (!token) {
-          throw new Error("Токен авторизации отсутствует");
-        }
+    if (!isConfirmed) return;
 
-        const response = await fetch(`${API_URL}/task/${taskId}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`${response.status}`);
-        }
-        window.location.href = "/task";
-      } catch (err) {
-        console.error("Ошибка при удалении задачи:", err.message);
-        setToast({
-          show: true,
-          text: "Не удалось удалить задачу",
-          color: "red",
-        });
-      }
+    try {
+      await apiRequest(`/task/${taskId}`, { method: "DELETE" });
+      navigate("/task", { replace: true });
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, text: "Не удалось удалить задачу", color: "red" });
     }
   };
 
+  useEffect(() => {
+    fetchDirections(setDirection, setLoading, setError);
+  }, []);
+
+  useEffect(() => {
+    if (taskId) {
+      setLoading(true);
+      fetchTask(taskId).finally(() => setLoading(false));
+    }
+  }, [taskId, fetchTask]);
+
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loading}>Загрузка данных...</div>
+      </div>
+    );
+  }
+
+  if (error || !task) {
+    return (
+      <div style={styles.container}>
+        <button style={styles.backButton} onClick={() => navigate("/task")}>
+          ← Назад
+        </button>
+        <div style={styles.error}>{error || "Данные задачи отсутствуют"}</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      <button style={{ background: "transparent" }} onClick={handleBack}>
+    <div style={styles.container}>
+      <button style={styles.backButton} onClick={() => navigate("/task")}>
         ← Назад
       </button>
 
-      {loading ? (
-        <div className="loading">Загрузка данных...</div>
-      ) : error ? (
-        <div className="error error-message">{error}</div>
-      ) : task ? (
-        <>
-          <h3 className="h3-mtmb">
-            Задача #{task.id} - {task.title || "Не указано"}
-          </h3>
-          <div style={taskHeader}>
-            <ul
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-              }}
-            >
-              <li className={`status-badge status-${task.status || ""}`}>
-                <b>Статус:</b> {task.status || "Не указано"}
-              </li>
-              <li>
-                <b>Задача создана:</b> {getUserName(task.created_by)}
-              </li>
-              <li>
-                <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
-              </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                }}
-              >
-                <b>Срок выполнения:&nbsp;</b>
-                {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
-                <button
-                  className="create-btn"
-                  onClick={() => setShowDatePicker(true)}
-                >
-                  Изменить
-                </button>
-              </li>
-              <li>
-                <b>Направление:</b> {getDirectionName(task.direction_id)}
-              </li>
-              <li>
-                <b>Описание:</b> {task.description || "Не указано"}
-              </li>
-              <li style={{ display: "flex", alignItems: "center" }}>
-                <b>Важность:&nbsp;</b>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                      key={star}
-                      onClick={() =>
-                        task?.created_by === userData.id &&
-                        handleStarClick(star - 1)
-                      }
-                      style={{
-                        cursor:
-                          task?.created_by === userData.id
-                            ? urgencyLoading
-                              ? "not-allowed"
-                              : "pointer"
-                            : "not-allowed",
-                        color:
-                          star <= task.urgency
-                            ? task.urgency <= 2
-                              ? "var(--color-green)"
-                              : task.urgency === 3
-                              ? "orange"
-                              : "var(--color-err)"
-                            : "#ddd",
-                        fontSize: "20px",
-                        marginRight: "2px",
-                        opacity:
-                          task?.created_by === userData.id
-                            ? urgencyLoading
-                              ? 0.6
-                              : 1
-                            : 0.6,
-                        transition: "all 0.2s ease",
-                      }}
-                      title={`Установить важность: ${star}`}
-                    >
-                      {star <= task.urgency ? "★" : "☆"}
-                    </span>
-                  ))}
-                </div>
-              </li>
+      <h3 style={styles.taskTitle}>
+        Задача #{task.id} - {task.title || "Не указано"}
+      </h3>
 
-              {task.links && (
-                <li style={{ display: "flex" }}>
-                  <b>Ссылки:&nbsp;</b>
-                  <div style={{ marginLeft: "5px" }}>
-                    {normalizeLinks(task.links).map((link, index) => (
-                      <a
-                        key={index}
-                        href={link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ marginRight: "10px" }}
-                      >
-                        {link}
-                      </a>
-                    ))}
-                  </div>
-                </li>
-              )}
-
-              <li>
-                <form
-                  onSubmit={handleStatusSubmit}
-                  style={{
-                    ...formStyle,
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    gap: "10px",
-                  }}
-                >
-                  <label htmlFor="status">
-                    <b>Статус:&nbsp;</b>
-                  </label>
-                  <select
-                    className="select-status"
-                    id="status"
-                    name="status"
-                    value={selectedStatus}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Выберите статус</option>
-                    {taskStatus
-                      .filter((status) => {
-                        if (
-                          status === "В работе" &&
-                          userData?.id != task?.assigned_user_id
-                        ) {
-                          return false;
-                        }
-                        return true;
-                      })
-                      .map((status, index) => (
-                        <option key={index} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                  </select>
-                  <button
-                    className="create-btn"
-                    style={{ width: "200px" }}
-                    disabled={statusLoading || !selectedStatus}
-                  >
-                    {statusLoading ? "Обновление..." : "Обновить статус"}
-                  </button>
-                </form>
-              </li>
-              {task.files && (
-                <li style={{ display: "flex" }}>
-                  <b>Файлы: </b>
-                  <div style={{ marginLeft: "5px", display: "flex" }}>
-                    {task.files.map((file, index) => (
-                      <div key={index} style={{ marginRight: "10px" }}>
-                        <a
-                          href={`${import.meta.env.VITE_API_KEY}${
-                            file.file_url
-                          }`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {file.file_name || "Файл без имени"}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                </li>
-              )}
-              <li style={{ display: "flex", flexDirection: "column" }}>
-                <b>Комментарии: </b>
-                <div style={{ margin: "10px 0 10px 0" }}>
-                  {task.comments && task.comments.length > 0 ? (
-                    task.comments.map((comment, index) => (
-                      <div key={index} style={commentsWrap}>
-                        <div>{comment.text || "Комментарий отсутствует"}</div>
-                        <div style={comments}>
-                          <b>{getUserName(comment.user_id)},&nbsp;</b>
-                          <b>Дата создания:&nbsp;</b>
-                          {formatDate(comment.created_at) || "Не указано"}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div>Нет комментариев</div>
-                  )}
-                </div>
-              </li>
-            </ul>
-
-            <form onSubmit={AddComments} style={formStyle}>
-              <textarea
-                style={formStyle}
-                type="text"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                disabled={commentLoading}
-                required
-              />
-              <button
-                className="create-btn"
-                style={{ width: "250px", marginTop: "10px" }}
-                disabled={commentLoading || comment.length === 0}
-              >
-                {commentLoading ? "Отправка..." : "Создать комментарий"}
-              </button>
-            </form>
-
-            <form onSubmit={uploadFiles} style={formStyle}>
-              <div className="create__block">
-                <div className="label">Файлы</div>
-                <div
-                  className={`file-upload ${
-                    isDragging ? "file-upload--dragging" : ""
-                  }`}
-                  onDragOver={handleDragOver}
-                  onDragEnter={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={handleAreaClick}
-                  style={{
-                    cursor: "pointer",
-                    border: isDragging
-                      ? "2px dashed #3b82f6"
-                      : "2px dashed #d1d5db",
-                    backgroundColor: isDragging ? "#f0f9ff" : "transparent",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <img src="/files.svg" alt="загрузка файлов" />
-                  <div>
-                    Перетащите файл сюда или&nbsp;
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        fileInputRef.current?.click();
-                      }}
-                    >
-                      загрузите
-                    </a>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    id="files"
-                    name="files"
-                    multiple
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                  />
-                </div>
-                {files.length > 0 && (
-                  <div style={{ marginTop: "10px" }}>
-                    Выбрано файлов: {files.length}
-                  </div>
-                )}
-              </div>
-              <button
-                className="create-btn"
-                style={{ width: "200px", marginTop: "10px" }}
-                disabled={fileLoading || files.length === 0}
-              >
-                {fileLoading ? "Загрузка..." : "Загрузить файлы"}
-              </button>
-            </form>
-            {userData.roles.includes("admin") && (
-              <button
-                className="delete-btn"
-                style={{ width: "200px", marginTop: "10px" }}
-                onClick={() => handleDeleteTask(task.id)}
-              >
-                Удалить
-              </button>
-            )}
-            {showDatePicker && (
-              <DateModal
-                isOpen={showDatePicker}
-                onClose={() => setShowDatePicker(false)}
-                onSave={updateDueDate}
-                initialDate={newDueDate}
-                loading={dateLoading}
-              />
-            )}
-          </div>
-        </>
-      ) : (
-        <div>Данные задачи отсутствуют</div>
-      )}
-
-      {toast.show && (
-        <Toast
-          text={toast.text}
-          color={toast.color}
-          onClose={() => setToast({ show: false, text: "", color: "" })}
+      <div style={styles.taskHeader}>
+        <TaskInfoSection
+          isAdmin={isAdmin}
+          task={task}
+          getUserName={getUserName}
+          getDirectionName={getDirectionName}
+          formatDate={formatDate}
+          normalizeLinks={normalizeLinks}
+          userPermissions={userPermissions}
+          getUrgencyColor={getUrgencyColor}
+          loadings={loadings}
+          onUrgencyChange={handleUrgencyUpdate}
+          onDateChange={() => setShowDatePicker(true)}
         />
-      )}
+
+        <StatusUpdateSection
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          statuses={filteredStatuses}
+          loading={loadings.status}
+          onSubmit={handleStatusUpdate}
+        />
+
+        <CommentsSection
+          comments={task.comments}
+          getUserName={getUserName}
+          formatDate={formatDate}
+          comment={comment}
+          onCommentChange={setComment}
+          loading={loadings.comment}
+          onSubmit={handleCommentSubmit}
+        />
+
+        <FileUploadSection
+          files={task.files}
+          newFiles={files}
+          isDragging={isDragging}
+          fileInputRef={fileInputRef}
+          loading={loadings.file}
+          onFileInteraction={handleFileInteraction}
+          onFileUpload={handleFileUpload}
+        />
+
+        {userPermissions.isAdmin && (
+          <button
+            className="delete-btn"
+            style={{ width: "200px", marginTop: "10px" }}
+            onClick={handleDeleteTask}
+          >
+            Удалить задачу
+          </button>
+        )}
+      </div>
+
+      <DateModal
+        isOpen={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onSave={handleDateUpdate}
+        initialDate={newDueDate}
+        loading={loadings.date}
+      />
+
+      <Toast
+        text={toast.text}
+        color={toast.color}
+        onClose={() => setToast({ show: false, text: "", color: "" })}
+      />
     </div>
   );
-}
+};
+
+const TaskInfoSection = ({
+  task,
+  isAdmin,
+  getUserName,
+  getDirectionName,
+  formatDate,
+  normalizeLinks,
+  userPermissions,
+  getUrgencyColor,
+  loadings,
+  onUrgencyChange,
+  onDateChange,
+}) => (
+  <ul style={styles.taskInfoList}>
+    <li className={`status-badge status-${task.status || ""}`}>
+      <b>Статус:</b> {task.status || "Не указано"}
+    </li>
+
+    <li>
+      <b>Создатель:</b> {getUserName(task.created_by)}
+    </li>
+    <li>
+      <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
+    </li>
+
+    <li style={styles.flexAlignCenter}>
+      <b>Срок выполнения:&nbsp;</b>
+      {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
+      {isAdmin && (
+        <button className="create-btn" onClick={onDateChange}>
+          Изменить
+        </button>
+      )}
+    </li>
+
+    <li>
+      <b>Направление:</b> {getDirectionName(task.direction_id)}
+    </li>
+    <li>
+      <b>Описание:</b> {task.description || "Не указано"}
+    </li>
+
+    <li style={styles.flexCenter}>
+      <b>Важность:&nbsp;</b>
+      <div style={styles.urgencyStars}>
+        {[...Array(MAX_URGENCY_STARS)].map((_, index) => {
+          const starValue = index + 1;
+          const isFilled = starValue <= task.urgency;
+
+          return (
+            <span
+              key={starValue}
+              onClick={() =>
+                userPermissions.canEditUrgency &&
+                !loadings.urgency &&
+                onUrgencyChange(starValue)
+              }
+              style={{
+                cursor: userPermissions.canEditUrgency
+                  ? loadings.urgency
+                    ? "not-allowed"
+                    : "pointer"
+                  : "not-allowed",
+                color: isFilled ? getUrgencyColor(task.urgency) : "#ddd",
+                fontSize: "20px",
+                marginRight: "2px",
+                opacity: userPermissions.canEditUrgency
+                  ? loadings.urgency
+                    ? 0.6
+                    : 1
+                  : 0.6,
+                transition: "all 0.2s ease",
+              }}
+              title={`Установить важность: ${starValue}`}
+            >
+              {isFilled ? "★" : "☆"}
+            </span>
+          );
+        })}
+      </div>
+    </li>
+
+    {task.links && (
+      <li style={styles.flexCenter}>
+        <b>Ссылки:&nbsp;</b>
+        <div style={styles.linksContainer}>
+          {normalizeLinks(task.links).map((link, index) => (
+            <a
+              key={index}
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ marginRight: "10px" }}
+            >
+              {link}
+            </a>
+          ))}
+        </div>
+      </li>
+    )}
+
+    {task.files && task.files.length > 0 && (
+      <li style={styles.flexCenter}>
+        <b>Файлы: </b>
+        <div style={styles.filesContainer}>
+          {task.files.map((file, index) => (
+            <div key={index} style={{ marginRight: "10px" }}>
+              <a
+                href={`${import.meta.env.VITE_API_KEY}${file.file_url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {file.file_name || "Файл без имени"}
+              </a>
+            </div>
+          ))}
+        </div>
+      </li>
+    )}
+  </ul>
+);
+
+const StatusUpdateSection = ({
+  selectedStatus,
+  onStatusChange,
+  statuses,
+  loading,
+  onSubmit,
+}) => (
+  <form onSubmit={onSubmit} style={styles.statusForm}>
+    <label htmlFor="status">
+      <b>Статус:&nbsp;</b>
+    </label>
+    <select
+      className="select-status"
+      id="status"
+      name="status"
+      value={selectedStatus}
+      onChange={(e) => onStatusChange(e.target.value)}
+      required
+      disabled={loading}
+    >
+      <option value="">Выберите статус</option>
+      {statuses.map((status, index) => (
+        <option key={index} value={status}>
+          {status}
+        </option>
+      ))}
+    </select>
+    <button
+      className="create-btn"
+      style={{ width: "200px" }}
+      disabled={loading || !selectedStatus}
+      type="submit"
+    >
+      {loading ? "Обновление..." : "Обновить статус"}
+    </button>
+  </form>
+);
+
+const CommentsSection = ({
+  comments,
+  getUserName,
+  formatDate,
+  comment,
+  onCommentChange,
+  loading,
+  onSubmit,
+}) => (
+  <div style={styles.commentsSection}>
+    <b>Комментарии: </b>
+
+    <div style={styles.commentsList}>
+      {comments && comments.length > 0 ? (
+        comments.map((commentItem, index) => (
+          <div key={index} style={styles.commentsWrap}>
+            <div>{commentItem.text || "Комментарий отсутствует"}</div>
+            <div style={styles.comments}>
+              <b>{getUserName(commentItem.user_id)},&nbsp;</b>
+              <b>Дата создания:&nbsp;</b>
+              {formatDate(commentItem.created_at) || "Не указано"}
+            </div>
+          </div>
+        ))
+      ) : (
+        <div>Нет комментариев</div>
+      )}
+    </div>
+
+    <form onSubmit={onSubmit} style={styles.form}>
+      <textarea
+        style={styles.form}
+        type="text"
+        value={comment}
+        onChange={(e) => onCommentChange(e.target.value)}
+        placeholder="Введите комментарий..."
+        disabled={loading}
+        required
+      />
+      <button
+        className="create-btn"
+        style={{ width: "250px", marginTop: "10px" }}
+        disabled={loading || !comment.trim()}
+        type="submit"
+      >
+        {loading ? "Отправка..." : "Добавить комментарий"}
+      </button>
+    </form>
+  </div>
+);
+
+const FileUploadSection = ({
+  newFiles,
+  isDragging,
+  fileInputRef,
+  loading,
+  onFileInteraction,
+  onFileUpload,
+}) => (
+  <form onSubmit={onFileUpload} style={styles.form}>
+    <div className="create__block">
+      <div className="label">Файлы</div>
+      <div
+        className={`file-upload ${isDragging ? "file-upload--dragging" : ""}`}
+        onDragOver={onFileInteraction.onDragOver}
+        onDragEnter={onFileInteraction.onDragOver}
+        onDragLeave={onFileInteraction.onDragLeave}
+        onDrop={onFileInteraction.onDrop}
+        onClick={onFileInteraction.onClick}
+        style={styles.fileDropZone(isDragging)}
+      >
+        <img src="/files.svg" alt="загрузка файлов" />
+        <div>
+          Перетащите файл сюда или&nbsp;
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
+          >
+            загрузите
+          </a>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          id="files"
+          name="files"
+          multiple
+          onChange={onFileInteraction.onChange}
+          style={{ display: "none" }}
+        />
+      </div>
+      {newFiles.length > 0 && (
+        <div style={{ marginTop: "10px" }}>
+          Выбрано файлов: {newFiles.length}
+        </div>
+      )}
+    </div>
+    <button
+      className="create-btn"
+      style={{ width: "200px", marginTop: "10px" }}
+      disabled={loading || newFiles.length === 0}
+      type="submit"
+    >
+      {loading ? "Загрузка..." : "Загрузить файлы"}
+    </button>
+  </form>
+);
 
 export default TaskDetails;
