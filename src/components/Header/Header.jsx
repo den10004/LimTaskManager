@@ -15,6 +15,20 @@ function Header() {
   const hasAddPermission =
     userInfo?.permissions?.includes("Добавление записей");
 
+  // Массив с навигационными ссылками
+  const navLinks = [
+    { to: "/kanban", label: "Доска" },
+    { to: "/calendar", label: "Календарь" },
+    { to: "/task", label: "Задачи" },
+    { to: "/directions", label: "Направления" },
+    { to: "/team", label: "Команда" },
+  ];
+
+  // Добавляем ссылку "Постановка задач" только если есть права
+  if (hasAddPermission) {
+    navLinks.splice(4, 0, { to: "/create", label: "Постановка задач" });
+  }
+
   const openModal = () => setIsModalOpen(true);
 
   const handleLoginSuccess = () => {
@@ -98,68 +112,18 @@ function Header() {
               <li>
                 <b className="user-email"></b>
               </li>
-              <li>
-                <NavLink
-                  to="/kanban"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Доска
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/calendar"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Календарь
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/task"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Задачи
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/directions"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Направления
-                </NavLink>
-              </li>
-              {hasAddPermission && (
-                <li>
+              {navLinks.map((link) => (
+                <li key={link.to}>
                   <NavLink
-                    to="/create"
+                    to={link.to}
                     className={({ isActive }) =>
                       isActive ? "nav-link active" : "nav-link"
                     }
                   >
-                    Постановка задач
+                    {link.label}
                   </NavLink>
                 </li>
-              )}
-              <li>
-                <NavLink
-                  to="/team"
-                  className={({ isActive }) =>
-                    isActive ? "nav-link active" : "nav-link"
-                  }
-                >
-                  Команда
-                </NavLink>
-              </li>
+              ))}
             </>
           )}
           <li
