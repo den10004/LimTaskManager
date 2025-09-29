@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 
-const INITIAL_LIMIT = 20;
+const PAGE_SIZE = 20;
 const addBtnStyle = { display: "flex", margin: "30px auto" };
 const searchInputStyle = {
   marginBottom: "20px",
@@ -31,8 +31,7 @@ function Task() {
   const [directions, setDirections] = useState([]);
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(INITIAL_LIMIT);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [hasMore, setHasMore] = useState(true);
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
@@ -45,10 +44,10 @@ function Task() {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
+  const timerRef = useRef(null);
 
   const resetPagination = useCallback(() => {
-    setOffset(0);
-    setLimit(INITIAL_LIMIT);
+    setVisibleCount(PAGE_SIZE);
   }, []);
 
   const fetchAllTasks = useCallback(async () => {
@@ -67,7 +66,6 @@ function Task() {
 
       const data = await response.json();
       setAllTasks(data.items || []);
-      setHasMore(false);
     } catch (err) {
       console.error("Fetch error:", err);
       setError(`Ошибка загрузки данных: ${err.message}`);
@@ -80,17 +78,25 @@ function Task() {
   const updatePendingTasks = useCallback(async () => {
     try {
       const token = getCookie("authTokenPM");
-      if (!token) return;
+      if (!token) {
+        scheduleNextUpdate(900000);
+        return;
+      }
 
-      const now = new Date();
+      const now = new Date().getTime(); // В мс
       const tasksToUpdate = allTasks.filter((task) => {
         if (task.status !== "Ответственный назначен") return false;
-        const createdAt = new Date(task.created_at);
-        const timeDiff = (now - createdAt) / 1000;
-        return task.notified_pending === 0 && timeDiff >= 86700; // 24 часа  + 5 минут
+        const createdAt = new Date(task.created_at).getTime();
+        const timeDiffMs = now - createdAt;
+        const timeDiffSec = timeDiffMs / 1000;
+        return task.notified_pending === 0 && timeDiffSec >= 86700;
       });
 
-      if (tasksToUpdate.length === 0) return;
+      if (tasksToUpdate.length === 0) {
+        // Нет задач для обновления — планируем следующий вызов
+        scheduleNextUpdate(900000);
+        return;
+      }
 
       // Получения обновлённых данных по задачам
       const updatedTasks = await Promise.all(
@@ -122,10 +128,43 @@ function Task() {
       if (hasChanges) {
         setAllTasks(newTasks);
       }
+
+      // Рассчёт минимального время до следующего обновления
+      let minRemainingMs = Infinity;
+      allTasks.forEach((task) => {
+        if (
+          task.status === "Ответственный назначен" &&
+          task.notified_pending === 0
+        ) {
+          const createdAt = new Date(task.created_at).getTime();
+          const timeDiffMs = now - createdAt;
+          const remainingMs = 86700 * 1000 - timeDiffMs;
+          if (remainingMs > 0) {
+            minRemainingMs = Math.min(minRemainingMs, remainingMs);
+          }
+        }
+      });
+
+      // Следующий вызов: minRemaining + буфер (5 мин), min 1 мин, max 15 мин
+      const nextTimeout = Math.max(
+        60000,
+        Math.min(
+          900000,
+          minRemainingMs === Infinity ? 900000 : minRemainingMs + 300000
+        )
+      );
+      scheduleNextUpdate(nextTimeout);
     } catch (err) {
       console.error("Update tasks error:", err);
+      scheduleNextUpdate(900000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allTasks, API_URL]);
+
+  const scheduleNextUpdate = (timeout) => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(updatePendingTasks, timeout);
+  };
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
@@ -133,11 +172,12 @@ function Task() {
   }, [fetchAllTasks]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      updatePendingTasks();
-    }, 900000); // 15 минут
+    scheduleNextUpdate(0); // Запустить сразу
 
-    return () => clearInterval(interval);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updatePendingTasks]);
 
   // Фильтрация по статусу
@@ -174,14 +214,13 @@ function Task() {
 
   // Пагинация
   const displayedTasks = useMemo(() => {
-    const result = sortedTasks.slice(0, offset + limit);
+    const result = sortedTasks.slice(0, visibleCount);
     setHasMore(sortedTasks.length > result.length);
     return result;
-  }, [sortedTasks, offset, limit]);
+  }, [sortedTasks, visibleCount]);
 
   const handleLoadMore = () => {
-    setOffset((prev) => prev + 10);
-    setLimit((prev) => prev + 20);
+    setVisibleCount((prev) => prev + PAGE_SIZE);
   };
 
   const handleSearch = (e) => {
