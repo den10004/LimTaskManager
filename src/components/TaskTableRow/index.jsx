@@ -18,8 +18,8 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
-  //просрочка**30 минут********
-  const deadline = new Date(Date.parse(task.created_at) + 30000)
+  //просрочка**1 сутки********
+  const deadline = new Date(Date.parse(task.created_at) + 86400000)
     .toISOString()
     .replace("Z", "+00:00");
   const [isOverdue, setIsOverdue] = useState(new Date() > new Date(deadline));
@@ -33,7 +33,7 @@ function TaskTableRow({ task, directions, team }) {
 
     return () => clearInterval(interval);
   }, [deadline]);
-  // console.log(formatDate(deadline));
+  console.log(formatDate(deadline));
 
   /************************************************************************** */
   return (

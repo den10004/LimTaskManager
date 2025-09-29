@@ -1,4 +1,4 @@
-import AddFiles from "../../components/AddFiles/AddFiles";
+import AddFiles from "../../components/AddFiles";
 import Toast from "../../components/Toast";
 import { useNavigate } from "react-router-dom";
 import { useTeam } from "../../contexts/TeamContext";

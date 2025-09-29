@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
@@ -8,6 +8,7 @@ import { taskStatus } from "../../utils/rolesTranslations";
 import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
+import AddFiles from "../../components/AddFiles";
 
 const styles = {
   container: {
@@ -141,7 +142,6 @@ const TaskDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [direction, setDirection] = useState([]);
-  const [isDragging, setIsDragging] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
@@ -155,7 +155,6 @@ const TaskDetails = () => {
     urgency: false,
   });
 
-  const fileInputRef = useRef(null);
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
@@ -259,31 +258,12 @@ const TaskDetails = () => {
     [apiRequest]
   );
 
-  const handleFileInteraction = {
-    onDragOver: useCallback((e) => {
-      e.preventDefault();
-      setIsDragging(true);
-    }, []),
-
-    onDragLeave: useCallback((e) => {
-      e.preventDefault();
-      setIsDragging(false);
-    }, []),
-
-    onDrop: useCallback((e) => {
-      e.preventDefault();
-      setIsDragging(false);
-      setFiles(Array.from(e.dataTransfer.files));
-    }, []),
-
-    onClick: useCallback(() => {
-      fileInputRef.current?.click();
-    }, []),
-
-    onChange: useCallback((e) => {
-      setFiles(Array.from(e.target.files));
-    }, []),
-  };
+  const handleFileChange = useCallback((e) => {
+    const newFiles = e.target.files;
+    if (newFiles) {
+      setFiles(Array.from(newFiles));
+    }
+  }, []);
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -522,15 +502,17 @@ const TaskDetails = () => {
           onSubmit={handleCommentSubmit}
         />
 
-        <FileUploadSection
-          files={task.files}
-          newFiles={files}
-          isDragging={isDragging}
-          fileInputRef={fileInputRef}
-          loading={loadings.file}
-          onFileInteraction={handleFileInteraction}
-          onFileUpload={handleFileUpload}
-        />
+        <form onSubmit={handleFileUpload} style={styles.form}>
+          <AddFiles formData={{ files }} handleFileChange={handleFileChange} />
+          <button
+            className="create-btn"
+            style={{ width: "200px", marginTop: "10px" }}
+            disabled={loadings.file || files.length === 0}
+            type="submit"
+          >
+            {loadings.file ? "Загрузка..." : "Загрузить файлы"}
+          </button>
+        </form>
 
         {userPermissions.isAdmin && (
           <button
@@ -769,67 +751,6 @@ const CommentsSection = ({
       </button>
     </form>
   </div>
-);
-
-const FileUploadSection = ({
-  newFiles,
-  isDragging,
-  fileInputRef,
-  loading,
-  onFileInteraction,
-  onFileUpload,
-}) => (
-  <form onSubmit={onFileUpload} style={styles.form}>
-    <div className="create__block">
-      <div className="label">Файлы</div>
-      <div
-        className={`file-upload ${isDragging ? "file-upload--dragging" : ""}`}
-        onDragOver={onFileInteraction.onDragOver}
-        onDragEnter={onFileInteraction.onDragOver}
-        onDragLeave={onFileInteraction.onDragLeave}
-        onDrop={onFileInteraction.onDrop}
-        onClick={onFileInteraction.onClick}
-        style={styles.fileDropZone(isDragging)}
-      >
-        <img src="/files.svg" alt="загрузка файлов" />
-        <div>
-          Перетащите файл сюда или&nbsp;
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              fileInputRef.current?.click();
-            }}
-          >
-            загрузите
-          </a>
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          id="files"
-          name="files"
-          multiple
-          onChange={onFileInteraction.onChange}
-          style={{ display: "none" }}
-        />
-      </div>
-      {newFiles.length > 0 && (
-        <div style={{ marginTop: "10px" }}>
-          Выбрано файлов: {newFiles.length}
-        </div>
-      )}
-    </div>
-    <button
-      className="create-btn"
-      style={{ width: "200px", marginTop: "10px" }}
-      disabled={loading || newFiles.length === 0}
-      type="submit"
-    >
-      {loading ? "Загрузка..." : "Загрузить файлы"}
-    </button>
-  </form>
 );
 
 export default TaskDetails;
