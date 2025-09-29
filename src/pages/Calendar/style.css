@@ -39,6 +39,7 @@
     border-radius: 8px;
     overflow-x: auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding-bottom: 20px;
 }
 
 .calendar-weekday {
@@ -59,6 +60,11 @@
     position: relative;
     border-right: 1px solid var(--color-input);
     border-bottom: 1px solid var(--color-input);
+    transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: var(--color-background);
 }
 
 .calendar-day.empty {
@@ -91,6 +97,7 @@
     font-size: 14px;
     font-weight: 500;
     color: var(--color-text);
+    font-weight: bold;
 }
 
 .events {
@@ -154,6 +161,21 @@
     color: var(--color-text);
 }
 
+.other-month {
+    background-color: rgb(216, 211, 211) !important;
+}
+
+.other-month>.day-number {
+    color: green !important;
+}
+
+.event {
+    transition: transform 0.1s ease;
+}
+
+.event:hover {
+    transform: scale(1.02);
+}
 
 @media (max-width: 768px) {
     .calendar {
@@ -193,21 +215,4 @@
         padding: 8px;
         font-size: 12px;
     }
-}
-
-
-.calendar-day {
-    transition: background-color 0.2s ease;
-}
-
-.calendar-day:hover {
-    background: var(--color-background);
-}
-
-.event {
-    transition: transform 0.1s ease;
-}
-
-.event:hover {
-    transform: scale(1.02);
 }

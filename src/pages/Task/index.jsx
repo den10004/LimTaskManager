@@ -77,10 +77,68 @@ function Task() {
     }
   }, [API_URL]);
 
+  const updatePendingTasks = useCallback(async () => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) return;
+
+      const now = new Date();
+      const tasksToUpdate = allTasks.filter((task) => {
+        if (task.status !== "Ответственный назначен") return false;
+        const createdAt = new Date(task.created_at);
+        const timeDiff = (now - createdAt) / 1000;
+        return task.notified_pending === 0 && timeDiff >= 86700; // 24 часа  + 5 минут
+      });
+
+      if (tasksToUpdate.length === 0) return;
+
+      // Получения обновлённых данных по задачам
+      const updatedTasks = await Promise.all(
+        tasksToUpdate.map(async (task) => {
+          const response = await fetch(`${API_URL}/task/${task.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          if (!response.ok) return task;
+          return await response.json();
+        })
+      );
+
+      let hasChanges = false;
+      const newTasks = allTasks.map((task) => {
+        const updatedTask = updatedTasks.find((ut) => ut.id === task.id);
+        if (
+          updatedTask &&
+          updatedTask.notified_pending !== task.notified_pending
+        ) {
+          hasChanges = true;
+          return { ...task, notified_pending: updatedTask.notified_pending };
+        }
+        return task;
+      });
+
+      if (hasChanges) {
+        setAllTasks(newTasks);
+      }
+    } catch (err) {
+      console.error("Update tasks error:", err);
+    }
+  }, [allTasks, API_URL]);
+
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
     fetchAllTasks();
   }, [fetchAllTasks]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updatePendingTasks();
+    }, 900000); // 15 минут
+
+    return () => clearInterval(interval);
+  }, [updatePendingTasks]);
 
   // Фильтрация по статусу
   const statusFilteredTasks = useMemo(() => {
@@ -195,7 +253,7 @@ function Task() {
             <thead>
               <tr>
                 <th>Назначил</th>
-                <th>Назначено</th>
+                <th>Ответственный</th>
                 <th>Дата создания</th>
                 <th style={{ display: "flex", alignItems: "center" }}>
                   Срок выполнения

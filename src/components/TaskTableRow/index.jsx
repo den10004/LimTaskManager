@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/dateUtils";
 import { statusColors } from "../../utils/rolesTranslations";
-import { useEffect, useState } from "react";
 
 function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
@@ -18,24 +17,6 @@ function TaskTableRow({ task, directions, team }) {
   const userCreated = team.find((member) => member.id === task.created_by);
   const createdBy = userCreated ? userCreated.name : "Пользователь не указан";
 
-  //просрочка**1 сутки********
-  const deadline = new Date(Date.parse(task.created_at) + 86400000)
-    .toISOString()
-    .replace("Z", "+00:00");
-  const [isOverdue, setIsOverdue] = useState(new Date() > new Date(deadline));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      const deadlineDate = new Date(deadline);
-      setIsOverdue(now > deadlineDate);
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [deadline]);
-  console.log(formatDate(deadline));
-
-  /************************************************************************** */
   return (
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>
@@ -45,8 +26,10 @@ function TaskTableRow({ task, directions, team }) {
       <td>{directionName}</td>
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
-        {task.status || "Не указан"}{" "}
-        {task.status === "Ответственный назначен" && isOverdue && " ⌛"}
+        {task.status || "Не указан"}
+        {task.status === "Ответственный назначен" &&
+          task.notified_pending === 1 &&
+          " ⌛"}
       </td>
       <td
         style={{
