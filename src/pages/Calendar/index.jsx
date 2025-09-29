@@ -6,6 +6,7 @@ const statusColorMap = {
   Просрочена: "var(--color-err)",
   "В работе": "var(--color-green)",
   "Ответственный назначен": "orange",
+  default: "var (--color-background)",
 };
 
 function MainPage() {
