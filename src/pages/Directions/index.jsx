@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import { restrictedDirections } from "../../utils/rolesTranslations";
 import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
 
@@ -112,23 +111,22 @@ function Directions() {
                 <tr key={task.id}>
                   <td style={{ display: "flex", alignItems: "center" }}>
                     <div style={{ minWidth: "210px" }}>{task.name}</div>
-                    {!restrictedDirections.includes(task.name) &&
-                      rolesUser === "admin" && (
-                        <div className="btns-direction">
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDelete(task.id)}
-                          >
-                            Удалить
-                          </button>
-                          <button
-                            className="change-btn"
-                            onClick={() => handleEdit(task)}
-                          >
-                            Редактировать
-                          </button>
-                        </div>
-                      )}
+                    {rolesUser === "admin" && (
+                      <div className="btns-direction">
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDelete(task.id)}
+                        >
+                          Удалить
+                        </button>
+                        <button
+                          className="change-btn"
+                          onClick={() => handleEdit(task)}
+                        >
+                          Редактировать
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

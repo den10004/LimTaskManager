@@ -1,8 +1,8 @@
-export const restrictedDirections = [
+/*export const restrictedDirections = [
   "Дистрибуция",
   "Партнерская программа",
   "Строительство",
-];
+];*/
 
 export const taskStatus = [
   "Просрочена",
