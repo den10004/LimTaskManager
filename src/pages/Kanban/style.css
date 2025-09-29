@@ -61,3 +61,14 @@
     background-color: var(--color-err);
     color: var(--color-background);
 }
+
+.bg-green-500 {
+    background-color: var(--color-green);
+    color: var(--color-background);
+}
+
+
+.bg-yellow-500 {
+    background-color: orange;
+    color: var(--color-background);
+}

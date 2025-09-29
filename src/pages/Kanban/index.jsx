@@ -162,6 +162,10 @@ function Kanban() {
                   className={`task-bar ${
                     task.status === "Просрочена"
                       ? "bg-red-500 text-white"
+                      : task.status === "В работе"
+                      ? "bg-green-500 text-white"
+                      : task.status === "Ответственный назначен"
+                      ? "bg-yellow-500 text-black"
                       : "bg-gray-200 text-black"
                   }`}
                   style={{
