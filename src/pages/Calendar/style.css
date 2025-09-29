@@ -162,11 +162,11 @@
 }
 
 .other-month {
-    background-color: rgb(216, 211, 211) !important;
+    background-color: rgb(243 243 243) !important;
 }
 
 .other-month>.day-number {
-    color: green !important;
+    color: #c4cdc4 !important;
 }
 
 .event {
