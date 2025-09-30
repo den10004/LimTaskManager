@@ -237,6 +237,7 @@ function CreatePage() {
               name="due_at"
               value={formData.due_at}
               onChange={handleInputChange}
+              min={new Date().toISOString().slice(0, 16)}
               required
             />
           </div>
