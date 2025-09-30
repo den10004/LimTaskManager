@@ -1,4 +1,4 @@
-export const OVERDUE = "Просрочена";
+export const OVERDUE = "Просрочено";
 export const COMPLETED = "Выполнена";
 export const WORK = "В работе";
 export const ASSIGNED = "Ответственный назначен";
