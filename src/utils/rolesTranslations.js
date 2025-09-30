@@ -17,10 +17,3 @@ export const statusColors = {
   [COMPLETED]: "#db9fe9",
   [WORK]: "var(--color-green)",
 };
-/*
-export const colorMap = {
-  44247: "var(--color-err)",
-  44086: "var(--color-blue)",
-  43668: "var(--color-green)",
-};
-*/

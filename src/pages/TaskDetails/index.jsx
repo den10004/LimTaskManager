@@ -172,7 +172,8 @@ const TaskDetails = () => {
   const filteredStatuses = useMemo(
     () =>
       taskStatus.filter(
-        (status) => status !== WORK || userData?.id === task?.assigned_user_id
+        (statusArray) =>
+          !statusArray.includes(WORK) || userData?.id === task?.assigned_user_id
       ),
     [task, userData]
   );
