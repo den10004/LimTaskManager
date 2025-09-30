@@ -4,7 +4,7 @@ import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
-import { taskStatus } from "../../utils/rolesTranslations";
+import { taskStatus, WORK } from "../../utils/rolesTranslations";
 import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
@@ -172,8 +172,7 @@ const TaskDetails = () => {
   const filteredStatuses = useMemo(
     () =>
       taskStatus.filter(
-        (status) =>
-          status !== "В работе" || userData?.id === task?.assigned_user_id
+        (status) => status !== WORK || userData?.id === task?.assigned_user_id
       ),
     [task, userData]
   );

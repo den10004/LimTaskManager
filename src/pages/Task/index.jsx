@@ -3,6 +3,12 @@ import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
+import {
+  ASSIGNED,
+  COMPLETED,
+  OVERDUE,
+  WORK,
+} from "../../utils/rolesTranslations";
 
 const PAGE_SIZE = 20;
 const addBtnStyle = { display: "flex", margin: "30px auto" };
@@ -85,7 +91,7 @@ function Task() {
 
       const now = new Date().getTime(); // В мс
       const tasksToUpdate = allTasks.filter((task) => {
-        if (task.status !== "Ответственный назначен") return false;
+        if (task.status !== ASSIGNED) return false;
         const createdAt = new Date(task.created_at).getTime();
         const timeDiffMs = now - createdAt;
         const timeDiffSec = timeDiffMs / 1000;
@@ -132,10 +138,7 @@ function Task() {
       // Рассчёт минимального время до следующего обновления
       let minRemainingMs = Infinity;
       allTasks.forEach((task) => {
-        if (
-          task.status === "Ответственный назначен" &&
-          task.notified_pending === 0
-        ) {
+        if (task.status === ASSIGNED && task.notified_pending === 0) {
           const createdAt = new Date(task.created_at).getTime();
           const timeDiffMs = now - createdAt;
           const remainingMs = 86700 * 1000 - timeDiffMs;
@@ -183,11 +186,10 @@ function Task() {
   // Фильтрация по статусу
   const statusFilteredTasks = useMemo(() => {
     return allTasks.filter((task) => {
-      if (task.status === "Выполнена" && !statusFilters.completed) return false;
-      if (task.status === "Просрочена" && !statusFilters.overdue) return false;
-      if (task.status === "Ответственный назначен" && !statusFilters.assigned)
-        return false;
-      if (task.status === "В работе" && !statusFilters.work) return false;
+      if (task.status === COMPLETED && !statusFilters.completed) return false;
+      if (task.status === OVERDUE && !statusFilters.overdue) return false;
+      if (task.status === ASSIGNED && !statusFilters.assigned) return false;
+      if (task.status === WORK && !statusFilters.work) return false;
       return true;
     });
   }, [allTasks, statusFilters]);
@@ -255,16 +257,16 @@ function Task() {
           let label = "";
           switch (key) {
             case "completed":
-              label = "Выполнена";
+              label = COMPLETED;
               break;
             case "overdue":
-              label = "Просрочена";
+              label = OVERDUE;
               break;
             case "assigned":
-              label = "Ответственный назначен";
+              label = ASSIGNED;
               break;
             case "work":
-              label = "В работе";
+              label = WORK;
               break;
             default:
               break;

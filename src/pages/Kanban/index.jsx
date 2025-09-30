@@ -1,6 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
+import {
+  ASSIGNED,
+  COMPLETED,
+  OVERDUE,
+  WORK,
+} from "../../utils/rolesTranslations";
 
 function Kanban() {
   const [tasks, setTasks] = useState([]);
@@ -98,7 +104,7 @@ function Kanban() {
   };
 
   const taskSpans = tasks
-    .filter((task) => task.status !== "Задача выполнена")
+    .filter((task) => task.status !== COMPLETED)
     .map(getTaskSpan)
     .filter((span) => span !== null);
 
@@ -160,11 +166,11 @@ function Kanban() {
                   key={task.id}
                   href={`/tasks/${task.id}`}
                   className={`task-bar ${
-                    task.status === "Просрочена"
+                    task.status === OVERDUE
                       ? "bg-red-500 text-white"
-                      : task.status === "В работе"
+                      : task.status === WORK
                       ? "bg-green-500 text-white"
-                      : task.status === "Ответственный назначен"
+                      : task.status === ASSIGNED
                       ? "bg-yellow-500 text-black"
                       : "bg-gray-200 text-black"
                   }`}

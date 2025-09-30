@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/dateUtils";
-import { statusColors } from "../../utils/rolesTranslations";
+import { ASSIGNED, statusColors } from "../../utils/rolesTranslations";
 
 function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
@@ -27,9 +27,7 @@ function TaskTableRow({ task, directions, team }) {
       <td>{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}
-        {task.status === "Ответственный назначен" &&
-          task.notified_pending === 1 &&
-          " ⌛"}
+        {task.status === ASSIGNED && task.notified_pending === 1 && " ⌛"}
       </td>
       <td
         style={{

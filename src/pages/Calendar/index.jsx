@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../utils/getCookies";
+import {
+  ASSIGNED,
+  COMPLETED,
+  statusColors,
+} from "../../utils/rolesTranslations";
 import "./style.css";
 
 const statusColorMap = {
-  Просрочена: "var(--color-err)",
-  "В работе": "#0af109",
-  "Ответственный назначен": "orange",
-  default: "var (--color-background)",
+  ...statusColors,
+  [ASSIGNED]: "orange",
 };
 
 function MainPage() {
@@ -20,7 +23,7 @@ function MainPage() {
   }, []);
 
   const getStatusColor = (status) => {
-    return statusColorMap[status] || statusColorMap["default"];
+    return statusColorMap[status] || "";
   };
 
   const loadEvents = async () => {
@@ -42,7 +45,7 @@ function MainPage() {
       const data = await response.json();
       const eventsByDate = {};
       const activeTasks = data.items.filter(
-        (task) => task.status !== "Задача выполнена"
+        (task) => task.status !== COMPLETED
       );
 
       activeTasks.forEach((event) => {

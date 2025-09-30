@@ -1,26 +1,26 @@
-/*export const restrictedDirections = [
-  "Дистрибуция",
-  "Партнерская программа",
-  "Строительство",
-];*/
+export const OVERDUE = "Просрочена";
+export const COMPLETED = "Выполнена";
+export const WORK = "В работе";
+export const ASSIGNED = "Ответственный назначен";
 
 export const taskStatus = [
-  "Просрочена",
-  "Выполнена",
-  "Ответственный назначен",
+  [OVERDUE],
+  [COMPLETED],
+  [ASSIGNED],
   // "Новая",
-  "В работе",
+  [WORK],
 ];
 
 export const statusColors = {
-  Просрочена: "var(--color-err)",
+  [OVERDUE]: "var(--color-err)",
   // Новая: "var(--color-blue)",
-  Выполнена: "var(--color-green)",
-  "В работе": "var(--color-blue)",
+  [COMPLETED]: "#db9fe9",
+  [WORK]: "var(--color-green)",
 };
-
+/*
 export const colorMap = {
   44247: "var(--color-err)",
   44086: "var(--color-blue)",
   43668: "var(--color-green)",
 };
+*/
