@@ -4,7 +4,7 @@ import "./style.css";
 
 const statusColorMap = {
   Просрочена: "var(--color-err)",
-  "В работе": "var(--color-green)",
+  "В работе": "#0af109",
   "Ответственный назначен": "orange",
   default: "var (--color-background)",
 };
