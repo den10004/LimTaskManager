@@ -10,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 import AddFiles from "../../components/AddFiles";
 import CommentsSection from "../../components/Comments";
+import TaskInfoSection from "../../components/TaskInfoSection";
 
 const styles = {
   container: {
@@ -41,36 +42,9 @@ const styles = {
     backgroundColor: "#f5f5f5",
     borderRadius: "5px",
   },
-
   flexColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: "10px",
-  },
-  flexAlignCenter: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  flexCenter: {
-    display: "flex",
-    alignItems: "center",
-  },
-  taskInfoList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-    listStyle: "none",
-    padding: 0,
-    margin: 0,
-  },
-
-  statusForm: {
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
     gap: "10px",
   },
 
@@ -86,22 +60,7 @@ const styles = {
     textAlign: "center",
     borderRadius: "8px",
   }),
-  linksContainer: {
-    marginLeft: "5px",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  filesContainer: {
-    marginLeft: "5px",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  urgencyStars: {
-    display: "flex",
-    alignItems: "center",
-  },
+
   loading: {
     textAlign: "center",
     padding: "40px",
@@ -116,7 +75,6 @@ const styles = {
   },
 };
 
-const MAX_URGENCY_STARS = 5;
 const URGENCY_COLORS = {
   low: "var(--color-green)",
   medium: "orange",
@@ -559,7 +517,7 @@ const TaskDetails = () => {
     </div>
   );
 };
-
+/*
 const TaskInfoSection = ({
   task,
   isAdmin,
@@ -714,6 +672,6 @@ const TaskInfoSection = ({
       </li>
     )}
   </ul>
-);
+);*/
 
 export default TaskDetails;
