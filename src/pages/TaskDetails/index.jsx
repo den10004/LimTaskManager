@@ -68,6 +68,7 @@ const styles = {
     padding: 0,
     margin: 0,
   },
+
   statusForm: {
     width: "100%",
     display: "flex",
@@ -146,6 +147,8 @@ const TaskDetails = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
+
+  console.log(task);
 
   const [loadings, setLoadings] = useState({
     comment: false,
@@ -506,14 +509,11 @@ const TaskDetails = () => {
           loadings={loadings}
           onUrgencyChange={handleUrgencyUpdate}
           onDateChange={() => setShowDatePicker(true)}
-        />
-
-        <StatusUpdateSection
           selectedStatus={selectedStatus}
           onStatusChange={setSelectedStatus}
           statuses={filteredStatuses}
-          loading={loadings.status}
-          onSubmit={handleStatusUpdate}
+          loadingStatus={loadings.status}
+          onStatusUpdate={handleStatusUpdate}
         />
 
         <CommentsSection
@@ -580,10 +580,44 @@ const TaskInfoSection = ({
   loadings,
   onUrgencyChange,
   onDateChange,
+  selectedStatus,
+  onStatusChange,
+  statuses,
+  loadingStatus,
+  onStatusUpdate,
 }) => (
   <ul style={styles.taskInfoList}>
     <li className={`status-badge status-${task.status || ""}`}>
-      <b>Статус:</b> {task.status || "Не указано"}
+      <b>Статус:</b>
+      &nbsp;{task.status || "Не указано"}
+    </li>
+
+    <li>
+      <form onSubmit={onStatusUpdate} style={styles.statusForm}>
+        <select
+          id="status"
+          name="status"
+          value={selectedStatus}
+          onChange={(e) => onStatusChange(e.target.value)}
+          required
+          disabled={loadingStatus}
+        >
+          <option value="">Выберите статус</option>
+          {statuses.map((status, index) => (
+            <option key={index} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
+        <button
+          className="create-btn"
+          style={{ width: "200px" }}
+          disabled={loadingStatus || !selectedStatus}
+          type="submit"
+        >
+          {loadingStatus ? "Обновление..." : "Обновить статус"}
+        </button>
+      </form>
     </li>
 
     <li>
@@ -688,44 +722,6 @@ const TaskInfoSection = ({
       </li>
     )}
   </ul>
-);
-
-const StatusUpdateSection = ({
-  selectedStatus,
-  onStatusChange,
-  statuses,
-  loading,
-  onSubmit,
-}) => (
-  <form onSubmit={onSubmit} style={styles.statusForm}>
-    <label htmlFor="status">
-      <b>Статус:&nbsp;</b>
-    </label>
-    <select
-      className="select-status"
-      id="status"
-      name="status"
-      value={selectedStatus}
-      onChange={(e) => onStatusChange(e.target.value)}
-      required
-      disabled={loading}
-    >
-      <option value="">Выберите статус</option>
-      {statuses.map((status, index) => (
-        <option key={index} value={status}>
-          {status}
-        </option>
-      ))}
-    </select>
-    <button
-      className="create-btn"
-      style={{ width: "200px" }}
-      disabled={loading || !selectedStatus}
-      type="submit"
-    >
-      {loading ? "Обновление..." : "Обновить статус"}
-    </button>
-  </form>
 );
 
 const CommentsSection = ({
