@@ -288,6 +288,11 @@ const TaskDetails = () => {
         comments: [...(prev?.comments || []), newComment],
       }));
       setComment("");
+      setToast({
+        show: true,
+        text: "Комментарий добавлен",
+        color: "rgba(33, 197, 140, 1)",
+      });
     } catch (err) {
       console.error(err);
       setToast({
@@ -315,7 +320,11 @@ const TaskDetails = () => {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-
+      setToast({
+        show: true,
+        text: "Файл загружен",
+        color: "rgba(33, 197, 140, 1)",
+      });
       if (!response.ok) throw new Error("Ошибка загрузки файлов");
 
       const newFiles = await response.json();
@@ -353,6 +362,11 @@ const TaskDetails = () => {
       });
 
       setTask((prev) => ({ ...prev, status: updatedTask.status }));
+      setToast({
+        show: true,
+        text: "Статус обновлён",
+        color: "rgba(33, 197, 140, 1)",
+      });
     } catch (err) {
       console.error(err);
       setToast({ show: true, text: "Ошибка обновления статуса", color: "red" });
@@ -404,7 +418,11 @@ const TaskDetails = () => {
         due_at: updatedTask.due_at || updatedTask.deadline,
         status: updatedTask.status || prev.status,
       }));
-
+      setToast({
+        show: true,
+        text: "Дата обновлена",
+        color: "rgba(33, 197, 140, 1)",
+      });
       if (updatedTask.status) {
         setSelectedStatus(updatedTask.status);
       }
@@ -539,11 +557,13 @@ const TaskDetails = () => {
         loading={loadings.date}
       />
 
-      <Toast
-        text={toast.text}
-        color={toast.color}
-        onClose={() => setToast({ show: false, text: "", color: "" })}
-      />
+      {toast.show && (
+        <Toast
+          text={toast.text}
+          color={toast.color}
+          onClose={() => setToast({ show: false, text: "", color: "" })}
+        />
+      )}
     </div>
   );
 };
