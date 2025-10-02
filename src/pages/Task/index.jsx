@@ -135,7 +135,7 @@ function Task() {
         setAllTasks(newTasks);
       }
 
-      // Рассчёт минимального время до следующего обновления
+      // Расчёт минимального время до следующего обновления
       let minRemainingMs = Infinity;
       allTasks.forEach((task) => {
         if (task.status === ASSIGNED && task.notified_pending === 0) {
@@ -175,7 +175,7 @@ function Task() {
   }, [fetchAllTasks]);
 
   useEffect(() => {
-    scheduleNextUpdate(0); // Запустить сразу
+    scheduleNextUpdate(0);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);

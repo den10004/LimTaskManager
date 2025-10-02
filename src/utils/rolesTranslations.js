@@ -14,6 +14,6 @@ export const taskStatus = [
 export const statusColors = {
   [OVERDUE]: "var(--color-err)",
   // Новая: "var(--color-blue)",
-  [COMPLETED]: "#db9fe9",
+  [COMPLETED]: "var(--color-blue)",
   [WORK]: "var(--color-green)",
 };

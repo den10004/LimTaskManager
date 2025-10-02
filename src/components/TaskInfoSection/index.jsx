@@ -57,6 +57,7 @@ function TaskInfoSection({
   onStatusUpdate,
 }) {
   const MAX_URGENCY_STARS = 5;
+
   return (
     <ul style={styles.taskInfoList}>
       <li className={`status-badge status-${task.status || ""}`}>
@@ -154,22 +155,23 @@ function TaskInfoSection({
           })}
         </div>
       </li>
-
       {task.links && (
         <li style={styles.flexCenter}>
           <b>Ссылки:&nbsp;</b>
           <div style={styles.linksContainer}>
-            {normalizeLinks(task.links).map((link, index) => (
-              <a
-                key={index}
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ marginRight: "10px" }}
-              >
-                {link}
-              </a>
-            ))}
+            {normalizeLinks(task.links).length === 0
+              ? "нет ссылок"
+              : normalizeLinks(task.links).map((link, index) => (
+                  <a
+                    key={index}
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ marginRight: "10px" }}
+                  >
+                    {link}
+                  </a>
+                ))}
           </div>
         </li>
       )}

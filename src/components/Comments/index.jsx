@@ -2,9 +2,7 @@ const styles = {
   commentsSection: {
     margin: "10px 0",
   },
-  commentsList: {
-    margin: "10px 0",
-  },
+
   comments: {
     fontSize: "12px",
     color: "#666",
@@ -26,9 +24,9 @@ const CommentsSection = ({
   onSubmit,
 }) => (
   <div style={styles.commentsSection}>
-    <b>Комментарии: </b>
+    <b>Комментарии:</b>
 
-    <div style={styles.commentsList}>
+    <div style={styles.commentsSection}>
       {comments && comments.length > 0 ? (
         comments.map((commentItem, index) => (
           <div key={index} style={styles.commentsWrap}>

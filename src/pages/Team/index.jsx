@@ -117,7 +117,6 @@ function TeamPage() {
 
   const openEditRoleModal = (role) => {
     setSelectedUser(role);
-    console.log(role);
     setModalMode("edit");
     setRoleOpen(true);
   };

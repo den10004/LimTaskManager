@@ -73,17 +73,6 @@ function AddFiles({ formData, handleFileChange }) {
             загрузите
           </a>
         </div>
-        {/*
-        <span
-          style={{
-            margin: "0 auto",
-            color: "rgba(156, 163, 175, 1)",
-            fontSize: "14px",
-          }}
-        >
-          Поддержка нескольких типов файлов
-        </span>
-*/}
         <input
           ref={fileInputRef}
           type="file"
@@ -97,7 +86,7 @@ function AddFiles({ formData, handleFileChange }) {
 
       {formData.files.length > 0 && (
         <div style={{ marginTop: "10px" }}>
-          Выбрано файлов: {formData.files.length}
+          Выбрано файлов: {formData.files.files.length}
         </div>
       )}
     </div>
