@@ -9,6 +9,7 @@ import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 import AddFiles from "../../components/AddFiles";
+import CommentsSection from "../../components/Comments";
 
 const styles = {
   container: {
@@ -40,11 +41,7 @@ const styles = {
     backgroundColor: "#f5f5f5",
     borderRadius: "5px",
   },
-  comments: {
-    fontSize: "12px",
-    color: "#666",
-    marginTop: "5px",
-  },
+
   flexColumn: {
     display: "flex",
     flexDirection: "column",
@@ -76,12 +73,7 @@ const styles = {
     flexWrap: "wrap",
     gap: "10px",
   },
-  commentsSection: {
-    margin: "10px 0",
-  },
-  commentsList: {
-    margin: "10px 0",
-  },
+
   fileUploadArea: {
     marginBottom: "15px",
   },
@@ -722,57 +714,6 @@ const TaskInfoSection = ({
       </li>
     )}
   </ul>
-);
-
-const CommentsSection = ({
-  comments,
-  getUserName,
-  formatDate,
-  comment,
-  onCommentChange,
-  loading,
-  onSubmit,
-}) => (
-  <div style={styles.commentsSection}>
-    <b>Комментарии: </b>
-
-    <div style={styles.commentsList}>
-      {comments && comments.length > 0 ? (
-        comments.map((commentItem, index) => (
-          <div key={index} style={styles.commentsWrap}>
-            <div>{commentItem.text || "Комментарий отсутствует"}</div>
-            <div style={styles.comments}>
-              <b>{getUserName(commentItem.user_id)},&nbsp;</b>
-              <b>Дата создания:&nbsp;</b>
-              {formatDate(commentItem.created_at) || "Не указано"}
-            </div>
-          </div>
-        ))
-      ) : (
-        <div>Нет комментариев</div>
-      )}
-    </div>
-
-    <form onSubmit={onSubmit} style={styles.form}>
-      <textarea
-        style={styles.form}
-        type="text"
-        value={comment}
-        onChange={(e) => onCommentChange(e.target.value)}
-        placeholder="Введите комментарий..."
-        disabled={loading}
-        required
-      />
-      <button
-        className="create-btn"
-        style={{ width: "250px", marginTop: "10px" }}
-        disabled={loading || !comment.trim()}
-        type="submit"
-      >
-        {loading ? "Отправка..." : "Добавить комментарий"}
-      </button>
-    </form>
-  </div>
 );
 
 export default TaskDetails;
