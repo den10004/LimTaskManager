@@ -173,7 +173,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
         },
         body: JSON.stringify(formData),
       });
-      console.log(formData);
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(

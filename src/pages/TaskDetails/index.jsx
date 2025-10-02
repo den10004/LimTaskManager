@@ -89,8 +89,7 @@ const TaskDetails = () => {
 
   const [task, setTask] = useState(null);
   const [comment, setComment] = useState("");
-  // const [files, setFiles] = useState([]);
-  const [files, setFiles] = useState({ files: [] });
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [direction, setDirection] = useState([]);
@@ -98,6 +97,8 @@ const TaskDetails = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
+
+  console.log(task);
 
   const [loadings, setLoadings] = useState({
     comment: false,
@@ -215,22 +216,11 @@ const TaskDetails = () => {
     },
     [apiRequest]
   );
-  /*
-  const handleFileChange = useCallback((e) => {
-    const newFiles = e.target.files;
-    if (newFiles) {
-      setFiles(Array.from(newFiles));
-    }
-  }, []);
-*/
 
   const handleFileChange = useCallback((e) => {
     const newFiles = e.target.files;
     if (newFiles) {
-      setFiles((prev) => ({
-        ...prev,
-        files: [...prev.files, ...Array.from(newFiles)],
-      }));
+      setFiles(Array.from(newFiles));
     }
   }, []);
 
