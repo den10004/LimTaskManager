@@ -4,7 +4,7 @@ import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
-import { taskStatus, WORK } from "../../utils/rolesTranslations";
+import { OVERDUE, taskStatus, WORK } from "../../utils/rolesTranslations";
 import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
@@ -171,11 +171,17 @@ const TaskDetails = () => {
 
   const filteredStatuses = useMemo(
     () =>
-      taskStatus.filter(
-        (statusArray) =>
-          !statusArray.includes(WORK) || userData?.id === task?.assigned_user_id
-      ),
-    [task, userData]
+      taskStatus.filter((statusArray) => {
+        const isOverdue = statusArray.includes(OVERDUE);
+        if (isOverdue) return false;
+        const hasWorkAccess =
+          !statusArray.includes(WORK) ||
+          userData?.id === task?.assigned_user_id;
+
+        return hasWorkAccess;
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [task, userData, taskStatus, WORK]
   );
 
   const getUserName = useCallback(
