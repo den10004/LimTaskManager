@@ -28,6 +28,7 @@ function DateModal({
           type="datetime-local"
           value={newDate}
           onChange={(e) => setNewDate(e.target.value)}
+          min={new Date().toISOString().slice(0, 16)}
           style={{
             margin: "10px 0",
             width: "100%",
