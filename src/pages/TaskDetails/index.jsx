@@ -36,12 +36,7 @@ const styles = {
     width: "100%",
     marginTop: "10px",
   },
-  commentsWrap: {
-    marginBottom: "15px",
-    padding: "10px",
-    backgroundColor: "#f5f5f5",
-    borderRadius: "5px",
-  },
+
   flexColumn: {
     display: "flex",
     flexDirection: "column",
