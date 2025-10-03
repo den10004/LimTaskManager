@@ -107,7 +107,6 @@ function CreatePage() {
           assigned_user_id: formData.assigned_user_id,
           urgency: formData.urgency,
           links: formData.links.filter((link) => link.trim() !== ""),
-          files: [],
         }),
       });
 
@@ -139,17 +138,18 @@ function CreatePage() {
       const taskId = taskData.id;
 
       if (formData.files.length > 0) {
-        const formDataToSend = new FormData();
+        const FormDataNew = new FormData();
         formData.files.forEach((file) => {
-          formDataToSend.append("file", file);
+          FormDataNew.append("files[]", file);
         });
+        FormDataNew.append("uploadType", "multiple");
 
         const fileResponse = await fetch(`${API_URL}/task/${taskId}/files`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${currentToken}`,
           },
-          body: formDataToSend,
+          body: FormDataNew,
         });
 
         if (!fileResponse.ok) {

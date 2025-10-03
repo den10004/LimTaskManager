@@ -88,7 +88,7 @@ function AddFiles({ formData, handleFileChange }) {
           ref={fileInputRef}
           type="file"
           id="files"
-          name="files"
+          name="files[]"
           multiple
           onChange={handleFileChange}
           style={{ display: "none" }}
