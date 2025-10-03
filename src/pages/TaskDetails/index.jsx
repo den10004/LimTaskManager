@@ -5,13 +5,11 @@ import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import { OVERDUE, taskStatus, WORK } from "../../utils/rolesTranslations";
-import DateModal from "../../components/Modal/DateModal";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 import AddFiles from "../../components/AddFiles";
 import CommentsSection from "../../components/Comments";
 import TaskInfoSection from "../../components/TaskInfoSection";
-import DescriptionModal from "../../components/Modal/DescriptionModal";
 import EditModal from "../../components/Modal/EditModal";
 
 const styles = {
