@@ -217,7 +217,7 @@ const TaskDetails = () => {
   const handleFileChange = useCallback((e) => {
     const newFiles = e.target.files;
     if (newFiles) {
-      setFiles(Array.from(newFiles));
+      setFiles((prevFiles) => [...prevFiles, ...Array.from(newFiles)]);
     }
   }, []);
 

@@ -51,7 +51,7 @@ function CreatePage() {
     const files = Array.from(e.target.files);
     setFormData((prev) => ({
       ...prev,
-      files,
+      files: [...prev.files, ...files],
     }));
   };
 
