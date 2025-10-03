@@ -115,9 +115,11 @@ function TaskInfoSection({
       </li>
       <li>
         <b>Описание:</b> {task.description || "Не указано"}
-        <button className="change-btn" onClick={onDescriptionChange}>
-          Редактирование
-        </button>
+        {isAdmin && (
+          <button className="change-btn" onClick={onDescriptionChange}>
+            Редактирование
+          </button>
+        )}
       </li>
 
       <li style={styles.flexCenter}>
