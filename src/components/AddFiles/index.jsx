@@ -117,7 +117,6 @@ function AddFiles({ formData, handleFileChange }) {
         />
       </div>
 
-      {/* Список файлов */}
       {filesToDisplay.length > 0 && (
         <ul style={{ marginTop: "20px" }}>
           {filesToDisplay.map((file, index) => (

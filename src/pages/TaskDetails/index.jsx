@@ -214,10 +214,21 @@ const TaskDetails = () => {
 
   const handleFileChange = useCallback((e) => {
     const newFiles = e.target.files;
-    if (newFiles) {
-      setFiles((prevFiles) => [...prevFiles, ...Array.from(newFiles)]);
-    } else {
+
+    if (!newFiles) {
       setFiles([]);
+      return;
+    }
+
+    const newFilesArray = Array.from(newFiles);
+
+    if (e.target.isRemoval) {
+      setFiles(newFilesArray);
+    } else {
+      setFiles((prevFiles) => [...prevFiles, ...newFilesArray]);
+    }
+    if (e.target.type === "file") {
+      e.target.value = "";
     }
   }, []);
 
@@ -505,7 +516,7 @@ const TaskDetails = () => {
         />
 
         <form onSubmit={handleFileUpload} style={styles.form}>
-          <AddFiles formData={files} handleFileChange={handleFileChange} />
+          <AddFiles formData={{ files }} handleFileChange={handleFileChange} />
           <button
             className="create-btn"
             style={{ width: "200px", marginTop: "10px" }}
