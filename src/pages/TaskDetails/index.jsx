@@ -11,6 +11,7 @@ import Toast from "../../components/Toast";
 import AddFiles from "../../components/AddFiles";
 import CommentsSection from "../../components/Comments";
 import TaskInfoSection from "../../components/TaskInfoSection";
+import DescriptionModal from "../../components/Modal/DescriptionModal";
 
 const styles = {
   container: {
@@ -95,10 +96,10 @@ const TaskDetails = () => {
   const [direction, setDirection] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [descriptionUpdate, setDescriptionUpdate] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
+  const [newDesc, setDescr] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
-
-  console.log(task);
 
   const [loadings, setLoadings] = useState({
     comment: false,
@@ -356,6 +357,35 @@ const TaskDetails = () => {
     }
   };
 
+  const handleDescriptionUpdate = async (desc) => {
+    if (!desc) return;
+    setLoadings((prev) => ({ ...prev, desc: true }));
+    try {
+      const updatedTask = await apiRequest(`/task/${taskId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ description: desc }),
+      });
+
+      setTask((prev) => ({
+        ...prev,
+        description: updatedTask.description || updatedTask.desc || desc,
+      }));
+      setToast({
+        show: true,
+        text: "Описание обновлено",
+        color: "rgba(33, 197, 140, 1)",
+      });
+
+      setDescriptionUpdate(false);
+      setDescr("");
+    } catch (err) {
+      console.error(err);
+      setToast({ show: true, text: "Ошибка обновления", color: "red" });
+    } finally {
+      setLoadings((prev) => ({ ...prev, desc: false }));
+    }
+  };
+
   const handleDateUpdate = async (date) => {
     if (!date) return;
 
@@ -436,7 +466,7 @@ const TaskDetails = () => {
       </div>
     );
   }
-  console.log(files);
+
   return (
     <div style={styles.container}>
       <button style={styles.backButton} onClick={() => navigate("/task")}>
@@ -460,6 +490,7 @@ const TaskDetails = () => {
           loadings={loadings}
           onUrgencyChange={handleUrgencyUpdate}
           onDateChange={() => setShowDatePicker(true)}
+          onDescriptionChange={() => setDescriptionUpdate(true)}
           selectedStatus={selectedStatus}
           onStatusChange={setSelectedStatus}
           statuses={filteredStatuses}
@@ -505,6 +536,14 @@ const TaskDetails = () => {
         onClose={() => setShowDatePicker(false)}
         onSave={handleDateUpdate}
         initialDate={newDueDate}
+        loading={loadings.date}
+      />
+
+      <DescriptionModal
+        isOpen={descriptionUpdate}
+        onClose={() => setDescriptionUpdate(false)}
+        onSave={handleDescriptionUpdate}
+        initialDescr={newDesc}
         loading={loadings.date}
       />
 

@@ -50,6 +50,7 @@ function TaskInfoSection({
   loadings,
   onUrgencyChange,
   onDateChange,
+  onDescriptionChange,
   selectedStatus,
   onStatusChange,
   statuses,
@@ -103,8 +104,8 @@ function TaskInfoSection({
         <b>Срок выполнения:&nbsp;</b>
         {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
         {isAdmin && (
-          <button className="create-btn" onClick={onDateChange}>
-            Изменить
+          <button className="change-btn" onClick={onDateChange}>
+            Редактирование
           </button>
         )}
       </li>
@@ -114,6 +115,9 @@ function TaskInfoSection({
       </li>
       <li>
         <b>Описание:</b> {task.description || "Не указано"}
+        <button className="change-btn" onClick={onDescriptionChange}>
+          Редактирование
+        </button>
       </li>
 
       <li style={styles.flexCenter}>
