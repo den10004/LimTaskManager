@@ -12,6 +12,7 @@ import AddFiles from "../../components/AddFiles";
 import CommentsSection from "../../components/Comments";
 import TaskInfoSection from "../../components/TaskInfoSection";
 import DescriptionModal from "../../components/Modal/DescriptionModal";
+import EditModal from "../../components/Modal/EditModal";
 
 const styles = {
   container: {
@@ -531,20 +532,22 @@ const TaskDetails = () => {
         )}
       </div>
 
-      <DateModal
+      <EditModal
         isOpen={showDatePicker}
         onClose={() => setShowDatePicker(false)}
         onSave={handleDateUpdate}
         initialDate={newDueDate}
         loading={loadings.date}
+        type="date"
       />
 
-      <DescriptionModal
+      <EditModal
         isOpen={descriptionUpdate}
         onClose={() => setDescriptionUpdate(false)}
         onSave={handleDescriptionUpdate}
         initialDescr={newDesc}
         loading={loadings.date}
+        type="description"
       />
 
       {toast.show && (
