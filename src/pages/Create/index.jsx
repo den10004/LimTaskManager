@@ -46,13 +46,37 @@ function CreatePage() {
       [name]: value,
     }));
   };
-
+  /*
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setFormData((prev) => ({
       ...prev,
       files: [...prev.files, ...files],
     }));
+  };
+*/
+
+  const handleFileChange = (e) => {
+    const newFiles = Array.from(e.target.files || []);
+
+    setFormData((prev) => {
+      const currentFiles = prev.files || [];
+
+      if (e.target.isRemoval) {
+        return {
+          ...prev,
+          files: newFiles,
+        };
+      } else {
+        return {
+          ...prev,
+          files: [...currentFiles, ...newFiles],
+        };
+      }
+    });
+    if (e.target.type === "file") {
+      e.target.value = "";
+    }
   };
 
   const handleLinkChange = (index, value) => {

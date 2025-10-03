@@ -95,8 +95,6 @@ const TaskDetails = () => {
   const [newDesc, setDescr] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
 
-  console.log(task);
-
   const [loadings, setLoadings] = useState({
     comment: false,
     file: false,
@@ -218,6 +216,8 @@ const TaskDetails = () => {
     const newFiles = e.target.files;
     if (newFiles) {
       setFiles((prevFiles) => [...prevFiles, ...Array.from(newFiles)]);
+    } else {
+      setFiles([]);
     }
   }, []);
 

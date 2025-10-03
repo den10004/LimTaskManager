@@ -42,6 +42,28 @@ function AddFiles({ formData, handleFileChange }) {
     }
   }, []);
 
+  const handleRemoveFile = useCallback(
+    (indexToRemove) => {
+      const currentFiles = formData.files || [];
+      const updatedFiles = currentFiles.filter(
+        (_, index) => index !== indexToRemove
+      );
+      const event = {
+        target: {
+          files: updatedFiles,
+          name: "files",
+          isRemoval: true,
+        },
+      };
+
+      handleFileChange(event);
+    },
+    [formData.files, handleFileChange]
+  );
+
+  const filesToDisplay = formData.files || [];
+  const filesCount = filesToDisplay.length;
+
   return (
     <div className="create__block">
       <div className="label">Файлы</div>
@@ -94,25 +116,48 @@ function AddFiles({ formData, handleFileChange }) {
           style={{ display: "none" }}
         />
       </div>
-      <ul style={{ marginTop: "20px" }}>
-        {Array.isArray(formData) &&
-          formData.map((file, index) => <li key={index}>{file.name}</li>)}
 
-        {formData.files?.map((file, index) => (
-          <li key={index}>{file.name}</li>
-        ))}
-      </ul>
-
-      {formData.files?.length > 0 && (
-        <div style={{ marginTop: "10px" }}>
-          Выбрано файлов: {formData.files.length}
-        </div>
+      {/* Список файлов */}
+      {filesToDisplay.length > 0 && (
+        <ul style={{ marginTop: "20px" }}>
+          {filesToDisplay.map((file, index) => (
+            <li
+              key={index}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "8px 0",
+                borderBottom: "1px solid #eee",
+              }}
+            >
+              <span style={{ flex: 1 }}>{file.name}</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemoveFile(index);
+                }}
+                style={{
+                  color: "var(--color-err)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  padding: "5px 10px",
+                  background: "none",
+                  border: "1px solid var(--color-err)",
+                  borderRadius: "4px",
+                  marginLeft: "10px",
+                }}
+              >
+                Удалить
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
-
-      {formData?.length > 0 && (
-        <div style={{ marginTop: "10px" }}>
-          Выбрано файлов: {formData.length}
-        </div>
+      {filesCount > 0 && (
+        <div style={{ marginTop: "10px" }}>Выбрано файлов: {filesCount}</div>
       )}
     </div>
   );
