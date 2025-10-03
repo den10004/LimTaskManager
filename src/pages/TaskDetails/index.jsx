@@ -266,7 +266,8 @@ const TaskDetails = () => {
 
     try {
       const formData = new FormData();
-      files.forEach((file) => formData.append("file", file));
+      files.forEach((file) => formData.append("files[]", file));
+      formData.append("uploadType", "multiple");
 
       const response = await fetch(`${API_URL}/task/${taskId}/files`, {
         method: "POST",
@@ -435,7 +436,7 @@ const TaskDetails = () => {
       </div>
     );
   }
-
+  console.log(files);
   return (
     <div style={styles.container}>
       <button style={styles.backButton} onClick={() => navigate("/task")}>
@@ -477,7 +478,7 @@ const TaskDetails = () => {
         />
 
         <form onSubmit={handleFileUpload} style={styles.form}>
-          <AddFiles formData={{ files }} handleFileChange={handleFileChange} />
+          <AddFiles formData={files} handleFileChange={handleFileChange} />
           <button
             className="create-btn"
             style={{ width: "200px", marginTop: "10px" }}

@@ -19,6 +19,7 @@ function CreatePage() {
     files: [],
     links: [""],
   });
+
   const [toast, setToast] = useState({
     show: false,
     text: "",
