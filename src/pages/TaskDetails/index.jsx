@@ -95,6 +95,8 @@ const TaskDetails = () => {
   const [newDesc, setDescr] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
 
+  console.log(task);
+
   const [loadings, setLoadings] = useState({
     comment: false,
     file: false,
@@ -517,7 +519,7 @@ const TaskDetails = () => {
         {userPermissions.isAdmin && (
           <button
             className="delete-btn"
-            style={{ width: "200px", marginTop: "10px" }}
+            style={{ width: "200px", margin: "10px 0 0 auto" }}
             onClick={handleDeleteTask}
           >
             Удалить задачу

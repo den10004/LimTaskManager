@@ -94,11 +94,21 @@ function AddFiles({ formData, handleFileChange }) {
           style={{ display: "none" }}
         />
       </div>
+      <ul style={{ marginTop: "20px" }}>
+        {Array.isArray(formData) &&
+          formData.map((file, index) => <li key={index}>{file.name}</li>)}
+
+        {formData.files?.map((file, index) => (
+          <li key={index}>{file.name}</li>
+        ))}
+      </ul>
+
       {formData.files?.length > 0 && (
         <div style={{ marginTop: "10px" }}>
           Выбрано файлов: {formData.files.length}
         </div>
       )}
+
       {formData?.length > 0 && (
         <div style={{ marginTop: "10px" }}>
           Выбрано файлов: {formData.length}
