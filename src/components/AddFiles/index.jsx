@@ -132,21 +132,12 @@ function AddFiles({ formData, handleFileChange }) {
             >
               <span style={{ flex: 1 }}>{file.name}</span>
               <button
+                className="delete-btn"
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   handleRemoveFile(index);
-                }}
-                style={{
-                  color: "var(--color-err)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  padding: "5px 10px",
-                  background: "none",
-                  border: "1px solid var(--color-err)",
-                  borderRadius: "4px",
-                  marginLeft: "10px",
                 }}
               >
                 Удалить
