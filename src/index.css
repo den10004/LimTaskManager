@@ -242,6 +242,21 @@ tr:last-child {
   align-items: center;
 }
 
+.taskDetailContainder {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.taskDetailHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
 
 @media screen and (max-width:1240px) {
   .container {
@@ -255,6 +270,18 @@ tr:last-child {
     width: 100%;
     height: auto;
   }
+
+  .taskDetailContainder {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .taskDetailHeader {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
 }
 
 @media screen and (max-width:425px) {

@@ -1,23 +1,6 @@
+import EditBtn from "../UI/EditBtn";
+
 const styles = {
-  statusForm: {
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  flexAlignCenter: {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
-  filesContainer: {
-    marginLeft: "5px",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px",
-  },
   taskInfoList: {
     display: "flex",
     flexDirection: "column",
@@ -26,15 +9,15 @@ const styles = {
     padding: 0,
     margin: 0,
   },
-  flexCenter: {
-    display: "flex",
-    alignItems: "center",
-  },
-  linksContainer: {
+  filesContainer: {
     marginLeft: "5px",
     display: "flex",
     flexWrap: "wrap",
     gap: "10px",
+  },
+  flexCenter: {
+    display: "flex",
+    alignItems: "center",
   },
 };
 
@@ -44,85 +27,59 @@ function TaskInfoSection({
   getUserName,
   getDirectionName,
   formatDate,
-  normalizeLinks,
   userPermissions,
   getUrgencyColor,
   loadings,
   onUrgencyChange,
   onDateChange,
-  onDescriptionChange,
-  selectedStatus,
-  onStatusChange,
-  statuses,
-  loadingStatus,
-  onStatusUpdate,
 }) {
   const MAX_URGENCY_STARS = 5;
+  console.log(task.links);
 
   return (
     <ul style={styles.taskInfoList}>
-      <li className={`status-badge status-${task.status || ""}`}>
-        <b>Статус:</b>
-        &nbsp;{task.status || "Не указано"}
-      </li>
+      <div
+        className="headlineBlock"
+        style={{
+          borderBottom: "1px solid #e9ecef",
+          marginBottom: "16px",
+          paddingBottom: "12px",
+        }}
+      >
+        <b>Описание задачи</b>
+      </div>
 
-      <li>
-        <form onSubmit={onStatusUpdate} style={styles.statusForm}>
-          <select
-            id="status"
-            name="status"
-            value={selectedStatus}
-            onChange={(e) => onStatusChange(e.target.value)}
-            required
-            disabled={loadingStatus}
-          >
-            <option value="">Выберите статус</option>
-            {statuses.map((status, index) => (
-              <option key={index} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <button
-            className="create-btn"
-            disabled={loadingStatus || !selectedStatus}
-            type="submit"
-          >
-            {loadingStatus ? "Обновление..." : "Обновить статус"}
-          </button>
-        </form>
-      </li>
-
-      <li>
+      <li className="headlineBlock">
         <b>Создатель:</b> {getUserName(task.created_by)}
       </li>
-      <li>
+      <li className="headlineBlock">
         <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
       </li>
 
-      <li style={styles.flexAlignCenter}>
-        <b>Срок выполнения:&nbsp;</b>
-        {formatDate(task.due_at) || "Не указано"}&nbsp;&nbsp;
-        {isAdmin && (
-          <button className="change-btn" onClick={onDateChange}>
-            Редактирование
-          </button>
-        )}
+      <li className="headlineBlock">
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <b style={{ marginBottom: "10px" }}>Срок выполнения:</b>
+          {formatDate(task.due_at) || "Не указано"}
+        </div>
+        {isAdmin && <EditBtn onDateChange={onDateChange} />}
       </li>
 
-      <li>
-        <b>Направление:</b> {getDirectionName(task.direction_id)}
-      </li>
-      <li>
-        <b>Описание:</b> {task.description || "Не указано"}
-        {isAdmin && (
-          <button className="change-btn" onClick={onDescriptionChange}>
-            Редактирование
-          </button>
-        )}
+      <li className="headlineBlock">
+        <b>Направление:</b>{" "}
+        <div
+          style={{
+            display: "inline-block",
+            padding: "4px 8px",
+            backgroundColor: "#e7f1ff",
+            color: "var(--color-blue)",
+            borderRadius: "4px",
+          }}
+        >
+          {getDirectionName(task.direction_id)}
+        </div>
       </li>
 
-      <li style={styles.flexCenter}>
+      <li className="headlineBlock" style={styles.flexCenter}>
         <b>Важность:&nbsp;</b>
         <div style={styles.flexCenter}>
           {[...Array(MAX_URGENCY_STARS)].map((_, index) => {
@@ -161,21 +118,22 @@ function TaskInfoSection({
           })}
         </div>
       </li>
+
       {task.links && (
-        <li style={styles.flexCenter}>
+        <li style={styles.flexCenter} className="headlineBlock">
           <b>Ссылки:&nbsp;</b>
           <div style={styles.linksContainer}>
-            {normalizeLinks(task.links).length === 0
+            {task.links.length === 0
               ? "нет ссылок"
-              : normalizeLinks(task.links).map((link, index) => (
+              : task.links.map((link, index) => (
                   <a
                     key={index}
-                    href={link}
+                    href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ marginRight: "10px" }}
                   >
-                    {link}
+                    {link.url}
                   </a>
                 ))}
           </div>
@@ -203,5 +161,4 @@ function TaskInfoSection({
     </ul>
   );
 }
-
 export default TaskInfoSection;
