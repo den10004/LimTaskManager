@@ -110,7 +110,8 @@ button:disabled {
   background-color: var(--color-background);
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 
@@ -239,18 +240,8 @@ tr:last-child {
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  /*
-  margin-bottom: 16px;
-  padding-bottom: 12px;*/
 }
 
-.info {
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 20px;
-  color: var(--color-blue);
-  border: 1px solid var(--color-blue)
-}
 
 @media screen and (max-width:1240px) {
   .container {

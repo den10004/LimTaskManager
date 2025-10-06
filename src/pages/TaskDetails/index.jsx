@@ -4,7 +4,12 @@ import { getCookie } from "../../utils/getCookies";
 import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
-import { OVERDUE, taskStatus, WORK } from "../../utils/rolesTranslations";
+import {
+  OVERDUE,
+  statusColors,
+  taskStatus,
+  WORK,
+} from "../../utils/rolesTranslations";
 import { useAuth } from "../../contexts/AuthContext";
 import Toast from "../../components/Toast";
 import AddFiles from "../../components/AddFiles";
@@ -26,11 +31,6 @@ const styles = {
     marginBottom: "20px",
   },
 
-  taskContainer: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "24px",
-  },
   form: {
     width: "100%",
     marginTop: "10px",
@@ -117,13 +117,11 @@ function TaskInfoSection({
   getUserName,
   getDirectionName,
   formatDate,
-  normalizeLinks,
   userPermissions,
   getUrgencyColor,
   loadings,
   onUrgencyChange,
   onDateChange,
-  onDescriptionChange,
 }) {
   const MAX_URGENCY_STARS = 5;
   console.log(task.links);
@@ -156,16 +154,6 @@ function TaskInfoSection({
         >
           {getDirectionName(task.direction_id)}
         </div>
-      </li>
-      <li>
-        <div
-          className="headlineBlock"
-          style={{ borderBottom: "1px solid #e9ecef" }}
-        >
-          <b>Описание:</b>
-          {isAdmin && <EditBtn onDateChange={onDescriptionChange} />}
-        </div>
-        {task.description || "Не указано"}
       </li>
 
       <li className="headlineBlock" style={styles.flexCenter}>
@@ -222,24 +210,9 @@ function TaskInfoSection({
                     rel="noopener noreferrer"
                     style={{ marginRight: "10px" }}
                   >
-                    {" "}
                     {link.url}
                   </a>
                 ))}
-            {/*
-            {normalizeLinks(task.links).length === 0
-              ? "нет ссылок"
-              : normalizeLinks(task.links).map((link, index) => (
-                  <a
-                    key={index}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ marginRight: "10px" }}
-                  >
-                    {link}
-                  </a>
-                ))}*/}
           </div>
         </li>
       )}
@@ -681,7 +654,18 @@ const TaskDetails = () => {
         <h3>
           Задача #{task.id} - {task.title || "Не указано"}
         </h3>
-        <div className="info">{task.status}</div>
+        <div
+          className="info"
+          style={{
+            alignItems: "center",
+            padding: "6px 12px",
+            borderRadius: "20px",
+            color: statusColors[task.status] || "inherit",
+            border: `1px solid ${statusColors[task.status]}`,
+          }}
+        >
+          {task.status}
+        </div>
 
         <form onSubmit={handleStatusUpdate} style={styles.statusForm}>
           <select
@@ -709,48 +693,82 @@ const TaskDetails = () => {
         </form>
       </div>
 
-      <div style={styles.taskContainer}>
-        <div className="taskCard">
-          <TaskInfoSection
-            isAdmin={isAdmin}
-            task={task}
-            getUserName={getUserName}
-            getDirectionName={getDirectionName}
-            formatDate={formatDate}
-            normalizeLinks={normalizeLinks}
-            userPermissions={userPermissions}
-            getUrgencyColor={getUrgencyColor}
-            loadings={loadings}
-            onUrgencyChange={handleUrgencyUpdate}
-            onDateChange={() => setShowDatePicker(true)}
-            onDescriptionChange={() => setDescriptionUpdate(true)}
-          />
-
-          <form onSubmit={handleFileUpload} style={styles.form}>
-            <AddFiles
-              formData={{ files }}
-              handleFileChange={handleFileChange}
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}
+      >
+        <div>
+          <div className="taskCard">
+            <TaskInfoSection
+              isAdmin={isAdmin}
+              task={task}
+              getUserName={getUserName}
+              getDirectionName={getDirectionName}
+              formatDate={formatDate}
+              normalizeLinks={normalizeLinks}
+              userPermissions={userPermissions}
+              getUrgencyColor={getUrgencyColor}
+              loadings={loadings}
+              onUrgencyChange={handleUrgencyUpdate}
+              onDateChange={() => setShowDatePicker(true)}
+              onDescriptionChange={() => setDescriptionUpdate(true)}
             />
-            <button
-              className="create-btn"
-              style={{ width: "200px", marginTop: "10px" }}
-              disabled={loadings.file || files.length === 0}
-              type="submit"
-            >
-              {loadings.file ? "Загрузка..." : "Загрузить файлы"}
-            </button>
-          </form>
-        </div>
+          </div>
 
-        <CommentsSection
-          comments={task.comments}
-          getUserName={getUserName}
-          formatDate={formatDate}
-          comment={comment}
-          onCommentChange={setComment}
-          loading={loadings.comment}
-          onSubmit={handleCommentSubmit}
-        />
+          <div className="taskCard">
+            <div
+              className="headlineBlock"
+              style={{
+                borderBottom: "1px solid #e9ecef",
+                marginBottom: "16px",
+                paddingBottom: "12px",
+              }}
+            >
+              <b>Описание</b>
+              {isAdmin && (
+                <EditBtn onDateChange={() => setDescriptionUpdate(true)} />
+              )}
+            </div>
+            {task.description || "Не указано"}
+          </div>
+          <div className="taskCard">
+            <div
+              className="headlineBlock"
+              style={{
+                borderBottom: "1px solid #e9ecef",
+                marginBottom: "16px",
+                paddingBottom: "12px",
+              }}
+            >
+              <b>Файлы</b>
+            </div>
+
+            <form onSubmit={handleFileUpload} style={styles.form}>
+              <AddFiles
+                formData={{ files }}
+                handleFileChange={handleFileChange}
+              />
+              <button
+                className="create-btn"
+                style={{ width: "200px", marginTop: "10px" }}
+                disabled={loadings.file || files.length === 0}
+                type="submit"
+              >
+                {loadings.file ? "Загрузка..." : "Загрузить файлы"}
+              </button>
+            </form>
+          </div>
+        </div>
+        <div>
+          <CommentsSection
+            comments={task.comments}
+            getUserName={getUserName}
+            formatDate={formatDate}
+            comment={comment}
+            onCommentChange={setComment}
+            loading={loadings.comment}
+            onSubmit={handleCommentSubmit}
+          />
+        </div>
       </div>
       {userPermissions.isAdmin && (
         <button
