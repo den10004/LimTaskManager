@@ -272,6 +272,31 @@ const TaskDetails = () => {
     }
   };
 
+  const commentDetele = async (commentId) => {
+    try {
+      await apiRequest(`/task/${taskId}/comments/${commentId}`, {
+        method: "DELETE",
+      });
+      setTask((prev) => ({
+        ...prev,
+        comments: prev.comments.filter((comment) => comment.id !== commentId),
+      }));
+
+      setToast({
+        show: true,
+        text: "Комментарий удалён",
+        color: "rgba(33, 197, 140, 1)",
+      });
+    } catch (err) {
+      console.error(err);
+      setToast({
+        show: true,
+        text: "Ошибка удаления комментария",
+        color: "red",
+      });
+    }
+  };
+
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (files.length === 0) return;
@@ -449,7 +474,6 @@ const TaskDetails = () => {
       setToast({ show: true, text: "Не удалось удалить задачу", color: "red" });
     }
   };
-
   useEffect(() => {
     fetchDirections(setDirection, setLoading, setError);
   }, []);
@@ -610,6 +634,7 @@ const TaskDetails = () => {
             onCommentChange={setComment}
             loading={loadings.comment}
             onSubmit={handleCommentSubmit}
+            onCommentDelete={commentDetele}
           />
         </div>
       </div>
