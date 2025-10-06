@@ -26,11 +26,13 @@ const styles = {
     marginBottom: "20px",
   },
   taskTitle: {
-    margin: "30px 0",
+    margin: "0 0 20px 0",
     color: "#333",
   },
-  taskHeader: {
-    margin: "30px 0",
+  taskContainer: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "24px",
   },
   form: {
     width: "100%",
@@ -483,27 +485,43 @@ const TaskDetails = () => {
       <h3 style={styles.taskTitle}>
         Задача #{task.id} - {task.title || "Не указано"}
       </h3>
+      <div style={styles.taskContainer}>
+        <div className="taskCard">
+          <TaskInfoSection
+            isAdmin={isAdmin}
+            task={task}
+            getUserName={getUserName}
+            getDirectionName={getDirectionName}
+            formatDate={formatDate}
+            normalizeLinks={normalizeLinks}
+            userPermissions={userPermissions}
+            getUrgencyColor={getUrgencyColor}
+            loadings={loadings}
+            onUrgencyChange={handleUrgencyUpdate}
+            onDateChange={() => setShowDatePicker(true)}
+            onDescriptionChange={() => setDescriptionUpdate(true)}
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            statuses={filteredStatuses}
+            loadingStatus={loadings.status}
+            onStatusUpdate={handleStatusUpdate}
+          />
 
-      <div style={styles.taskHeader}>
-        <TaskInfoSection
-          isAdmin={isAdmin}
-          task={task}
-          getUserName={getUserName}
-          getDirectionName={getDirectionName}
-          formatDate={formatDate}
-          normalizeLinks={normalizeLinks}
-          userPermissions={userPermissions}
-          getUrgencyColor={getUrgencyColor}
-          loadings={loadings}
-          onUrgencyChange={handleUrgencyUpdate}
-          onDateChange={() => setShowDatePicker(true)}
-          onDescriptionChange={() => setDescriptionUpdate(true)}
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          statuses={filteredStatuses}
-          loadingStatus={loadings.status}
-          onStatusUpdate={handleStatusUpdate}
-        />
+          <form onSubmit={handleFileUpload} style={styles.form}>
+            <AddFiles
+              formData={{ files }}
+              handleFileChange={handleFileChange}
+            />
+            <button
+              className="create-btn"
+              style={{ width: "200px", marginTop: "10px" }}
+              disabled={loadings.file || files.length === 0}
+              type="submit"
+            >
+              {loadings.file ? "Загрузка..." : "Загрузить файлы"}
+            </button>
+          </form>
+        </div>
 
         <CommentsSection
           comments={task.comments}
@@ -514,30 +532,16 @@ const TaskDetails = () => {
           loading={loadings.comment}
           onSubmit={handleCommentSubmit}
         />
-
-        <form onSubmit={handleFileUpload} style={styles.form}>
-          <AddFiles formData={{ files }} handleFileChange={handleFileChange} />
-          <button
-            className="create-btn"
-            style={{ width: "200px", marginTop: "10px" }}
-            disabled={loadings.file || files.length === 0}
-            type="submit"
-          >
-            {loadings.file ? "Загрузка..." : "Загрузить файлы"}
-          </button>
-        </form>
-
-        {userPermissions.isAdmin && (
-          <button
-            className="delete-btn"
-            style={{ width: "200px", margin: "10px 0 0 auto" }}
-            onClick={handleDeleteTask}
-          >
-            Удалить задачу
-          </button>
-        )}
       </div>
-
+      {userPermissions.isAdmin && (
+        <button
+          className="delete-btn"
+          style={{ width: "200px", margin: "10px 0 0 auto" }}
+          onClick={handleDeleteTask}
+        >
+          Удалить задачу
+        </button>
+      )}
       <EditModal
         isOpen={showDatePicker}
         onClose={() => setShowDatePicker(false)}
@@ -546,7 +550,6 @@ const TaskDetails = () => {
         loading={loadings.date}
         type="date"
       />
-
       <EditModal
         isOpen={descriptionUpdate}
         onClose={() => setDescriptionUpdate(false)}
@@ -555,7 +558,6 @@ const TaskDetails = () => {
         loading={loadings.date}
         type="description"
       />
-
       {toast.show && (
         <Toast
           text={toast.text}

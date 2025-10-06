@@ -29,7 +29,7 @@ const CommentsSection = ({
   loading,
   onSubmit,
 }) => (
-  <div style={styles.commentsSection}>
+  <div className="taskCard">
     <b>Комментарии:</b>
 
     <div style={styles.commentsSection}>
