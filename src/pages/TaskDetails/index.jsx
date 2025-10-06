@@ -273,6 +273,13 @@ const TaskDetails = () => {
   };
 
   const commentDetele = async (commentId) => {
+    const isConfirmed = window.confirm(
+      "Вы уверены, что хотите удалить комментарий?"
+    );
+
+    if (!isConfirmed) {
+      return;
+    }
     try {
       await apiRequest(`/task/${taskId}/comments/${commentId}`, {
         method: "DELETE",
@@ -292,6 +299,38 @@ const TaskDetails = () => {
       setToast({
         show: true,
         text: "Ошибка удаления комментария",
+        color: "red",
+      });
+    }
+  };
+
+  const commentChange = async (commentId, newText) => {
+    if (!newText.trim()) return;
+    try {
+      await apiRequest(`/task/${taskId}/comments/${commentId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ text: newText.trim() }),
+      });
+
+      setTask((prev) => ({
+        ...prev,
+        comments: prev.comments.map((comment) =>
+          comment.id === commentId
+            ? { ...comment, text: newText.trim() }
+            : comment
+        ),
+      }));
+
+      setToast({
+        show: true,
+        text: "Комментарий отредактирован",
+        color: "rgba(33, 197, 140, 1)",
+      });
+    } catch (err) {
+      console.error(err);
+      setToast({
+        show: true,
+        text: "Ошибка редактирования комментария",
         color: "red",
       });
     }
@@ -635,6 +674,7 @@ const TaskDetails = () => {
             loading={loadings.comment}
             onSubmit={handleCommentSubmit}
             onCommentDelete={commentDetele}
+            commentChange={commentChange}
           />
         </div>
       </div>
