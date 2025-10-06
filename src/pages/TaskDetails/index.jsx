@@ -28,7 +28,7 @@ const styles = {
     border: "none",
     cursor: "pointer",
     fontSize: "16px",
-    marginBottom: "20px",
+    padding: "0 0 10px 0",
   },
 
   form: {
@@ -128,6 +128,17 @@ function TaskInfoSection({
 
   return (
     <ul style={styles.taskInfoList}>
+      <div
+        className="headlineBlock"
+        style={{
+          borderBottom: "1px solid #e9ecef",
+          marginBottom: "16px",
+          paddingBottom: "12px",
+        }}
+      >
+        <b>Описание задачи</b>
+      </div>
+
       <li className="headlineBlock">
         <b>Создатель:</b> {getUserName(task.created_by)}
       </li>

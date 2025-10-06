@@ -30,7 +30,16 @@ const CommentsSection = ({
   onSubmit,
 }) => (
   <div className="taskCard">
-    <b>Комментарии:</b>
+    <div
+      className="headlineBlock"
+      style={{
+        borderBottom: "1px solid #e9ecef",
+        marginBottom: "16px",
+        paddingBottom: "12px",
+      }}
+    >
+      <b>Комментарии задачи</b>
+    </div>
 
     <div style={styles.commentsSection}>
       {comments && comments.length > 0 ? (
