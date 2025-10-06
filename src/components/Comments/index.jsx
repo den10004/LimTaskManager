@@ -70,7 +70,7 @@ const CommentsSection = ({
       />
       <button
         className="create-btn"
-        style={{ width: "250px", marginTop: "10px" }}
+        style={{ marginTop: "10px" }}
         disabled={loading || !comment.trim()}
         type="submit"
       >

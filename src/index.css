@@ -10,12 +10,14 @@
   --color-link: rgba(79, 70, 229, 1);
   --color-err: red;
   --color-blue: #007bff;
-  --color-green: rgba(33, 197, 140, 1)
+  --color-green: rgba(33, 197, 140, 1);
+  --color-gray: #6c757d;
 }
 
 * {
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html,
@@ -32,7 +34,7 @@ body {
   padding: 0;
   max-width: 1200px;
   background: var(--color-page);
-  font-family: "Roboto", Helvetica, sans-serif
+
 }
 
 .body-black {
@@ -244,8 +246,18 @@ tr:last-child {
 
 .taskDetailContainder {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
+}
+
+.taskDetailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.taskDetailItem>div {
+  color: var(--color-gray);
 }
 
 .taskDetailHeader {
@@ -273,7 +285,7 @@ tr:last-child {
 
   .taskDetailContainder {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 24px;
   }
 

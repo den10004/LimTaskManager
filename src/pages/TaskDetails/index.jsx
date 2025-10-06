@@ -561,7 +561,15 @@ const TaskDetails = () => {
                 <EditBtn onDateChange={() => setDescriptionUpdate(true)} />
               )}
             </div>
-            {task.description || "Не указано"}
+            <div
+              style={{
+                wordWrap: "break-word",
+                overflowWrap: "break-word",
+                hyphens: "auto",
+              }}
+            >
+              {task.description || "Не указано"}
+            </div>
           </div>
           <div className="taskCard">
             <div
@@ -582,7 +590,9 @@ const TaskDetails = () => {
               />
               <button
                 className="create-btn"
-                style={{ width: "200px", marginTop: "10px" }}
+                style={{
+                  marginTop: "10px",
+                }}
                 disabled={loadings.file || files.length === 0}
                 type="submit"
               >

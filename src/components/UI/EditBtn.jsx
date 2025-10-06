@@ -4,9 +4,9 @@ const styles = {
     background: "none",
     border: "none",
     display: "flex",
-    alignItems: "center",
     gap: "5px",
     padding: "8px 0px 8px 0px",
+    width: "fit-content",
   },
 };
 

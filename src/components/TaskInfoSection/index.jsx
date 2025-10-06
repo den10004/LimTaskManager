@@ -37,7 +37,7 @@ function TaskInfoSection({
   console.log(task.links);
 
   return (
-    <ul style={styles.taskInfoList}>
+    <div style={styles.taskInfoList}>
       <div
         className="headlineBlock"
         style={{
@@ -48,80 +48,79 @@ function TaskInfoSection({
       >
         <b>Описание задачи</b>
       </div>
-
-      <li className="headlineBlock">
-        <b>Создатель:</b> {getUserName(task.created_by)}
-      </li>
-      <li className="headlineBlock">
-        <b>Ответственный:</b> {getUserName(task.assigned_user_id)}
-      </li>
-
-      <li className="headlineBlock">
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <b style={{ marginBottom: "10px" }}>Срок выполнения:</b>
-          {formatDate(task.due_at) || "Не указано"}
+      <div className="taskDetailContainder">
+        <div className="taskDetailItem">
+          <div>Создатель</div>
+          <b>{getUserName(task.created_by)}</b>
         </div>
-        {isAdmin && <EditBtn onDateChange={onDateChange} />}
-      </li>
-
-      <li className="headlineBlock">
-        <b>Направление:</b>{" "}
-        <div
-          style={{
-            display: "inline-block",
-            padding: "4px 8px",
-            backgroundColor: "#e7f1ff",
-            color: "var(--color-blue)",
-            borderRadius: "4px",
-          }}
-        >
-          {getDirectionName(task.direction_id)}
+        <div className="taskDetailItem">
+          <div>Ответственный</div>
+          <b>{getUserName(task.assigned_user_id)}</b>
         </div>
-      </li>
+        <div className="taskDetailItem">
+          <div style={{ marginBottom: "10px" }}>Срок выполнения:</div>
+          <b>{formatDate(task.due_at) || "Не указано"}</b>
 
-      <li className="headlineBlock" style={styles.flexCenter}>
-        <b>Важность:&nbsp;</b>
-        <div style={styles.flexCenter}>
-          {[...Array(MAX_URGENCY_STARS)].map((_, index) => {
-            const starValue = index + 1;
-            const isFilled = starValue <= task.urgency;
-
-            return (
-              <span
-                key={starValue}
-                onClick={() =>
-                  userPermissions.canEditUrgency &&
-                  !loadings.urgency &&
-                  onUrgencyChange(starValue)
-                }
-                style={{
-                  cursor: userPermissions.canEditUrgency
-                    ? loadings.urgency
-                      ? "not-allowed"
-                      : "pointer"
-                    : "not-allowed",
-                  color: isFilled ? getUrgencyColor(task.urgency) : "#ddd",
-                  fontSize: "20px",
-                  marginRight: "2px",
-                  opacity: userPermissions.canEditUrgency
-                    ? loadings.urgency
-                      ? 0.6
-                      : 1
-                    : 0.6,
-                  transition: "all 0.2s ease",
-                }}
-                title={`Установить важность: ${starValue}`}
-              >
-                {isFilled ? "★" : "☆"}
-              </span>
-            );
-          })}
+          {isAdmin && <EditBtn onDateChange={onDateChange} />}
         </div>
-      </li>
+        <div className="taskDetailItem">
+          <div>Направление</div>
+          <div
+            style={{
+              padding: "4px 8px",
+              backgroundColor: "#e7f1ff",
+              color: "var(--color-blue)",
+              borderRadius: "4px",
+              width: "fit-content",
+            }}
+          >
+            {getDirectionName(task.direction_id)}
+          </div>
+        </div>
+        <div className="taskDetailItem">
+          <div>Важность:</div>
+          <div style={styles.flexCenter}>
+            {[...Array(MAX_URGENCY_STARS)].map((_, index) => {
+              const starValue = index + 1;
+              const isFilled = starValue <= task.urgency;
+
+              return (
+                <span
+                  key={starValue}
+                  onClick={() =>
+                    userPermissions.canEditUrgency &&
+                    !loadings.urgency &&
+                    onUrgencyChange(starValue)
+                  }
+                  style={{
+                    cursor: userPermissions.canEditUrgency
+                      ? loadings.urgency
+                        ? "not-allowed"
+                        : "pointer"
+                      : "not-allowed",
+                    color: isFilled ? getUrgencyColor(task.urgency) : "#ddd",
+                    fontSize: "20px",
+                    marginRight: "2px",
+                    opacity: userPermissions.canEditUrgency
+                      ? loadings.urgency
+                        ? 0.6
+                        : 1
+                      : 0.6,
+                    transition: "all 0.2s ease",
+                  }}
+                  title={`Установить важность: ${starValue}`}
+                >
+                  {isFilled ? "★" : "☆"}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {task.links && (
-        <li style={styles.flexCenter} className="headlineBlock">
-          <b>Ссылки:&nbsp;</b>
+        <div style={styles.flexCenter}>
+          <div>Ссылки:&nbsp;</div>
           <div style={styles.linksContainer}>
             {task.links.length === 0
               ? "нет ссылок"
@@ -137,12 +136,12 @@ function TaskInfoSection({
                   </a>
                 ))}
           </div>
-        </li>
+        </div>
       )}
 
       {task.files && task.files.length > 0 && (
         <li style={styles.flexCenter}>
-          <b>Файлы: </b>
+          Файлы:
           <div style={styles.filesContainer}>
             {task.files.map((file, index) => (
               <div key={index} style={{ marginRight: "10px" }}>
@@ -158,7 +157,7 @@ function TaskInfoSection({
           </div>
         </li>
       )}
-    </ul>
+    </div>
   );
 }
 export default TaskInfoSection;

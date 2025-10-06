@@ -66,7 +66,6 @@ function AddFiles({ formData, handleFileChange }) {
 
   return (
     <div className="create__block">
-      <div className="label">Файлы</div>
       <div
         className={`file-upload ${isDragging ? "file-upload--dragging" : ""}`}
         onDragOver={handleDragOver}
