@@ -120,6 +120,25 @@ function TaskInfoSection({
         </div>
       </div>
 
+      {task.files && task.files.length > 0 && (
+        <div style={styles.flexCenter}>
+          <div style={{ color: "var(--color-gray)" }}>Файлы:&nbsp;</div>
+          <div style={styles.filesContainer}>
+            {task.files.map((file, index) => (
+              <div key={index} style={{ marginRight: "10px" }}>
+                <a
+                  href={`${import.meta.env.VITE_API_KEY}${file.file_url}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {file.file_name || "Файл без имени"}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {task.links && (
         <div style={styles.flexCenter}>
           <div style={{ color: "var(--color-gray)" }}>Ссылки:&nbsp;</div>
@@ -161,24 +180,6 @@ function TaskInfoSection({
       <button className="create-btn" onClick={onAddLink}>
         Добавить ссылки
       </button>
-      {task.files && task.files.length > 0 && (
-        <li style={styles.flexCenter}>
-          Файлы:
-          <div style={styles.filesContainer}>
-            {task.files.map((file, index) => (
-              <div key={index} style={{ marginRight: "10px" }}>
-                <a
-                  href={`${import.meta.env.VITE_API_KEY}${file.file_url}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {file.file_name || "Файл без имени"}
-                </a>
-              </div>
-            ))}
-          </div>
-        </li>
-      )}
     </div>
   );
 }
