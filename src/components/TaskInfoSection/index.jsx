@@ -18,6 +18,7 @@ const styles = {
   flexCenter: {
     display: "flex",
     alignItems: "center",
+    gap: "15px",
   },
 };
 
@@ -35,15 +36,7 @@ function TaskInfoSection({
   onDeleteLink,
 }) {
   const MAX_URGENCY_STARS = 5;
-  console.log(task);
-
-  const normalizeLinks = (links) => {
-    if (!links) return [];
-    if (Array.isArray(links)) return links;
-    return [];
-  };
-
-  const links = normalizeLinks(task.links);
+  console.log(isAdmin);
 
   return (
     <div style={styles.taskInfoList}>
@@ -129,8 +122,8 @@ function TaskInfoSection({
 
       {task.links && (
         <div style={styles.flexCenter}>
-          <div>Ссылки:&nbsp;</div>
-          <div style={styles.linksContainer}>
+          <div style={{ color: "var(--color-gray)" }}>Ссылки:&nbsp;</div>
+          <div style={styles.flexCenter}>
             {task.links.length === 0
               ? "нет ссылок"
               : task.links.map((link, index) => (
@@ -144,21 +137,23 @@ function TaskInfoSection({
                     >
                       {link.url}
                     </a>
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "-5px",
-                        right: "-5px",
-                      }}
-                    >
-                      <button
-                        className="crossBtn"
-                        onClick={() => onDeleteLink(link.id)}
-                        title="Удалить ссылку"
+                    {isAdmin && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "-5px",
+                          right: "-5px",
+                        }}
                       >
-                        x
-                      </button>
-                    </div>
+                        <button
+                          className="crossBtn"
+                          onClick={() => onDeleteLink(link.id)}
+                          title="Удалить ссылку"
+                        >
+                          x
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
           </div>
