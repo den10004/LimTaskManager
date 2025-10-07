@@ -17,6 +17,7 @@ function TeamPage() {
   const [modalMode, setModalMode] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [rolesList, setRolesList] = useState([]);
+  const [userList, setUserList] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState("");
   const [toast, setToast] = useState({
@@ -24,6 +25,7 @@ function TeamPage() {
     text: "",
     color: "",
   });
+
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
@@ -54,6 +56,10 @@ function TeamPage() {
       setRolesLoading(false);
     }
   };
+
+  useEffect(() => {
+    setUserList(team);
+  }, [team]);
 
   useEffect(() => {
     fetchRoles();
@@ -93,6 +99,44 @@ function TeamPage() {
       setToast({
         show: true,
         text: "Ошибка при удалении роли:",
+        error,
+        color: "red",
+      });
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Вы уверены, что хотите удалить пользователя?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setUserList((prevUsers) => prevUsers.filter((user) => user.id !== id));
+      setToast({
+        show: true,
+        text: "Пользователь успешно удалена",
+        color: "rgba(33, 197, 140, 1)",
+      });
+      if (!response.ok) {
+        setToast({
+          show: true,
+          text: "Ошибка загрузки пользователя",
+          color: "red",
+        });
+        throw new Error("Ошибка удаления пользователя");
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении пользователя:", error);
+      setToast({
+        show: true,
+        text: "Ошибка при удалении пользователя:",
         error,
         color: "red",
       });
@@ -171,7 +215,7 @@ function TeamPage() {
         <div className="error error-message">{error}</div>
       ) : (
         <div className="container-scroll">
-          {team.length > 0 ? (
+          {userList.length > 0 ? (
             <table>
               <thead>
                 <tr>
@@ -184,7 +228,7 @@ function TeamPage() {
                 </tr>
               </thead>
               <tbody>
-                {team.map((user) => (
+                {userList.map((user) => (
                   <tr key={user.id}>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
@@ -194,12 +238,23 @@ function TeamPage() {
                     <td>{user?.roles[0]?.[0]}</td>
                     <td className="lastRow">
                       {rolesUser === ADMIN && (
-                        <button
-                          className="change-btn"
-                          onClick={() => openEditModal(user)}
+                        <div
+                          className="btns-direction"
+                          style={{ flexDirection: "end" }}
                         >
-                          Редактировать
-                        </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Удалить
+                          </button>
+                          <button
+                            className="change-btn"
+                            onClick={() => openEditModal(user)}
+                          >
+                            Редактировать
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
