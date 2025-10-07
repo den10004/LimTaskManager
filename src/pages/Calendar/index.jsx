@@ -70,7 +70,7 @@ function MainPage() {
 
             eventsByDate[dateKey].push({
               id: event.id || Date.now(),
-              description: event.description || "No description",
+              description: event.title || "Нет заголовка",
               createdAt: event.created_at,
               dueAt: event.due_at,
               date: new Date(currentDay),
