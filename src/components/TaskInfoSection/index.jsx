@@ -34,6 +34,7 @@ function TaskInfoSection({
   onUrgencyChange,
   onDateChange,
   onDeleteLink,
+  onAddLink,
 }) {
   const MAX_URGENCY_STARS = 5;
 
@@ -126,9 +127,8 @@ function TaskInfoSection({
             {task.links.length === 0
               ? "нет ссылок"
               : task.links.map((link, index) => (
-                  <div style={{ position: "relative" }}>
+                  <div style={{ position: "relative" }} key={index}>
                     <a
-                      key={index}
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -158,7 +158,9 @@ function TaskInfoSection({
           </div>
         </div>
       )}
-
+      <button className="create-btn" onClick={onAddLink}>
+        Добавить ссылки
+      </button>
       {task.files && task.files.length > 0 && (
         <li style={styles.flexCenter}>
           Файлы:

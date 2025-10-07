@@ -27,8 +27,6 @@ function TeamPage() {
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
-  console.log(userData);
-
   const fetchRoles = async () => {
     try {
       setRolesLoading(true);

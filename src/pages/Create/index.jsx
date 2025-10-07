@@ -6,6 +6,7 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
+import { normalizeUrl } from "../../utils/rolesTranslations";
 
 function CreatePage() {
   const [formData, setFormData] = useState({
@@ -93,20 +94,6 @@ function CreatePage() {
       ...prev,
       links: [...prev.links, "https://"],
     }));
-  };
-
-  const normalizeUrl = (url) => {
-    if (!url) return "";
-
-    if (url.startsWith("https://") || url.startsWith("http://")) {
-      return url;
-    }
-
-    if (url.startsWith("www.")) {
-      return "https://" + url;
-    }
-
-    return "https://" + url;
   };
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -395,7 +382,7 @@ function CreatePage() {
             </div>
           )}
         </form>
-      </div>{" "}
+      </div>
       {toast.show && (
         <Toast
           text={toast.text}

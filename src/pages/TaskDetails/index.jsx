@@ -100,6 +100,9 @@ const TaskDetails = () => {
   const [newDueDate, setNewDueDate] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
 
+  const [showAddLinkModal, setShowAddLinkModal] = useState(false);
+  const [newLinkUrl, setNewLinkUrl] = useState("");
+
   const [loadings, setLoadings] = useState({
     comment: false,
     file: false,
@@ -364,6 +367,37 @@ const TaskDetails = () => {
       setToast({
         show: true,
         text: "Ошибка удаления ссылки",
+        color: "red",
+      });
+    }
+  };
+
+  const handleAddLink = async (url) => {
+    if (!url.trim()) return;
+
+    try {
+      const newLink = await apiRequest(`/task/${taskId}/links`, {
+        method: "POST",
+        body: JSON.stringify({ url: url.trim() }),
+      });
+
+      setTask((prev) => ({
+        ...prev,
+        links: [...(prev?.links || []), newLink],
+      }));
+
+      setToast({
+        show: true,
+        text: "Ссылка добавлена",
+        color: "rgba(33, 197, 140, 1)",
+      });
+      setShowAddLinkModal(false);
+      setNewLinkUrl("");
+    } catch (err) {
+      console.error(err);
+      setToast({
+        show: true,
+        text: "Ошибка добавления ссылки",
         color: "red",
       });
     }
@@ -640,6 +674,7 @@ const TaskDetails = () => {
               onDateChange={() => setShowDatePicker(true)}
               onDescriptionChange={() => setDescriptionUpdate(true)}
               onDeleteLink={handleDeleteLink}
+              onAddLink={() => setShowAddLinkModal(true)}
             />
           </div>
 
@@ -735,6 +770,19 @@ const TaskDetails = () => {
         initialValue={task?.description || ""}
         loading={loadings.desc}
         type="description"
+      />
+      <EditModal
+        isOpen={showAddLinkModal}
+        onClose={() => {
+          setShowAddLinkModal(false);
+          setNewLinkUrl("");
+        }}
+        onSave={handleAddLink}
+        initialValue={newLinkUrl}
+        loading={false}
+        type="link"
+        placeholder="Введите URL ссылки"
+        title="Добавить ссылку"
       />
       {toast.show && (
         <Toast

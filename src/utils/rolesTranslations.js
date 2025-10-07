@@ -18,3 +18,17 @@ export const statusColors = {
   [COMPLETED]: "var(--color-blue)",
   [WORK]: "var(--color-green)",
 };
+
+export const normalizeUrl = (url) => {
+  if (!url) return "";
+
+  if (url.startsWith("https://") || url.startsWith("http://")) {
+    return url;
+  }
+
+  if (url.startsWith("www.")) {
+    return "https://" + url;
+  }
+
+  return "https://" + url;
+};
