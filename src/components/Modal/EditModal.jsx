@@ -125,9 +125,7 @@ function EditModal({
                   fontSize: "12px",
                   marginTop: "4px",
                 }}
-              >
-                Будет сохранено как: {normalizeUrl(newValue)}
-              </div>
+              ></div>
             )}
           </div>
         ) : (
