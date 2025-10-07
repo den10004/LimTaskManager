@@ -98,7 +98,6 @@ const TaskDetails = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [descriptionUpdate, setDescriptionUpdate] = useState(false);
   const [newDueDate, setNewDueDate] = useState("");
-  const [newDesc, setDescr] = useState("");
   const [toast, setToast] = useState({ show: false, text: "", color: "" });
 
   const [loadings, setLoadings] = useState({
@@ -107,6 +106,7 @@ const TaskDetails = () => {
     status: false,
     date: false,
     urgency: false,
+    desc: false,
   });
 
   const API_URL = import.meta.env.VITE_API_KEY;
@@ -454,7 +454,6 @@ const TaskDetails = () => {
       });
 
       setDescriptionUpdate(false);
-      setDescr("");
     } catch (err) {
       console.error(err);
       setToast({ show: true, text: "Ошибка обновления", color: "red" });
@@ -699,8 +698,8 @@ const TaskDetails = () => {
         isOpen={descriptionUpdate}
         onClose={() => setDescriptionUpdate(false)}
         onSave={handleDescriptionUpdate}
-        initialDescr={newDesc}
-        loading={loadings.date}
+        initialValue={task?.description || ""}
+        loading={loadings.desc}
         type="description"
       />
       {toast.show && (

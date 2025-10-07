@@ -26,6 +26,7 @@ function EditModal({
   if (!isOpen) return null;
 
   const isDateType = type === "date";
+  const isDescriptionType = type === "description";
   const title = isDateType
     ? "Выберите срок выполнения"
     : "Редактирование описания";
@@ -39,16 +40,29 @@ function EditModal({
     <div className="modal-backdrop">
       <div className="modal-content">
         <h2>{title}</h2>
-        <input
-          type={inputType}
-          value={newValue}
-          onChange={(e) => setNewValue(e.target.value)}
-          min={minDate}
-          style={{
-            margin: "10px 0",
-            width: "100%",
-          }}
-        />
+        {isDescriptionType ? (
+          <textarea
+            value={newValue}
+            onChange={(e) => setNewValue(e.target.value)}
+            rows={6}
+            style={{
+              margin: "10px 0",
+              width: "100%",
+              resize: "vertical",
+            }}
+          />
+        ) : (
+          <input
+            type={inputType}
+            value={newValue}
+            onChange={(e) => setNewValue(e.target.value)}
+            min={minDate}
+            style={{
+              margin: "10px 0",
+              width: "100%",
+            }}
+          />
+        )}
         <div>
           <button
             className="create-btn modal-button"
