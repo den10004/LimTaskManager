@@ -19,6 +19,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "15px",
+    flexWrap: "wrap",
   },
 };
 
