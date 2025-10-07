@@ -32,9 +32,18 @@ function TaskInfoSection({
   loadings,
   onUrgencyChange,
   onDateChange,
+  onDeleteLink,
 }) {
   const MAX_URGENCY_STARS = 5;
-  console.log(task.links);
+  console.log(task);
+
+  const normalizeLinks = (links) => {
+    if (!links) return [];
+    if (Array.isArray(links)) return links;
+    return [];
+  };
+
+  const links = normalizeLinks(task.links);
 
   return (
     <div style={styles.taskInfoList}>
@@ -125,15 +134,32 @@ function TaskInfoSection({
             {task.links.length === 0
               ? "нет ссылок"
               : task.links.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ marginRight: "10px" }}
-                  >
-                    {link.url}
-                  </a>
+                  <div style={{ position: "relative" }}>
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ marginRight: "10px" }}
+                    >
+                      {link.url}
+                    </a>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-5px",
+                        right: "-5px",
+                      }}
+                    >
+                      <button
+                        className="crossBtn"
+                        onClick={() => onDeleteLink(link.id)}
+                        title="Удалить ссылку"
+                      >
+                        x
+                      </button>
+                    </div>
+                  </div>
                 ))}
           </div>
         </div>

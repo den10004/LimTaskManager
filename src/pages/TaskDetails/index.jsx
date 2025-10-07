@@ -336,6 +336,39 @@ const TaskDetails = () => {
     }
   };
 
+  // Добавить в компонент TaskDetails
+  const handleDeleteLink = async (linkId) => {
+    const isConfirmed = window.confirm(
+      "Вы уверены, что хотите удалить ссылку?"
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      await apiRequest(`/task/${taskId}/links/${linkId}`, {
+        method: "DELETE",
+      });
+
+      setTask((prev) => ({
+        ...prev,
+        links: prev.links.filter((link) => link.id !== linkId),
+      }));
+
+      setToast({
+        show: true,
+        text: "Ссылка удалена",
+        color: "rgba(33, 197, 140, 1)",
+      });
+    } catch (err) {
+      console.error(err);
+      setToast({
+        show: true,
+        text: "Ошибка удаления ссылки",
+        color: "red",
+      });
+    }
+  };
+
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (files.length === 0) return;
@@ -606,6 +639,7 @@ const TaskDetails = () => {
               onUrgencyChange={handleUrgencyUpdate}
               onDateChange={() => setShowDatePicker(true)}
               onDescriptionChange={() => setDescriptionUpdate(true)}
+              onDeleteLink={handleDeleteLink}
             />
           </div>
 

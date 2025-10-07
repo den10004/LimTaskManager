@@ -65,7 +65,7 @@ const CommentsSection = ({
           paddingBottom: "12px",
         }}
       >
-        <b>Комментарии задачи</b>
+        <b>Комментарии</b>
       </div>
 
       <div style={styles.commentsSection}>
@@ -125,9 +125,7 @@ const CommentsSection = ({
                       }}
                     >
                       <button
-                        style={{
-                          color: "var(--color-err)",
-                        }}
+                        className="crossBtn"
                         onClick={() => onCommentDelete(commentItem.id)}
                       >
                         x

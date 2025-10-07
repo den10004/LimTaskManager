@@ -111,6 +111,11 @@ button:disabled {
   padding: 8px 24px 8px 24px;
 }
 
+.crossBtn {
+  color: var(--color-err);
+  background: transparent
+}
+
 .taskCard {
   background-color: var(--color-background);
   border-radius: 10px;
@@ -118,6 +123,8 @@ button:disabled {
   padding: 20px;
   margin-bottom: 20px;
 }
+
+
 
 
 .h3-mtmb {
