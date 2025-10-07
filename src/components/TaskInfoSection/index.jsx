@@ -36,7 +36,6 @@ function TaskInfoSection({
   onDeleteLink,
 }) {
   const MAX_URGENCY_STARS = 5;
-  console.log(isAdmin);
 
   return (
     <div style={styles.taskInfoList}>

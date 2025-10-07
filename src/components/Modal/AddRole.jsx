@@ -10,7 +10,7 @@ function AddRole({
   role,
   onRoleCreated,
 }) {
-  const [roleRus, setRoleRus] = useState("");
+  //const [roleRus, setRoleRus] = useState("");
   const [roleLat, setRoleLat] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +21,8 @@ function AddRole({
   useEffect(() => {
     if (isOpen) {
       if (mode === "edit" && role) {
-        setRoleRus(role.description || "");
         setRoleLat(role.name || "");
       } else {
-        setRoleRus("");
         setRoleLat("");
       }
       setError("");
@@ -34,12 +32,12 @@ function AddRole({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!roleRus.trim() || !roleLat.trim()) {
+    if (!roleLat.trim()) {
       setError("Все поля обязательны для заполнения");
       return;
     }
 
-    if (roleRus.length < 2 || roleLat.length < 2) {
+    if (roleLat.length < 2) {
       setError("Название роли должно содержать минимум 2 символа");
       return;
     }
@@ -50,7 +48,7 @@ function AddRole({
 
       const formData = {
         name: roleLat.trim(),
-        description: roleRus.trim(),
+        //   description: roleRus.trim(),
       };
 
       let url = `${API_URL}/roles`;
@@ -85,7 +83,7 @@ function AddRole({
       const updatedRole = {
         id: roleData.id || (mode === "edit" ? role.id : Date.now()),
         name: roleData.name || roleLat.trim(),
-        description: roleData.description || roleRus.trim(),
+        //  description: roleData.description || roleRus.trim(),
       };
 
       if (onRoleCreated) {
@@ -110,7 +108,6 @@ function AddRole({
   };
 
   const handleClose = () => {
-    setRoleRus("");
     setRoleLat("");
     setError("");
     onClose();
@@ -124,20 +121,7 @@ function AddRole({
         <h2>{mode === "edit" ? "Редактировать роль" : "Создать роль"}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Введите роль на русском</label>
-            <input
-              type="text"
-              required
-              value={roleRus}
-              onChange={(e) => setRoleRus(e.target.value)}
-              disabled={isLoading || loading}
-              minLength={2}
-              placeholder="Например: Администратор"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Введите роль на латинице</label>
+            <label>Введите роль</label>
             <input
               type="text"
               required
@@ -145,10 +129,9 @@ function AddRole({
               onChange={(e) => setRoleLat(e.target.value)}
               disabled={isLoading || loading}
               minLength={2}
-              placeholder="Например: admin"
+              placeholder="Например: Администратор"
             />
           </div>
-
           {error && <div className="error-message">{error}</div>}
 
           <div className="modal-buttons">

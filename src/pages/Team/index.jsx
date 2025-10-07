@@ -6,6 +6,7 @@ import { useTeam } from "../../contexts/TeamContext";
 import AddRole from "../../components/Modal/AddRole";
 import Toast from "../../components/Toast";
 import { getCookie } from "../../utils/getCookies";
+import { ADMIN } from "../../utils/rolesTranslations";
 
 function TeamPage() {
   const { userData } = useAuth();
@@ -25,6 +26,8 @@ function TeamPage() {
   });
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
+
+  console.log(userData);
 
   const fetchRoles = async () => {
     try {
@@ -190,9 +193,9 @@ function TeamPage() {
                     <td>{user.telegram_id}</td>
                     <td>{formatDate(user.created_at)}</td>
 
-                    <td>{user?.roles[0]?.[1]}</td>
+                    <td>{user?.roles[0]?.[0]}</td>
                     <td className="lastRow">
-                      {rolesUser === "admin" && (
+                      {rolesUser === ADMIN && (
                         <button
                           className="change-btn"
                           onClick={() => openEditModal(user)}
@@ -213,7 +216,7 @@ function TeamPage() {
         </div>
       )}
 
-      {rolesUser === "admin" && (
+      {rolesUser === ADMIN && (
         <button
           type="submit"
           style={{ marginTop: "20px" }}
@@ -236,8 +239,7 @@ function TeamPage() {
             <table>
               <thead>
                 <tr>
-                  <th>Имя (рус)</th>
-                  <th>Имя (лат)</th>
+                  <th>Имя</th>
                   <th className="lastRow"></th>
                 </tr>
               </thead>
@@ -249,11 +251,10 @@ function TeamPage() {
 
                   return (
                     <tr key={role.id}>
-                      <td>{role.description || "Нет описания"}</td>
                       <td>{role.name}</td>
 
                       <td className="lastRow" style={{ display: "flex" }}>
-                        {rolesUser === "admin" && !isCurrentUserRole && (
+                        {rolesUser === ADMIN && !isCurrentUserRole && (
                           <div
                             className="btns-direction"
                             style={{ flexDirection: "end" }}
@@ -286,7 +287,7 @@ function TeamPage() {
         </div>
       )}
 
-      {rolesUser === "admin" && (
+      {rolesUser === ADMIN && (
         <button
           type="submit"
           style={{ marginTop: "10px" }}

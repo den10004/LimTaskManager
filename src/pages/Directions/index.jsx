@@ -4,6 +4,7 @@ import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
+import { ADMIN } from "../../utils/rolesTranslations";
 
 function Directions() {
   const { userData } = useAuth();
@@ -111,7 +112,7 @@ function Directions() {
                 <tr key={task.id}>
                   <td style={{ display: "flex", alignItems: "center" }}>
                     <div style={{ minWidth: "210px" }}>{task.name}</div>
-                    {rolesUser === "admin" && (
+                    {rolesUser === ADMIN && (
                       <div className="btns-direction">
                         <button
                           className="delete-btn"
@@ -137,7 +138,7 @@ function Directions() {
         <div className="error error-message">Нет данных для отображения</div>
       )}
 
-      {rolesUser === "admin" && (
+      {rolesUser === ADMIN && (
         <button
           className="create-btn"
           style={{ marginTop: "20px" }}

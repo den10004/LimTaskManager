@@ -15,7 +15,8 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
 
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
-  const isAdmin = user?.roles?.flat().includes("admin");
+
+  const isAdmin = user?.roles?.flat().includes("Администратор");
 
   useEffect(() => {
     if (!isOpen) {
@@ -286,7 +287,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
               <option value="">Выберите роль</option>
               {rolesList.map((role) => (
                 <option key={role.id} value={role.name}>
-                  {role.description}
+                  {role.name}
                 </option>
               ))}
             </select>

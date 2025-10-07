@@ -2,6 +2,7 @@ export const OVERDUE = "Просрочено";
 export const COMPLETED = "Выполнена";
 export const WORK = "В работе";
 export const ASSIGNED = "Ответственный назначен";
+export const ADMIN = "Администратор";
 
 export const taskStatus = [
   [OVERDUE],

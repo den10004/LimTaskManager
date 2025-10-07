@@ -112,13 +112,13 @@ const TaskDetails = () => {
   const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
-  const isAdmin = userData?.roles?.includes("admin");
+  const isAdmin = userData?.roles?.includes("Администратор");
 
   const userPermissions = useMemo(
     () => ({
       canEditUrgency: task?.created_by === userData?.id,
       canChangeStatus: userData?.id === task?.assigned_user_id,
-      isAdmin: userData?.roles?.includes("admin"),
+      isAdmin: userData?.roles?.includes("Администратор"),
     }),
     [task, userData]
   );
