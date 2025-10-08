@@ -68,7 +68,6 @@ export function AuthProvider({ children }) {
         setCookie("refreshToken", data.refresh_token, { days: 30 });
       }
     } catch (error) {
-      // Очистка cookie при ошибке
       document.cookie =
         "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
       logout();
@@ -83,6 +82,7 @@ export function AuthProvider({ children }) {
     window.fetch = async (...args) => {
       try {
         const response = await originalFetch(...args);
+
         const url = args[0];
         const isRefreshRequest =
           typeof url === "string" && url.includes("/auth/refresh");
