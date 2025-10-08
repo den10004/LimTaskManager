@@ -10,7 +10,6 @@ function AddRole({
   role,
   onRoleCreated,
 }) {
-  //const [roleRus, setRoleRus] = useState("");
   const [roleLat, setRoleLat] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

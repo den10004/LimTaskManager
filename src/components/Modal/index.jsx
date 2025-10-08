@@ -42,7 +42,7 @@ function Modal({ onCancel, onLoginSuccess }) {
           telegram_id: data.user.telegram_id,
         };
 
-        login(data.token, userData);
+        login(data.token, userData, data.refresh_token);
         onLoginSuccess();
         navigate("/task");
       } else {
