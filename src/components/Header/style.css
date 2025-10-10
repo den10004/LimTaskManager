@@ -130,7 +130,7 @@ header>ul li:not(:last-child) {
 
     .header__account {
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         align-items: center;
         gap: 5px;
     }
