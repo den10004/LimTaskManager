@@ -1,6 +1,6 @@
 header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     padding: 20px 30px;
     color: var(--color-text);
     box-sizing: border-box;
@@ -15,7 +15,9 @@ header>div {
     font-weight: 400;
     line-height: 24px;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    flex-direction: row;
 }
 
 
@@ -31,8 +33,12 @@ header>ul {
 header>ul li {
     white-space: nowrap;
     flex-shrink: 0;
-    margin-left: 30px;
 }
+
+header>ul li:not(:last-child) {
+    margin-right: 20px;
+}
+
 
 
 .nav-link.active {
@@ -42,6 +48,46 @@ header>ul li {
 }
 
 
+.header__account {
+    display: flex;
+    align-items: center;
+}
+
+.header__user {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+    align-items: center;
+    background: var(--color-page);
+    padding: 12px 20px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: wheat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+}
+
+.header__user>div>b {
+    font-size: 16px;
+    text-align: center;
+}
+
+.header__user>div>p {
+    font-size: 14px;
+    text-align: center;
+}
+
 
 @media screen and (max-width:1140px) {
     header {
@@ -50,10 +96,13 @@ header>ul li {
     }
 
     header>ul {
-        justify-content: space-between;
         margin-top: 10px;
-        ;
     }
+
+    header>ul li:not(:last-child) {
+        margin-right: 10px;
+    }
+
 
     header>ul>li {
         margin-left: 5px;
@@ -61,12 +110,44 @@ header>ul li {
 }
 
 
-@media screen and (max-width:768px) {
+@media screen and (max-width:600px) {
     header>ul {
+        overflow-x: auto;
+        padding-bottom: 10px;
+        position: relative;
+    }
+
+    header>div {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header>ul li:not(:last-child) {
+        margin-right: 10px;
+    }
+
+    .header__account {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .header__user {
+        margin-right: 0;
+    }
+
+}
+
+@media screen and (max-width:425px) {
+    header {
+        display: flex;
         flex-direction: column;
     }
 
-    header>ul>li {
-        margin-left: 0px;
+    .header__user {
+        flex-direction: column;
+        align-items: center;
     }
+
 }

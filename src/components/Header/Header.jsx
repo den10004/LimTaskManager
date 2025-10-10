@@ -42,9 +42,22 @@ function Header() {
     navigate("/");
   };
 
+  const getInitials = (name) => {
+    if (!name) return "";
+
+    const words = name.trim().split(" ");
+    if (words.length === 1) {
+      return words[0].charAt(0).toUpperCase();
+    }
+
+    return (
+      words[0].charAt(0) + words[words.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
   return (
-    <>
-      <header>
+    <header>
+      <div>
         <div>
           <NavLink to="/">
             <svg
@@ -97,45 +110,53 @@ function Header() {
                 ></path>
               </g>
             </svg>
-          </NavLink>{" "}
-          {userData && (
-            <b style={{ fontSize: "16px" }}>
-              {userData.email} &nbsp;&nbsp;{userData.name}
-            </b>
-          )}
+          </NavLink>
         </div>
-        <ul>
-          {isAuthenticated && (
+        <div className="header__account">
+          {userData && (
             <>
-              <li>
-                <b className="user-email"></b>
-              </li>
-              {navLinks.map((link) => (
-                <li key={link.to}>
-                  <NavLink
-                    to={link.to}
-                    className={({ isActive }) =>
-                      isActive ? "nav-link active" : "nav-link"
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                </li>
-              ))}
+              <div className="header__user">
+                <div class="circle">{getInitials(userData.name)}</div>
+                <div>
+                  <b>{userData.name}</b>
+                  <p>{userData.email}</p>
+                </div>
+              </div>
             </>
           )}
-          <li
-            id="auth-button"
-            onClick={isAuthenticated ? handleLogout : openModal}
-          >
-            {isAuthenticated ? "Выйти" : "Войти"}
-          </li>
-        </ul>
-      </header>
+          <div>
+            <button
+              className="delete-btn"
+              id="auth-button"
+              onClick={isAuthenticated ? handleLogout : openModal}
+            >
+              {isAuthenticated ? "Выйти" : "Войти"}
+            </button>
+          </div>
+        </div>
+      </div>
+      <ul>
+        {isAuthenticated && (
+          <>
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                <NavLink
+                  to={link.to}
+                  className={({ isActive }) =>
+                    isActive ? "nav-link active" : "nav-link"
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              </li>
+            ))}
+          </>
+        )}
+      </ul>
       {isModalOpen && (
         <Modal onCancel={handleCancel} onLoginSuccess={handleLoginSuccess} />
       )}
-    </>
+    </header>
   );
 }
 
