@@ -58,7 +58,9 @@ function Header() {
   return (
     <header>
       <div>
-        <div>
+        <div
+          style={{ alignItems: "center", textAlign: "center", display: "flex" }}
+        >
           <NavLink to="/">
             <svg
               version="1.1"
@@ -116,7 +118,7 @@ function Header() {
           {userData && (
             <>
               <div className="header__user">
-                <div class="circle">{getInitials(userData.name)}</div>
+                <div className="circle">{getInitials(userData.name)}</div>
                 <div>
                   <b>{userData.name}</b>
                   <p>{userData.email}</p>

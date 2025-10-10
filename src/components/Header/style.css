@@ -78,14 +78,16 @@ header>ul li:not(:last-child) {
     color: #333;
 }
 
+.header__user>div {
+    text-align: center;
+}
+
 .header__user>div>b {
     font-size: 16px;
-    text-align: center;
 }
 
 .header__user>div>p {
     font-size: 14px;
-    text-align: center;
 }
 
 
