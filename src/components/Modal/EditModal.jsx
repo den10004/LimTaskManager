@@ -79,7 +79,10 @@ function EditModal({
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-content">
+      <div
+        className="modal-content"
+        style={isDescriptionType ? { width: "600px" } : {}}
+      >
         <h2>{title}</h2>
         {isDescriptionType ? (
           <textarea
