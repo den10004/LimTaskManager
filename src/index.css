@@ -116,6 +116,14 @@ button:disabled {
   background: transparent
 }
 
+.cancel-btn:hover,
+.create-btn:hover,
+.delete-btn:hover,
+.change-btn:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
 .taskCard {
   background-color: var(--color-background);
   border-radius: 10px;
