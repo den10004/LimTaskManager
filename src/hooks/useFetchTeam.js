@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { getCookie } from "../utils/getCookies";
-import { useAuth } from "../contexts/AuthContext"; // Импортируем useAuth
+import { useAuth } from "../contexts/AuthContext";
 
 const useFetchTeam = (apiUrl) => {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { isAuthenticated } = useAuth(); // Используем контекст аутентификации
+  const { isAuthenticated } = useAuth();
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -26,9 +26,7 @@ const useFetchTeam = (apiUrl) => {
       });
 
       if (!response.ok) {
-        // Если получили 401, пробуем обновить токен через существующий интерцептор
         if (response.status === 401) {
-          // Делаем повторный запрос - интерцептор автоматически обновит токен
           const retryResponse = await fetch(`${apiUrl}/users`, {
             method: "GET",
             headers: {
@@ -69,7 +67,6 @@ const useFetchTeam = (apiUrl) => {
     }
   }, [apiUrl]);
 
-  // Упрощаем логику - загружаем данные когда пользователь аутентифицирован
   useEffect(() => {
     if (isAuthenticated) {
       fetchTeam();

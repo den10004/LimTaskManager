@@ -99,12 +99,10 @@ function Task() {
       });
 
       if (tasksToUpdate.length === 0) {
-        // Нет задач для обновления — планируем следующий вызов
         scheduleNextUpdate(900000);
         return;
       }
 
-      // Получения обновлённых данных по задачам
       const updatedTasks = await Promise.all(
         tasksToUpdate.map(async (task) => {
           const response = await fetch(`${API_URL}/task/${task.id}`, {
