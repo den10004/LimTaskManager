@@ -9,21 +9,10 @@ import {
   OVERDUE,
   WORK,
 } from "../../utils/rolesTranslations";
+import "./style.css";
 
 const PAGE_SIZE = 20;
-const addBtnStyle = { display: "flex", margin: "30px auto" };
-const searchInputStyle = {
-  marginBottom: "20px",
-  padding: "8px",
-  width: "100%",
-};
-const filtersContainerStyle = {
-  marginBottom: "20px",
-  display: "flex",
-  gap: "15px",
-  flexWrap: "wrap",
-};
-const filterLabelStyle = { display: "flex", alignItems: "center", gap: "5px" };
+
 const sortButtonStyle = (active) => ({
   marginLeft: "5px",
   padding: "0",
@@ -99,10 +88,12 @@ function Task() {
       });
 
       if (tasksToUpdate.length === 0) {
+        // Нет задач для обновления — планируем следующий вызов
         scheduleNextUpdate(900000);
         return;
       }
 
+      // Получения обновлённых данных по задачам
       const updatedTasks = await Promise.all(
         tasksToUpdate.map(async (task) => {
           const response = await fetch(`${API_URL}/task/${task.id}`, {
@@ -247,10 +238,10 @@ function Task() {
         placeholder="Поиск по имени назначенного пользователя"
         value={searchName}
         onChange={handleSearch}
-        style={searchInputStyle}
+        className="searchInputStyle"
       />
 
-      <div style={filtersContainerStyle}>
+      <div className="filtersContainerStyle">
         {Object.entries(statusFilters).map(([key, value]) => {
           let label = "";
           switch (key) {
@@ -270,7 +261,7 @@ function Task() {
               break;
           }
           return (
-            <label key={key} style={filterLabelStyle}>
+            <label key={key} className="filterLabelStyle">
               <input
                 type="checkbox"
                 checked={value}
@@ -338,7 +329,7 @@ function Task() {
       )}
 
       {hasMore && !loading && !error && (
-        <button style={addBtnStyle} onClick={handleLoadMore}>
+        <button className="addBtnStyle" onClick={handleLoadMore}>
           Загрузить ещё
         </button>
       )}

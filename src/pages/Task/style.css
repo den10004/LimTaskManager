@@ -1,0 +1,23 @@
+.addBtnStyle {
+    display: "flex";
+    margin: 30px auto
+}
+
+.searchInputStyle {
+    margin-bottom: 20px;
+    padding: 8px;
+    width: 100%
+}
+
+.filtersContainerStyle {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap
+}
+
+.filterLabelStyle {
+    display: "flex";
+    align-items: center;
+    gap: 5px
+}
