@@ -1,6 +1,5 @@
 import { getCookie } from "../utils/getCookies";
-
-const API_URL = import.meta.env.VITE_API_KEY;
+import { API_URL } from "../utils/rolesTranslations";
 
 export const fetchDirections = async (setDirection, setLoading, setError) => {
   try {

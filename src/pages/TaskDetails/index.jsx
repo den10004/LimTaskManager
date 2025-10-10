@@ -5,6 +5,7 @@ import { formatDate } from "../../utils/dateUtils";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import {
+  API_URL,
   OVERDUE,
   statusColors,
   taskStatus,
@@ -112,7 +113,6 @@ const TaskDetails = () => {
     desc: false,
   });
 
-  const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
   const isAdmin = userData?.roles?.includes("Администратор");

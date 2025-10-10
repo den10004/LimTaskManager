@@ -3,8 +3,8 @@ import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useAuth } from "../../contexts/AuthContext";
+import { ADMIN, API_URL } from "../../utils/rolesTranslations";
 import "./style.css";
-import { ADMIN } from "../../utils/rolesTranslations";
 
 function Directions() {
   const { userData } = useAuth();
@@ -16,8 +16,6 @@ function Directions() {
   const [error, setError] = useState(null);
   const [modalMode, setModalMode] = useState("add");
   const [directionToEdit, setDirectionToEdit] = useState(null);
-
-  const API_URL = import.meta.env.VITE_API_KEY;
 
   const loadDirections = useCallback(() => {
     fetchDirections(setDirections, setLoading, setError);

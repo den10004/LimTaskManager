@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import {
+  API_URL,
   ASSIGNED,
   COMPLETED,
   OVERDUE,
@@ -19,7 +20,6 @@ function Kanban() {
   const [scrollLeft, setScrollLeft] = useState(0);
 
   const loadEvents = async () => {
-    const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
     if (!token) {
       setLoading(false);

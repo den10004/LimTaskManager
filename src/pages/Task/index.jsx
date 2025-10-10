@@ -7,11 +7,10 @@ import {
   ASSIGNED,
   COMPLETED,
   OVERDUE,
+  PAGE_SIZE,
   WORK,
 } from "../../utils/rolesTranslations";
 import "./style.css";
-
-const PAGE_SIZE = 20;
 
 const sortButtonStyle = (active) => ({
   marginLeft: "5px",

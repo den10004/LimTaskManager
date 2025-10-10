@@ -6,7 +6,7 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
-import { normalizeUrl } from "../../utils/rolesTranslations";
+import { API_URL, normalizeUrl } from "../../utils/rolesTranslations";
 
 function CreatePage() {
   const [formData, setFormData] = useState({
@@ -95,8 +95,6 @@ function CreatePage() {
       links: [...prev.links, "https://"],
     }));
   };
-
-  const API_URL = import.meta.env.VITE_API_KEY;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

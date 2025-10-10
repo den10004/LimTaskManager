@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
+import { API_URL } from "../../utils/rolesTranslations";
 
 function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [name, setName] = useState("");
@@ -13,7 +14,6 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
   const [error, setError] = useState("");
   const [canAddRecords, setCanAddRecords] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
   const isAdmin = user?.roles?.flat().includes("Администратор");

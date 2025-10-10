@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./style.css";
 import { getCookie } from "../../utils/getCookies";
+import { API_URL } from "../../utils/rolesTranslations";
 
 function DirectionModal({
   isOpen,
@@ -13,8 +14,6 @@ function DirectionModal({
   const [direction, setDirection] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const API_URL = import.meta.env.VITE_API_KEY;
 
   useEffect(() => {
     if (mode === "edit" && directionToEdit) {

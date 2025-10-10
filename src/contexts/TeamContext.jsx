@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import useFetchTeam from "../hooks/useFetchTeam";
+import { API_URL } from "../utils/rolesTranslations";
 
 const TeamContext = createContext();
 
 export const TeamProvider = ({ children }) => {
-  const API_URL = import.meta.env.VITE_API_KEY;
   const { team, loading, error, refetch } = useFetchTeam(`${API_URL}`);
 
   return (

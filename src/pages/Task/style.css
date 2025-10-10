@@ -1,5 +1,5 @@
 .addBtnStyle {
-    display: "flex";
+    display: flex;
     margin: 30px auto
 }
 
@@ -17,7 +17,7 @@
 }
 
 .filterLabelStyle {
-    display: "flex";
+    display: flex;
     align-items: center;
     gap: 5px
 }

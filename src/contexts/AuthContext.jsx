@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getCookie } from "../utils/getCookies";
+import { API_URL } from "../utils/rolesTranslations";
 
 const AuthContext = createContext();
 
@@ -46,7 +47,6 @@ export function AuthProvider({ children }) {
         throw new Error("No refresh token");
       }
 
-      const API_URL = import.meta.env.VITE_API_KEY;
       const response = await fetch(`${API_URL}/auth/refresh`, {
         method: "POST",
         headers: {

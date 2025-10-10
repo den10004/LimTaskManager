@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
+import { API_URL } from "../../utils/rolesTranslations";
 
 function Modal({ onCancel, onLoginSuccess }) {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ function Modal({ onCancel, onLoginSuccess }) {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    const API_URL = import.meta.env.VITE_API_KEY;
+
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",

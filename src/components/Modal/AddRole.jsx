@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
+import { API_URL } from "../../utils/rolesTranslations";
 
 function AddRole({
   isOpen,
@@ -14,7 +15,6 @@ function AddRole({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
   useEffect(() => {

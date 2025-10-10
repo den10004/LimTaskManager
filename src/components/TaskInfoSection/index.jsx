@@ -1,3 +1,4 @@
+import { API_URL } from "../../utils/rolesTranslations";
 import EditBtn from "../UI/EditBtn";
 
 const styles = {
@@ -128,7 +129,7 @@ function TaskInfoSection({
             {task.files.map((file, index) => (
               <div key={index} style={{ marginRight: "10px" }}>
                 <a
-                  href={`${import.meta.env.VITE_API_KEY}${file.file_url}`}
+                  href={`${API_URL}${file.file_url}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

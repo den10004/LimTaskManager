@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCookie } from "../../utils/getCookies";
 import {
+  API_URL,
   ASSIGNED,
   COMPLETED,
   statusColors,
@@ -27,7 +28,6 @@ function MainPage() {
   };
 
   const loadEvents = async () => {
-    const API_URL = import.meta.env.VITE_API_KEY;
     const token = getCookie("authTokenPM");
     if (!token) {
       setLoading(false);

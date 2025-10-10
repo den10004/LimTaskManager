@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getCookie } from "../utils/getCookies";
+import { API_URL } from "../utils/rolesTranslations";
 
 const useUserFetch = (id) => {
   const [user, setUser] = useState(null);
@@ -17,7 +18,6 @@ const useUserFetch = (id) => {
       setIsLoading(true);
       setError(null);
 
-      const API_URL = import.meta.env.VITE_API_KEY;
       const response = await fetch(`${API_URL}/users/${id}`, {
         method: "GET",
         headers: {

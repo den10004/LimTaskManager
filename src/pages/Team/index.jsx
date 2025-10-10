@@ -6,7 +6,7 @@ import { useTeam } from "../../contexts/TeamContext";
 import AddRole from "../../components/Modal/AddRole";
 import Toast from "../../components/Toast";
 import { getCookie } from "../../utils/getCookies";
-import { ADMIN } from "../../utils/rolesTranslations";
+import { ADMIN, API_URL } from "../../utils/rolesTranslations";
 
 function TeamPage() {
   const { userData } = useAuth();
@@ -26,7 +26,6 @@ function TeamPage() {
     color: "",
   });
 
-  const API_URL = import.meta.env.VITE_API_KEY;
   const token = getCookie("authTokenPM");
 
   const fetchRoles = async () => {

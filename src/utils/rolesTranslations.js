@@ -4,6 +4,10 @@ export const WORK = "В работе";
 export const ASSIGNED = "Ответственный назначен";
 export const ADMIN = "Администратор";
 
+export const API_URL = import.meta.env.VITE_API_KEY;
+
+export const PAGE_SIZE = 20;
+
 export const taskStatus = [
   [OVERDUE],
   [COMPLETED],
