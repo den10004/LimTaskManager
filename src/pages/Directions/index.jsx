@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { getCookie } from "../../utils/getCookies";
 import DirectionModal from "../../components/Modal/DirectionModal";
 import { fetchDirections } from "../../hooks/useFetchDirection";
@@ -8,7 +8,7 @@ import "./style.css";
 
 function Directions() {
   const { userData } = useAuth();
-  const rolesUser = userData.roles.join("");
+  const rolesUser = useMemo(() => userData?.roles?.join("") || "", [userData]);
 
   const [directions, setDirections] = useState([]);
   const [loading, setLoading] = useState(true);
