@@ -4,6 +4,7 @@ import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import {
+  API_URL,
   ASSIGNED,
   COMPLETED,
   OVERDUE,
@@ -11,6 +12,24 @@ import {
   WORK,
 } from "../../utils/rolesTranslations";
 import "./style.css";
+
+const STATUS_CONFIG = {
+  [COMPLETED]: { label: COMPLETED, key: "completed" },
+  [OVERDUE]: { label: OVERDUE, key: "overdue" },
+  [ASSIGNED]: { label: ASSIGNED, key: "assigned" },
+  [WORK]: { label: WORK, key: "work" },
+};
+
+const SORT_DIRECTIONS = {
+  ASC: "asc",
+  DESC: "desc",
+};
+
+const UPDATE_TIMEOUTS = {
+  MIN: 60000, // 1 минута
+  MAX: 900000, // 15 минут
+  BUFFER: 300000, // 5 минут
+};
 
 const sortButtonStyle = (active) => ({
   marginLeft: "5px",
@@ -30,18 +49,26 @@ function Task() {
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
   const [statusFilters, setStatusFilters] = useState({
-    completed: true,
-    overdue: true,
-    assigned: true,
-    work: true,
+    [COMPLETED]: true,
+    [OVERDUE]: true,
+    [ASSIGNED]: true,
+    [WORK]: true,
   });
 
-  const API_URL = import.meta.env.VITE_API_KEY;
   const { team } = useTeam();
   const timerRef = useRef(null);
 
   const resetPagination = useCallback(() => {
     setVisibleCount(PAGE_SIZE);
+  }, []);
+
+  const handleFetchError = useCallback((error) => {
+    console.error("Fetch error:", error);
+    const message = error.message.includes("Токен")
+      ? "Ошибка авторизации"
+      : `Ошибка загрузки данных: ${error.message}`;
+    setError(message);
+    setHasMore(false);
   }, []);
 
   const fetchAllTasks = useCallback(async () => {
@@ -61,101 +88,132 @@ function Task() {
       const data = await response.json();
       setAllTasks(data.items || []);
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(`Ошибка загрузки данных: ${err.message}`);
-      setHasMore(false);
+      handleFetchError(err);
     } finally {
       setIsLoading(false);
     }
-  }, [API_URL]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [API_URL, handleFetchError]);
 
-  const updatePendingTasks = useCallback(async () => {
-    try {
-      const token = getCookie("authTokenPM");
-      if (!token) {
-        scheduleNextUpdate(900000);
-        return;
-      }
+  const isTaskEligibleForUpdate = useCallback((task) => {
+    const createdAt = new Date(task.created_at).getTime();
+    const timeDiffSec = (Date.now() - createdAt) / 1000;
+    return timeDiffSec >= 86700;
+  }, []);
 
-      const now = new Date().getTime(); // В мс
-      const tasksToUpdate = allTasks.filter((task) => {
-        if (task.status !== ASSIGNED) return false;
-        const createdAt = new Date(task.created_at).getTime();
-        const timeDiffMs = now - createdAt;
-        const timeDiffSec = timeDiffMs / 1000;
-        return task.notified_pending === 0 && timeDiffSec >= 86700;
-      });
-
-      if (tasksToUpdate.length === 0) {
-        // Нет задач для обновления — планируем следующий вызов
-        scheduleNextUpdate(900000);
-        return;
-      }
-
-      // Получения обновлённых данных по задачам
-      const updatedTasks = await Promise.all(
-        tasksToUpdate.map(async (task) => {
+  const fetchUpdatedTasks = useCallback(
+    async (tasks, token) => {
+      return Promise.all(
+        tasks.map(async (task) => {
           const response = await fetch(`${API_URL}/task/${task.id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           });
-          if (!response.ok) return task;
-          return await response.json();
+          return response.ok ? await response.json() : task;
         })
       );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [API_URL]
+  );
 
+  const updateTasksState = useCallback(
+    (updatedTasks) => {
       let hasChanges = false;
       const newTasks = allTasks.map((task) => {
         const updatedTask = updatedTasks.find((ut) => ut.id === task.id);
-        if (
-          updatedTask &&
-          updatedTask.notified_pending !== task.notified_pending
-        ) {
+        if (updatedTask?.notified_pending !== task.notified_pending) {
           hasChanges = true;
           return { ...task, notified_pending: updatedTask.notified_pending };
         }
         return task;
       });
 
-      if (hasChanges) {
-        setAllTasks(newTasks);
+      if (hasChanges) setAllTasks(newTasks);
+      return hasChanges;
+    },
+    [allTasks]
+  );
+
+  const calculateNextUpdateTimeout = useCallback((tasks) => {
+    const now = Date.now();
+    let minRemainingMs = Infinity;
+
+    tasks.forEach((task) => {
+      if (task.status === ASSIGNED && task.notified_pending === 0) {
+        const createdAt = new Date(task.created_at).getTime();
+        const timeDiffMs = now - createdAt;
+        const remainingMs = 86700 * 1000 - timeDiffMs;
+
+        if (remainingMs > 0) {
+          minRemainingMs = Math.min(minRemainingMs, remainingMs);
+        }
+      }
+    });
+
+    return Math.max(
+      UPDATE_TIMEOUTS.MIN,
+      Math.min(
+        UPDATE_TIMEOUTS.MAX,
+        minRemainingMs === Infinity
+          ? UPDATE_TIMEOUTS.MAX
+          : minRemainingMs + UPDATE_TIMEOUTS.BUFFER
+      )
+    );
+  }, []);
+
+  const updatePendingTasks = useCallback(async () => {
+    try {
+      const token = getCookie("authTokenPM");
+      if (!token) {
+        scheduleNextUpdate(UPDATE_TIMEOUTS.MAX);
+        return;
       }
 
-      // Расчёт минимального время до следующего обновления
-      let minRemainingMs = Infinity;
-      allTasks.forEach((task) => {
-        if (task.status === ASSIGNED && task.notified_pending === 0) {
-          const createdAt = new Date(task.created_at).getTime();
-          const timeDiffMs = now - createdAt;
-          const remainingMs = 86700 * 1000 - timeDiffMs;
-          if (remainingMs > 0) {
-            minRemainingMs = Math.min(minRemainingMs, remainingMs);
-          }
-        }
-      });
-
-      // Следующий вызов: minRemaining + буфер (5 мин), min 1 мин, max 15 мин
-      const nextTimeout = Math.max(
-        60000,
-        Math.min(
-          900000,
-          minRemainingMs === Infinity ? 900000 : minRemainingMs + 300000
-        )
+      const pendingTasks = allTasks.filter(
+        (task) =>
+          task.status === ASSIGNED &&
+          task.notified_pending === 0 &&
+          isTaskEligibleForUpdate(task)
       );
-      scheduleNextUpdate(nextTimeout);
+
+      if (pendingTasks.length === 0) {
+        scheduleNextUpdate(UPDATE_TIMEOUTS.MAX);
+        return;
+      }
+
+      const updatedTasks = await fetchUpdatedTasks(pendingTasks, token);
+      const hasChanges = updateTasksState(updatedTasks);
+
+      if (hasChanges) {
+        const nextTimeout = calculateNextUpdateTimeout(allTasks);
+        scheduleNextUpdate(nextTimeout);
+      } else {
+        scheduleNextUpdate(UPDATE_TIMEOUTS.MAX);
+      }
     } catch (err) {
       console.error("Update tasks error:", err);
-      scheduleNextUpdate(900000);
+      scheduleNextUpdate(UPDATE_TIMEOUTS.MAX);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTasks, API_URL]);
+  }, [
+    allTasks,
+    API_URL,
+    isTaskEligibleForUpdate,
+    fetchUpdatedTasks,
+    updateTasksState,
+    calculateNextUpdateTimeout,
+  ]);
 
-  const scheduleNextUpdate = (timeout) => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(updatePendingTasks, timeout);
-  };
+  const scheduleNextUpdate = useCallback(
+    (timeout) => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(updatePendingTasks, timeout);
+    },
+    [updatePendingTasks]
+  );
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
@@ -168,64 +226,66 @@ function Task() {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updatePendingTasks]);
+  }, [scheduleNextUpdate]);
 
-  // Фильтрация по статусу
-  const statusFilteredTasks = useMemo(() => {
-    return allTasks.filter((task) => {
-      if (task.status === COMPLETED && !statusFilters.completed) return false;
-      if (task.status === OVERDUE && !statusFilters.overdue) return false;
-      if (task.status === ASSIGNED && !statusFilters.assigned) return false;
-      if (task.status === WORK && !statusFilters.work) return false;
-      return true;
-    });
-  }, [allTasks, statusFilters]);
+  // Исправленная фильтрация
+  const filteredAndSortedTasks = useMemo(() => {
+    let filtered = allTasks.filter(
+      (task) => statusFilters[task.status] ?? true
+    );
 
-  // Фильтрация по поиску
-  const searchFilteredTasks = useMemo(() => {
-    if (!searchName.trim()) return statusFilteredTasks;
-    const lowerSearch = searchName.toLowerCase();
-    return statusFilteredTasks.filter((task) => {
-      const user = team.find((m) => m.id === task.assigned_user_id);
-      return user?.name.toLowerCase().includes(lowerSearch);
-    });
-  }, [statusFilteredTasks, searchName, team]);
+    if (searchName.trim()) {
+      const lowerSearch = searchName.toLowerCase();
+      filtered = filtered.filter((task) => {
+        const user = team.find((m) => m.id === task.assigned_user_id);
+        return user?.name.toLowerCase().includes(lowerSearch);
+      });
+    }
 
-  // Сортировка
-  const sortedTasks = useMemo(() => {
-    if (!sortDirection) return searchFilteredTasks;
-    return [...searchFilteredTasks].sort((a, b) => {
-      const dateA = new Date(a.due_at || 0);
-      const dateB = new Date(b.due_at || 0);
-      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
-    });
-  }, [searchFilteredTasks, sortDirection]);
+    if (sortDirection) {
+      filtered = [...filtered].sort((a, b) => {
+        const dateA = new Date(a.due_at || 0);
+        const dateB = new Date(b.due_at || 0);
+        return sortDirection === SORT_DIRECTIONS.ASC
+          ? dateA - dateB
+          : dateB - dateA;
+      });
+    }
+
+    return filtered;
+  }, [allTasks, statusFilters, searchName, team, sortDirection]);
 
   // Пагинация
   const displayedTasks = useMemo(() => {
-    const result = sortedTasks.slice(0, visibleCount);
-    setHasMore(sortedTasks.length > result.length);
+    const result = filteredAndSortedTasks.slice(0, visibleCount);
+    setHasMore(filteredAndSortedTasks.length > visibleCount);
     return result;
-  }, [sortedTasks, visibleCount]);
+  }, [filteredAndSortedTasks, visibleCount]);
+
+  // Обработчики с сбросом пагинации
+  const withPaginationReset = useCallback(
+    (fn) =>
+      (...args) => {
+        fn(...args);
+        resetPagination();
+      },
+    [resetPagination]
+  );
+
+  const handleSearch = withPaginationReset((e) => {
+    setSearchName(e.target.value);
+  });
+
+  const handleSort = withPaginationReset((direction) => {
+    setSortDirection(direction);
+  });
+
+  const handleStatusFilterChange = withPaginationReset((status) => {
+    setStatusFilters((prev) => ({ ...prev, [status]: !prev[status] }));
+  });
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
-  };
-
-  const handleSearch = (e) => {
-    setSearchName(e.target.value);
-    resetPagination();
-  };
-
-  const handleSort = (direction) => {
-    setSortDirection(direction);
-    resetPagination();
-  };
-
-  const handleStatusFilterChange = (status) => {
-    setStatusFilters((prev) => ({ ...prev, [status]: !prev[status] }));
-    resetPagination();
   };
 
   return (
@@ -241,35 +301,16 @@ function Task() {
       />
 
       <div className="filtersContainerStyle">
-        {Object.entries(statusFilters).map(([key, value]) => {
-          let label = "";
-          switch (key) {
-            case "completed":
-              label = COMPLETED;
-              break;
-            case "overdue":
-              label = OVERDUE;
-              break;
-            case "assigned":
-              label = ASSIGNED;
-              break;
-            case "work":
-              label = WORK;
-              break;
-            default:
-              break;
-          }
-          return (
-            <label key={key} className="filterLabelStyle">
-              <input
-                type="checkbox"
-                checked={value}
-                onChange={() => handleStatusFilterChange(key)}
-              />
-              {label}
-            </label>
-          );
-        })}
+        {Object.entries(STATUS_CONFIG).map(([status, { label }]) => (
+          <label key={status} className="filterLabelStyle">
+            <input
+              type="checkbox"
+              checked={statusFilters[status]}
+              onChange={() => handleStatusFilterChange(status)}
+            />
+            {label}
+          </label>
+        ))}
       </div>
 
       {loading ? (
@@ -287,14 +328,18 @@ function Task() {
                 <th style={{ display: "flex", alignItems: "center" }}>
                   Срок выполнения
                   <button
-                    onClick={() => handleSort("asc")}
-                    style={sortButtonStyle(sortDirection === "asc")}
+                    onClick={() => handleSort(SORT_DIRECTIONS.ASC)}
+                    style={sortButtonStyle(
+                      sortDirection === SORT_DIRECTIONS.ASC
+                    )}
                   >
                     ↑
                   </button>
                   <button
-                    onClick={() => handleSort("desc")}
-                    style={sortButtonStyle(sortDirection === "desc")}
+                    onClick={() => handleSort(SORT_DIRECTIONS.DESC)}
+                    style={sortButtonStyle(
+                      sortDirection === SORT_DIRECTIONS.DESC
+                    )}
                   >
                     ↓
                   </button>
