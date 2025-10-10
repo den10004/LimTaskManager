@@ -55,7 +55,6 @@ header>ul li:not(:last-child) {
 
 .header__user {
     display: flex;
-    flex-direction: column;
     margin-right: 20px;
     align-items: center;
     background: var(--color-page);
@@ -63,6 +62,7 @@ header>ul li:not(:last-child) {
     border-radius: 15px;
     transition: all 0.3s ease;
     border: 1px solid #e9ecef;
+    gap: 10px;
 }
 
 .circle {
