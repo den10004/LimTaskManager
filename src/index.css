@@ -247,6 +247,12 @@ tr:last-child {
   border-bottom: none;
 }
 
+.lastRow {
+  display: flex;
+  margin-left: auto;
+  margin-right: 0;
+}
+
 .lastRow>button {
   display: flex;
   margin: 0 0 0 auto;
