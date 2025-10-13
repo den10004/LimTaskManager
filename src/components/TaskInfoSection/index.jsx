@@ -40,8 +40,6 @@ function TaskInfoSection({
 }) {
   const MAX_URGENCY_STARS = 5;
 
-  console.log(getUserName(task.assigned_user_id));
-
   return (
     <div style={styles.taskInfoList}>
       <div
