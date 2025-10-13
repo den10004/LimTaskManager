@@ -234,7 +234,17 @@ function TeamPage() {
                     <td>{user.telegram_id}</td>
                     <td>{formatDate(user.created_at)}</td>
 
-                    <td>{user?.roles[0]?.[0]}</td>
+                    <td>
+                      {user?.roles[0]?.[0]}{" "}
+                      <span
+                        style={{
+                          color: "var(--color-err)",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {!user?.roles.length && "Роль не определена"}
+                      </span>
+                    </td>
                     <td className="lastRow">
                       {rolesUser === ADMIN && (
                         <div

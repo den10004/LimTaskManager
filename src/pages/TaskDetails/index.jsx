@@ -144,7 +144,7 @@ const TaskDetails = () => {
   const getUserName = useCallback(
     (userId) => {
       const user = team.find((user) => user.id === userId);
-      return user?.name || "Неизвестный пользователь";
+      return user?.name || "Пользователь не указан";
     },
     [team]
   );
