@@ -23,6 +23,12 @@ export const statusColors = {
   [WORK]: "var(--color-green)",
 };
 
+export const URGENCY_COLORS = {
+  low: "var(--color-green)",
+  medium: "orange",
+  high: "var(--color-err)",
+};
+
 export const normalizeUrl = (url) => {
   if (!url) return "";
 

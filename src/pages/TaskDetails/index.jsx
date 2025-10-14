@@ -6,9 +6,11 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import {
   API_URL,
+  ASSIGNED,
   OVERDUE,
   statusColors,
   taskStatus,
+  URGENCY_COLORS,
   WORK,
 } from "../../utils/rolesTranslations";
 import { useAuth } from "../../contexts/AuthContext";
@@ -75,12 +77,6 @@ const styles = {
     flexWrap: "wrap",
     gap: "10px",
   },
-};
-
-const URGENCY_COLORS = {
-  low: "var(--color-green)",
-  medium: "orange",
-  high: "var(--color-err)",
 };
 
 const TaskDetails = () => {
@@ -201,6 +197,7 @@ const TaskDetails = () => {
 
       return response.json();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [API_URL, token]
   );
 
@@ -625,7 +622,10 @@ const TaskDetails = () => {
             padding: "6px 12px",
             borderRadius: "20px",
             color: statusColors[task.status] || "inherit",
-            border: `1px solid ${statusColors[task.status]}`,
+            border:
+              task.status === ASSIGNED
+                ? "1px solid var(--color-text)"
+                : `1px solid ${statusColors[task.status]}`,
           }}
         >
           {task.status}
