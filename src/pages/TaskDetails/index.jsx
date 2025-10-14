@@ -254,6 +254,7 @@ const TaskDetails = () => {
         ...prev,
         comments: [...(prev?.comments || []), newComment],
       }));
+      console.log(task);
       setComment("");
       setToast({
         show: true,
@@ -444,17 +445,15 @@ const TaskDetails = () => {
       setLoadings((prev) => ({ ...prev, file: false }));
     }
   };
-
-  const handleStatusUpdate = async (e) => {
-    e.preventDefault();
-    if (!selectedStatus) return;
+  const handleStatusUpdate = async (status = selectedStatus) => {
+    if (!status) return;
 
     setLoadings((prev) => ({ ...prev, status: true }));
 
     try {
       const updatedTask = await apiRequest(`/task/${taskId}/status`, {
         method: "PATCH",
-        body: JSON.stringify({ status: selectedStatus }),
+        body: JSON.stringify({ status }),
       });
 
       setTask((prev) => ({ ...prev, status: updatedTask.status }));
@@ -549,6 +548,11 @@ const TaskDetails = () => {
       });
       if (updatedTask.status) {
         setSelectedStatus(updatedTask.status);
+      }
+
+      if (updatedTask.status === OVERDUE) {
+        setSelectedStatus(ASSIGNED);
+        await handleStatusUpdate(ASSIGNED);
       }
 
       setShowDatePicker(false);
