@@ -6,6 +6,7 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { useTeam } from "../../contexts/TeamContext";
 import {
   API_URL,
+  ASSIGNED,
   OVERDUE,
   statusColors,
   taskStatus,
@@ -631,7 +632,10 @@ const TaskDetails = () => {
             padding: "6px 12px",
             borderRadius: "20px",
             color: statusColors[task.status] || "inherit",
-            border: `1px solid ${statusColors[task.status]}`,
+            border:
+              task.status === ASSIGNED
+                ? "1px solid var(--color-text)"
+                : `1px solid ${statusColors[task.status]}`,
           }}
         >
           {task.status}
