@@ -272,7 +272,7 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
               value={telegram}
               onChange={(e) => setTelegram(e.target.value)}
               disabled={isLoading}
-              placeholder="Введите телеграм (не обязательно)"
+              placeholder="Введите телеграм без @ (не обязательно)"
             />
           </div>
 
