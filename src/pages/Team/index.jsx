@@ -232,28 +232,7 @@ function TeamPage() {
                   <tr key={user.id}>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
-                    <td>
-                      <a
-                        href={`https://t.me/${
-                          user.username || user.telegram_id
-                        }`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          textDecoration: "none",
-                          color: "inherit",
-                          transition: "text-decoration 0.2s ease",
-                        }}
-                        onMouseOver={(e) =>
-                          (e.target.style.textDecoration = "underline")
-                        }
-                        onMouseOut={(e) =>
-                          (e.target.style.textDecoration = "none")
-                        }
-                      >
-                        {user.telegram_id}
-                      </a>
-                    </td>
+                    <td>{user.telegram_id}</td>
                     <td>{formatDate(user.created_at)}</td>
 
                     <td>
