@@ -47,15 +47,6 @@ function CreatePage() {
       [name]: value,
     }));
   };
-  /*
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    setFormData((prev) => ({
-      ...prev,
-      files: [...prev.files, ...files],
-    }));
-  };
-*/
 
   const handleFileChange = (e) => {
     const newFiles = Array.from(e.target.files || []);

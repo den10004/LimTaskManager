@@ -213,8 +213,10 @@ const TaskDetails = () => {
         console.error("Ошибка загрузки задачи:", err);
         setToast({ show: true, text: "Ошибка загрузки задачи", color: "red" });
         setError(err.message);
+        navigate("/task");
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [apiRequest]
   );
 
