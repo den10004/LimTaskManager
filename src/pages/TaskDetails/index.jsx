@@ -533,7 +533,13 @@ const TaskDetails = () => {
     try {
       const updatedTask = await apiRequest(`/task/${taskId}`, {
         method: "PATCH",
-        body: JSON.stringify({ deadline: date }),
+        body: JSON.stringify({
+          deadline: date,
+          notified_pending: 0,
+          notified_30: 0,
+          notified_10: 0,
+          notified_0: 0,
+        }),
       });
 
       setTask((prev) => ({
