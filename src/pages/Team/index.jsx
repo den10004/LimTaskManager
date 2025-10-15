@@ -233,7 +233,7 @@ function TeamPage() {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.telegram_id}</td>
-                    <td>{formatDate(user.created_at)}</td>
+                    <td>{formatDate(user.created_at).split(" ")[0]}</td>
 
                     <td>
                       {user?.roles[0]?.[0]}{" "}
