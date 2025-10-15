@@ -126,12 +126,11 @@ function Header() {
                     <p key={index}>{role}</p>
                   ))}
 
-                  {userInfo?.permissions?.map((permission, index) => (
-                    <p key={index}>
-                      <strong>Права:</strong>&nbsp;
-                      {permission}
-                    </p>
-                  ))}
+                  {[...new Set(userInfo?.permissions || [])]?.map(
+                    (permission, index) => (
+                      <p key={index}>{permission}</p>
+                    )
+                  )}
                 </div>
               </div>
             </>
