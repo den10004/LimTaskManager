@@ -1,8 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
 import Header from "./components/Header/Header";
 import { AppProviders } from "./AppProviders";
 import { routes } from "./routesConfig";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
+import { useEffect } from "react";
+
+function NotFoundRedirect() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/task");
+  }, [navigate]);
+
+  return null;
+}
 
 function App() {
   return (
@@ -32,7 +48,8 @@ function App() {
                   }
                 />
               );
-            })}
+            })}{" "}
+            <Route path="*" element={<NotFoundRedirect />} />
           </Routes>
         </div>
       </Router>
