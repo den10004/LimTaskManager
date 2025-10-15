@@ -250,8 +250,8 @@ function TeamPage() {
                     <td style={{ textAlign: "center" }}>
                       {user.permissions &&
                       user.permissions.includes("Добавление записей")
-                        ? "✓"
-                        : "Х"}
+                        ? "✅"
+                        : "❌"}
                     </td>
 
                     <td className="lastRow">
