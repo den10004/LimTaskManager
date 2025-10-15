@@ -50,6 +50,15 @@ function EditModal({
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!isSaveDisabled && !(isLinkType && showUrlError)) {
+        handleSave();
+      }
+    }
+  };
+
   const isValidUrl = (url) => {
     try {
       new URL(url);
@@ -102,6 +111,7 @@ function EditModal({
               value={newValue}
               onChange={handleUrlChange}
               placeholder="example.com или https://example.com"
+              onKeyDown={handleKeyDown}
               style={{
                 margin: "10px 0",
                 width: "100%",
