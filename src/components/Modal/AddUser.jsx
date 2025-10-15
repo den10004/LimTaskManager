@@ -266,13 +266,13 @@ function AddUser({ isOpen, onClose, rolesList, onUserCreated, mode, user }) {
           </div>
 
           <div className="form-group">
-            <label>Телеграм:</label>
+            <label>Телеграм id:</label>
             <input
               type="text"
               value={telegram}
               onChange={(e) => setTelegram(e.target.value)}
               disabled={isLoading}
-              placeholder="Введите телеграм без @ (не обязательно)"
+              placeholder="Введите телеграм id (не обязательно)"
             />
           </div>
 

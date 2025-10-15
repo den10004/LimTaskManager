@@ -220,7 +220,7 @@ function TeamPage() {
                 <tr>
                   <th>Имя</th>
                   <th>Email</th>
-                  <th>Телеграм</th>
+                  <th>Телеграм id</th>
                   <th>Создан</th>
                   <th>Роль</th>
                   <th>Записи</th>
