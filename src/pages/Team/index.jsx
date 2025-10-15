@@ -223,6 +223,7 @@ function TeamPage() {
                   <th>Телеграм</th>
                   <th>Создан</th>
                   <th>Роль</th>
+                  <th>Записи</th>
                   <th className="lastRow"></th>
                 </tr>
               </thead>
@@ -245,6 +246,14 @@ function TeamPage() {
                         {!user?.roles.length && "Роль не определена"}
                       </span>
                     </td>
+
+                    <td style={{ textAlign: "center" }}>
+                      {user.permissions &&
+                      user.permissions.includes("Добавление записей")
+                        ? "✓"
+                        : "Х"}
+                    </td>
+
                     <td className="lastRow">
                       {rolesUser === ADMIN && (
                         <div
