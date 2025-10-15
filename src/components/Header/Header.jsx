@@ -122,6 +122,16 @@ function Header() {
                 <div>
                   <b>{userData.name}</b>
                   <p>{userData.email}</p>
+                  {userData?.roles?.map((role, index) => (
+                    <p key={index}>{role}</p>
+                  ))}
+
+                  {userInfo?.permissions?.map((permission, index) => (
+                    <p key={index}>
+                      <strong>Права:</strong>&nbsp;
+                      {permission}
+                    </p>
+                  ))}
                 </div>
               </div>
             </>

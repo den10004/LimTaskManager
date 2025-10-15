@@ -79,7 +79,7 @@ header>ul li:not(:last-child) {
 }
 
 .header__user>div {
-    text-align: center;
+    text-align: left;
 }
 
 .header__user>div>b {
