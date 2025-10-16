@@ -24,7 +24,7 @@ function TaskTableRow({ task, directions, team }) {
       <td>{formatDate(task.created_at).split(" ")[0] || "Не установлен"}</td>
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{directionName}</td>
-      <td>{task.title || "Нет текста"}</td>
+      <td className="truncate-cell">{task.title || "Нет текста"}</td>
       <td style={{ color: statusColors[task.status] || "inherit" }}>
         {task.status || "Не указан"}
         {task.status === ASSIGNED && task.notified_pending === 1 && " ⌛"}

@@ -624,10 +624,17 @@ const TaskDetails = () => {
       <button style={styles.backButton} onClick={() => navigate("/task")}>
         ← Назад
       </button>
+
+      <h3
+        style={{
+          marginBottom: "10px",
+          hyphens: "auto",
+          wordWrap: "break-word",
+        }}
+      >
+        Задача #{task.id} - {task.title || "Не указано"}
+      </h3>
       <div className="taskDetailHeader">
-        <h3>
-          Задача #{task.id} - {task.title || "Не указано"}
-        </h3>
         <div
           className="info"
           style={{
