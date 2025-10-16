@@ -291,7 +291,7 @@ tr:last-child {
 }
 
 .truncate-cell {
-  max-width: 150px;
+  max-width: 0px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -325,7 +325,6 @@ tr:last-child {
 
 @media screen and (max-width:425px) {
   button {
-    padding: 8px;
     font-size: 14px;
   }
 
