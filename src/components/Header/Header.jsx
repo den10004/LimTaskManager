@@ -110,7 +110,9 @@ function Header() {
                 <div>
                   <b>{userData.name}</b>{" "}
                   {userData?.roles?.map((role, index) => (
-                    <p key={index}>{role}</p>
+                    <p key={index} style={{ color: "var(--color-blue)" }}>
+                      {role}
+                    </p>
                   ))}
                   <p>{userData.email}</p>
                   {[...new Set(userInfo?.permissions || [])]?.map(
