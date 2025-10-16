@@ -303,9 +303,9 @@ function Task() {
       <tr>
         <th>Назначил</th>
         <th>Ответственный</th>
-        <th>Дата создания</th>
+        <th>Создано</th>
         <th style={{ display: "flex", alignItems: "center" }}>
-          Срок выполнения
+          Срок <br /> выполнения
           <button
             onClick={() => handleSort("asc")}
             style={sortButtonStyle(sortDirection === "asc")}
