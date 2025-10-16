@@ -28,7 +28,7 @@
     margin-left: auto
 }
 
-.btns-direction>.change-btn {
+.btns-direction>.delete-btn {
     margin-left: 10px
 }
 
@@ -38,7 +38,7 @@
         flex-direction: column;
     }
 
-    .btns-direction>.change-btn {
+    .btns-direction>.delete-btn {
         margin-left: 0px;
         margin-top: 10px;
     }

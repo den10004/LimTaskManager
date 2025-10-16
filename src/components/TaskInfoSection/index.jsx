@@ -70,12 +70,10 @@ function TaskInfoSection({
         <div className="taskDetailItem">
           <div>Направление</div>
           <div
+            className="status-badge"
             style={{
-              padding: "4px 8px",
               backgroundColor: "#e7f1ff",
               color: "var(--color-blue)",
-              borderRadius: "4px",
-              width: "fit-content",
             }}
           >
             {getDirectionName(task.direction_id)}

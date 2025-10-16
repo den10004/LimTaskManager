@@ -5,6 +5,7 @@ import Modal from "./../Modal";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUser } from "../../contexts/UserContext";
 import "./style.css";
+import { getInitials } from "../../utils/getInitials";
 
 function Header() {
   const navigate = useNavigate();
@@ -40,19 +41,6 @@ function Header() {
   const handleLogout = () => {
     logout();
     navigate("/");
-  };
-
-  const getInitials = (name) => {
-    if (!name) return "";
-
-    const words = name.trim().split(" ");
-    if (words.length === 1) {
-      return words[0].charAt(0).toUpperCase();
-    }
-
-    return (
-      words[0].charAt(0) + words[words.length - 1].charAt(0)
-    ).toUpperCase();
   };
 
   return (
@@ -120,12 +108,11 @@ function Header() {
               <div className="header__user">
                 <div className="circle">{getInitials(userData.name)}</div>
                 <div>
-                  <b>{userData.name}</b>
-                  <p>{userData.email}</p>
+                  <b>{userData.name}</b>{" "}
                   {userData?.roles?.map((role, index) => (
                     <p key={index}>{role}</p>
                   ))}
-
+                  <p>{userData.email}</p>
                   {[...new Set(userInfo?.permissions || [])]?.map(
                     (permission, index) => (
                       <p key={index}>{permission}</p>

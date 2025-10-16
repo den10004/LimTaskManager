@@ -7,6 +7,8 @@ import AddRole from "../../components/Modal/AddRole";
 import Toast from "../../components/Toast";
 import { getCookie } from "../../utils/getCookies";
 import { ADMIN, API_URL } from "../../utils/rolesTranslations";
+import "./style.css";
+import { getInitials } from "../../utils/getInitials";
 
 function TeamPage() {
   const { userData } = useAuth();
@@ -260,17 +262,18 @@ function TeamPage() {
                           className="btns-direction"
                           style={{ flexDirection: "end" }}
                         >
-                          <button
-                            className="delete-btn"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            Удалить
-                          </button>
+                          {" "}
                           <button
                             className="change-btn"
                             onClick={() => openEditModal(user)}
                           >
                             Редактировать
+                          </button>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Удалить
                           </button>
                         </div>
                       )}
@@ -284,6 +287,81 @@ function TeamPage() {
               Нет данных для отображения
             </div>
           )}
+        </div>
+      )}
+
+      <h3 className="h3-mtmb">Команда (вариант с карточками)</h3>
+
+      {loading ? (
+        <div className="loading">Загрузка данных...</div>
+      ) : error ? (
+        <div className="error error-message">{error}</div>
+      ) : (
+        <div className="team__container">
+          {userList.map((user) => (
+            <ul key={user.id} className="taskCard">
+              <li className="headlineBlock team-block">
+                <div className="circle">{getInitials(user.name)}</div>
+                <div>
+                  <b>{user.name}</b>
+                </div>
+                <div style={{ color: "var(--color-blue)" }}>
+                  {user?.roles[0]?.[0]}
+                </div>
+              </li>
+              <li className="team-label">
+                <div>Email:</div>
+                <div> {user.email}</div>
+              </li>
+              <li className="team-label">
+                <div>Телеграм id:</div>
+                <div>{user.telegram_id ? user.telegram_id : "не указан"}</div>
+              </li>
+              <li className="team-label">
+                <div>Зарегистрирован:</div>
+                <div>{formatDate(user.created_at).split(" ")[0]}</div>
+              </li>
+              <li className="team-label tl">
+                <div>Права:</div>
+                <div
+                  className="status-badge"
+                  style={{
+                    backgroundColor: user?.permissions?.length
+                      ? "#e7f1ff"
+                      : "transparent",
+                    color: user?.permissions?.length
+                      ? "var(--color-blue)"
+                      : "inherit",
+                  }}
+                >
+                  {user?.permissions?.length ? (
+                    [...new Set(user.permissions)].map((permission, index) => (
+                      <p key={index}>{permission}</p>
+                    ))
+                  ) : (
+                    <p>нет прав</p>
+                  )}
+                </div>
+              </li>
+
+              {rolesUser === ADMIN && (
+                <div className="teamCards">
+                  <button
+                    className="change-btn"
+                    onClick={() => openEditModal(user)}
+                  >
+                    Редактировать
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Удалить
+                  </button>
+                </div>
+              )}
+            </ul>
+          ))}
         </div>
       )}
 
@@ -331,16 +409,16 @@ function TeamPage() {
                             style={{ flexDirection: "end" }}
                           >
                             <button
-                              className="delete-btn"
-                              onClick={() => handleDeleteRole(role.id)}
-                            >
-                              Удалить
-                            </button>
-                            <button
                               className="change-btn"
                               onClick={() => openEditRoleModal(role)}
                             >
                               Редактировать
+                            </button>
+                            <button
+                              className="delete-btn"
+                              onClick={() => handleDeleteRole(role.id)}
+                            >
+                              Удалить
                             </button>
                           </div>
                         )}

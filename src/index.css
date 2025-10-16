@@ -9,7 +9,7 @@
   --color-page: rgba(248, 250, 252, 1);
   --color-link: rgba(79, 70, 229, 1);
   --color-err: red;
-  --color-blue: #007bff;
+  --color-blue: #42A4FF;
   --color-green: rgba(33, 197, 140, 1);
   --color-gray: #6c757d;
 }
@@ -165,6 +165,11 @@ select {
   padding: 0;
   width: 20px;
   height: 20px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 8px;
 }
 
 .page {

@@ -113,16 +113,16 @@ function Directions() {
                     {rolesUser === ADMIN && (
                       <div className="btns-direction">
                         <button
-                          className="delete-btn"
-                          onClick={() => handleDelete(task.id)}
-                        >
-                          Удалить
-                        </button>
-                        <button
                           className="change-btn"
                           onClick={() => handleEdit(task)}
                         >
                           Редактировать
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDelete(task.id)}
+                        >
+                          Удалить
                         </button>
                       </div>
                     )}
