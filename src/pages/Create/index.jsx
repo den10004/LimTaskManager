@@ -232,17 +232,15 @@ function CreatePage() {
 
           <div className="create__block">
             <label htmlFor="due_at">Срок исполнения</label>
-            <div style={{ overflow: "hidden", maxWidth: "100%" }}>
-              <input
-                type="datetime-local"
-                id="due_at"
-                name="due_at"
-                value={formData.due_at}
-                onChange={handleInputChange}
-                min={new Date().toISOString().slice(0, 16)}
-                required
-              />
-            </div>
+            <input
+              type="datetime-local"
+              id="due_at"
+              name="due_at"
+              value={formData.due_at}
+              onChange={handleInputChange}
+              min={new Date().toISOString().slice(0, 16)}
+              required
+            />
           </div>
 
           <div className="create__block">
