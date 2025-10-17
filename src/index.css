@@ -177,13 +177,13 @@ input[type="datetime-local"] {
   appearance: none;
   -webkit-appearance: none;
   font-size: 16px;
-  -webkit-appearance: textfield;
   appearance: textfield;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   display: block;
   cursor: pointer;
+  background: transparent;
   opacity: 1;
 }
 
