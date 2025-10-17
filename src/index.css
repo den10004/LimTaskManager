@@ -157,36 +157,7 @@ select {
   border: 1px solid var(--color-input);
   border-radius: 8px;
   padding: 8px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-color: var(--color-background)
 }
-
-select option {
-  color: var(--color-text)
-}
-
-input[type="datetime-local"] {
-  width: 100%;
-  max-width: 100%;
-  padding: 8px;
-  border-radius: 8px;
-  box-sizing: border-box;
-  background-color: var(--color-background);
-  appearance: none;
-  -webkit-appearance: none;
-  font-size: 16px;
-  appearance: textfield;
-}
-
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  display: block;
-  cursor: pointer;
-  background: transparent;
-  opacity: 1;
-}
-
 
 [type="checkbox"],
 [type="radio"] {
@@ -331,8 +302,17 @@ tr:last-child {
   text-overflow: ellipsis;
 }
 
+input[type="datetime-local"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
-
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--color-background)
+}
 
 @media screen and (max-width:1240px) {
   .container {
