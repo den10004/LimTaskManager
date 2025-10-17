@@ -162,6 +162,22 @@ select {
   background-color: var(--color-background)
 }
 
+select,
+select option {
+  color: var(--color-text);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+select:focus,
+select option:checked {
+  color: var(--color-text);
+}
+
+select option[disabled][selected] {
+  color: #999999;
+}
+
 .inputdate-wrapper {
   position: relative;
   width: 100%;
