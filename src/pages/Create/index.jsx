@@ -240,6 +240,7 @@ function CreatePage() {
                 value={formData.due_at}
                 onChange={handleInputChange}
                 min={new Date().toISOString().slice(0, 16)}
+                className="datetime-input"
                 required
               />
             </div>
