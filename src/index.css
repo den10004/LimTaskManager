@@ -163,12 +163,8 @@ select {
   background-color: var(--color-background)
 }
 
-select#direction_id option {
-  color: var(--color-text);
-}
-
-select#direction_id option[value=""] {
-  color: var(--color-text);
+select option {
+  color: var(--color-text)
 }
 
 input[type="datetime-local"] {
@@ -180,9 +176,16 @@ input[type="datetime-local"] {
   background-color: var(--color-background);
   appearance: none;
   -webkit-appearance: none;
+  font-size: 16px;
+  -webkit-appearance: textfield;
+  appearance: textfield;
 }
 
-
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: block;
+  cursor: pointer;
+  opacity: 1;
+}
 
 
 [type="checkbox"],
