@@ -164,13 +164,23 @@ select {
 }
 
 select#direction_id option {
-  color: #000;
+  color: var(--color-text);
 }
 
 select#direction_id option[value=""] {
-  color: #999;
+  color: var(--color-text);
 }
 
+input[type="datetime-local"] {
+  width: 100%;
+  max-width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  background-color: var(--color-background);
+  -webkit-appearance: none;
+  appearance: none;
+}
 
 [type="checkbox"],
 [type="radio"] {
@@ -315,11 +325,7 @@ tr:last-child {
   text-overflow: ellipsis;
 }
 
-input[type="datetime-local"] {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
+
 
 
 @media screen and (max-width:1240px) {
