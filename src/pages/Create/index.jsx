@@ -232,7 +232,7 @@ function CreatePage() {
 
           <div className="create__block">
             <label htmlFor="due_at">Срок исполнения</label>
-            <div style={{ position: "relative", width: "100%" }}>
+            <div style={{ overflow: "hidden", maxWidth: "100%" }}>
               <input
                 type="datetime-local"
                 id="due_at"

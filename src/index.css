@@ -158,9 +158,19 @@ select {
   border-radius: 8px;
   padding: 8px;
   -webkit-appearance: none;
+  -moz-appearance: none;
   appearance: none;
   background-color: var(--color-background)
 }
+
+select#direction_id option {
+  color: #000;
+}
+
+select#direction_id option[value=""] {
+  color: #999;
+}
+
 
 [type="checkbox"],
 [type="radio"] {
@@ -310,7 +320,6 @@ input[type="datetime-local"] {
   max-width: 100%;
   box-sizing: border-box;
 }
-
 
 
 @media screen and (max-width:1240px) {
