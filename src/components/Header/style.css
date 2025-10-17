@@ -153,4 +153,8 @@ header>ul li:not(:last-child) {
         align-items: center;
     }
 
+    .header__user>div {
+        text-align: center;
+    }
+
 }

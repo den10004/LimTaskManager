@@ -383,57 +383,86 @@ function TeamPage() {
       ) : rolesError ? (
         <div className="error error-message">{rolesError}</div>
       ) : (
-        <div className="container-scroll">
-          {rolesList.length > 0 ? (
-            <table>
-              <thead>
-                <tr>
-                  <th>Имя</th>
-                  <th className="lastRow"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rolesList.map((role) => {
-                  const isCurrentUserRole = userData?.roles?.includes(
-                    role.name
-                  );
+        <>
+          <div className="container-scroll">
+            {rolesList.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Имя</th>
+                    <th className="lastRow"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rolesList.map((role) => {
+                    const isCurrentUserRole = userData?.roles?.includes(
+                      role.name
+                    );
 
-                  return (
-                    <tr key={role.id}>
-                      <td>{role.name}</td>
+                    return (
+                      <tr key={role.id}>
+                        <td>{role.name}</td>
 
-                      <td className="lastRow" style={{ display: "flex" }}>
-                        {rolesUser === ADMIN && !isCurrentUserRole && (
-                          <div
-                            className="btns-direction"
-                            style={{ flexDirection: "end" }}
-                          >
-                            <button
-                              className="change-btn"
-                              onClick={() => openEditRoleModal(role)}
+                        <td className="lastRow" style={{ display: "flex" }}>
+                          {rolesUser === ADMIN && !isCurrentUserRole && (
+                            <div
+                              className="btns-direction"
+                              style={{ flexDirection: "end" }}
                             >
-                              Редактировать
-                            </button>
-                            <button
-                              className="delete-btn"
-                              onClick={() => handleDeleteRole(role.id)}
-                            >
-                              Удалить
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          ) : (
-            <div className="error error-message">
-              Нет данных для отображения
-            </div>
-          )}
-        </div>
+                              <button
+                                className="change-btn"
+                                onClick={() => openEditRoleModal(role)}
+                              >
+                                Редактировать
+                              </button>
+                              <button
+                                className="delete-btn"
+                                onClick={() => handleDeleteRole(role.id)}
+                              >
+                                Удалить
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <div className="error error-message">
+                Нет данных для отображения
+              </div>
+            )}
+          </div>
+          <h3 className="h3-mtmb">Роли (вариант с карточками)</h3>
+          <div className="team__container">
+            {rolesList.map((role) => (
+              <ul key={role.id} className="taskCard">
+                <li className="headlineBlock team-block">
+                  <div> {role.name}</div>
+                </li>
+
+                {rolesUser === ADMIN && (
+                  <div className="teamCards">
+                    <button
+                      className="change-btn"
+                      onClick={() => openEditModal(role)}
+                    >
+                      Редактировать
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeleteUser(role.id)}
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                )}
+              </ul>
+            ))}
+          </div>
+        </>
       )}
 
       {rolesUser === ADMIN && (

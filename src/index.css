@@ -157,6 +157,9 @@ select {
   border: 1px solid var(--color-input);
   border-radius: 8px;
   padding: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--color-background)
 }
 
 [type="checkbox"],
@@ -301,6 +304,14 @@ tr:last-child {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+input[type="datetime-local"] {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+
 
 @media screen and (max-width:1240px) {
   .container {
