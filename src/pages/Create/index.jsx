@@ -232,7 +232,13 @@ function CreatePage() {
 
           <div className="create__block">
             <label htmlFor="due_at">Срок исполнения</label>
-            <div style={{ maxWidth: "100%", boxSizing: "border-box" }}>
+            <div
+              style={{
+                maxWidth: "100%",
+                boxSizing: "border-box",
+                position: "relative",
+              }}
+            >
               <input
                 type="datetime-local"
                 id="due_at"
