@@ -231,7 +231,7 @@ function CreatePage() {
           </div>
 
           <div className="create__block">
-            <label htmlFor="due_at">Срок исполнения</label>
+            <label htmlFor="due_at">Срок исполнения *</label>
             <div className="inputdate-wrapper">
               <input
                 type="datetime-local"
@@ -285,7 +285,7 @@ function CreatePage() {
           </div>
 
           <div className="create__block">
-            <label htmlFor="direction_id">Направление</label>
+            <label htmlFor="direction_id">Направление *</label>
             <select
               id="direction_id"
               name="direction_id"
@@ -317,7 +317,7 @@ function CreatePage() {
                 onChange={handleInputChange}
                 required
               >
-                <option value="">Выберите пользователя *</option>
+                <option value="">Выберите пользователя</option>
                 {team?.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name}

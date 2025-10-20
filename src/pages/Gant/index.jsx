@@ -9,7 +9,7 @@ import {
   WORK,
 } from "../../utils/rolesTranslations";
 
-function Kanban() {
+function Gant() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -132,7 +132,7 @@ function Kanban() {
 
   return (
     <section className="container">
-      <h3 className="h3-mtmb">Доска</h3>
+      <h3 className="h3-mtmb">Диаграмма Ганта</h3>
 
       {loading ? (
         <div className="loading">Загрузка данных...</div>
@@ -140,7 +140,7 @@ function Kanban() {
         <div className="error error-message">{error}</div>
       ) : formattedDates ? (
         <div
-          className="kanban-board"
+          className="gant-board"
           ref={boardRef}
           onMouseDown={handleMouseDown}
           onMouseLeave={handleMouseLeave}
@@ -192,4 +192,4 @@ function Kanban() {
   );
 }
 
-export default Kanban;
+export default Gant;

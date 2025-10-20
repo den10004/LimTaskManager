@@ -17,7 +17,7 @@ function Header() {
     userInfo?.permissions?.includes("Добавление записей");
 
   const navLinks = [
-    { to: "/kanban", label: "Доска" },
+    { to: "/Gant", label: "Диаграмма Ганта" },
     { to: "/calendar", label: "Календарь" },
     { to: "/task", label: "Задачи" },
     { to: "/directions", label: "Направления" },
@@ -49,7 +49,7 @@ function Header() {
         <div
           style={{ alignItems: "center", textAlign: "center", display: "flex" }}
         >
-          <NavLink to="/">
+          <NavLink to="/Gant">
             <svg
               version="1.1"
               viewBox="0 0 1400 222"
