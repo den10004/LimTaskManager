@@ -21,7 +21,8 @@ function TaskTableRow({ task, directions, team }) {
     <tr onClick={handleRowClick} style={{ cursor: "pointer" }}>
       <td>{createdBy}</td>
       <td>{userName}</td>
-      <td>{formatDate(task.created_at).split(" ")[0] || "Не установлен"}</td>
+      {/*
+      <td>{formatDate(task.created_at).split(" ")[0] || "Не установлен"}</td>*/}
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{directionName}</td>
       <td className="truncate-cell">{task.title || "Нет текста"}</td>

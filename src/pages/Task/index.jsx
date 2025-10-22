@@ -303,7 +303,7 @@ function Task() {
       <tr>
         <th>Назначил</th>
         <th>Ответственный</th>
-        <th>Создано</th>
+        {/*<th>Создано</th>*/}
         <th style={{ display: "flex", alignItems: "center" }}>
           Срок <br /> выполнения
           <button
@@ -322,9 +322,11 @@ function Task() {
           </button>
         </th>
         <th>Направление</th>
-        <th>Название</th>
+        <th style={{ width: "250px", minWidth: "250px", maxWidth: "250px" }}>
+          Название
+        </th>
         <th>Статус</th>
-        <th>Важность</th>
+        <th>Приоритет</th>
       </tr>
     </thead>
   );
