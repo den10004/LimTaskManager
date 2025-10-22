@@ -323,7 +323,7 @@ function Task() {
           </button>
         </th>
         <th>Направление</th>
-        <th style={{ width: "250px", minWidth: "250px", maxWidth: "250px" }}>
+        <th style={{ width: "300px", minWidth: "300px", maxWidth: "300px" }}>
           Название
         </th>
         <th>Статус</th>

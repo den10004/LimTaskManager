@@ -17,10 +17,17 @@ export const taskStatus = [
 ];
 
 export const statusColors = {
-  [OVERDUE]: "var(--color-err)",
+  [OVERDUE]: "rgb(254, 202, 202)",
   // Новая: "var(--color-blue)",
-  [COMPLETED]: "var(--color-blue)",
-  [WORK]: "var(--color-green)",
+  [COMPLETED]: "rgb(219, 234, 254)",
+  [WORK]: "rgb(209, 250, 229)",
+};
+
+export const statusColorsC = {
+  [OVERDUE]: "rgb(153, 27, 27)",
+  // Новая: "var(--color-blue)",
+  [COMPLETED]: "rgb(30, 64, 175)",
+  [WORK]: "rgb(6, 95, 70)",
 };
 
 export const URGENCY_COLORS = {

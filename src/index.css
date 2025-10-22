@@ -292,7 +292,8 @@ table {
 }
 
 thead {
-  background-color: #eff7ff;
+  background-color: rgb(249, 250, 251);
+  border-bottom: 1px solid rgb(229, 231, 235);
   border-radius: 8px 8px 0 0;
 }
 
@@ -322,6 +323,7 @@ td {
   overflow-wrap: break-word;
   white-space: normal;
   padding: 12px 8px;
+  font-size: 14px;
 }
 
 tr:hover td {
@@ -395,6 +397,7 @@ input[type="datetime-local"] {
   font-size: 12px;
   border-radius: 12px;
   display: inline-block;
+  font-weight: bold;
   white-space: nowrap;
   text-align: center;
 

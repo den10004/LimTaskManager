@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/dateUtils";
-import { ASSIGNED, statusColors } from "../../utils/rolesTranslations";
+import {
+  ASSIGNED,
+  statusColors,
+  statusColorsC,
+} from "../../utils/rolesTranslations";
 
 function TaskTableRow({ task, directions, team }) {
   const navigate = useNavigate();
@@ -33,10 +37,7 @@ function TaskTableRow({ task, directions, team }) {
             background: statusColors[task.status] || "inherit",
             border:
               task.status === ASSIGNED ? "1px solid var(--color-text)" : `none`,
-            color:
-              task.status === ASSIGNED
-                ? "var(--color-text)"
-                : `var(--color-background)`,
+            color: statusColorsC[task.status] || "inherit",
           }}
         >
           {task.status || "Не указан"}

@@ -9,6 +9,7 @@ import {
   ASSIGNED,
   OVERDUE,
   statusColors,
+  statusColorsC,
   taskStatus,
   WORK,
 } from "../../utils/rolesTranslations";
@@ -641,10 +642,7 @@ const TaskDetails = () => {
             background: statusColors[task.status] || "inherit",
             border:
               task.status === ASSIGNED ? "1px solid var(--color-text)" : `none`,
-            color:
-              task.status === ASSIGNED
-                ? "var(--color-text)"
-                : `var(--color-background)`,
+            color: statusColorsC[task.status] || "inherit",
           }}
         >
           {task.status}
