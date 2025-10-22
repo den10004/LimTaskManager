@@ -257,6 +257,7 @@ select option[disabled][selected] {
 
 .error-message {
   color: var(--color-err);
+  font-size: 18px;
 }
 
 .form-group {

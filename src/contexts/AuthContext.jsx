@@ -86,8 +86,27 @@ export function AuthProvider({ children }) {
         const url = args[0];
         const isRefreshRequest =
           typeof url === "string" && url.includes("/auth/refresh");
+        const isLoginRequest =
+          typeof url === "string" && url.includes("/auth/login");
 
-        if (response.status === 401 && !isRefreshRequest) {
+        // Проверяем заголовок Authorization (для доп. безопасности)
+        let fetchOptions = args[1] || {};
+        let hasAuthHeader = false;
+        if (fetchOptions.headers) {
+          if (fetchOptions.headers instanceof Headers) {
+            hasAuthHeader = fetchOptions.headers.has("Authorization");
+          } else if (typeof fetchOptions.headers === "object") {
+            hasAuthHeader = !!fetchOptions.headers.Authorization;
+          }
+        }
+
+        // Обрабатываем 401 ТОЛЬКО для protected запросов (не login/refresh)
+        if (
+          response.status === 401 &&
+          !isRefreshRequest &&
+          !isLoginRequest &&
+          hasAuthHeader
+        ) {
           if (!currentRefreshPromise) {
             currentRefreshPromise = performRefresh();
           }
@@ -100,21 +119,22 @@ export function AuthProvider({ children }) {
             currentRefreshPromise = null;
           }
 
+          // Повторяем запрос с новым токеном
           const newToken = getCookie("authTokenPM");
           const fetchUrl = args[0];
-          let fetchOptions = args[1] || {};
+          let retryOptions = { ...fetchOptions };
           let headers = {};
-          if (fetchOptions.headers) {
-            if (fetchOptions.headers instanceof Headers) {
-              headers = Object.fromEntries(fetchOptions.headers.entries());
+          if (retryOptions.headers) {
+            if (retryOptions.headers instanceof Headers) {
+              headers = Object.fromEntries(retryOptions.headers.entries());
             } else {
-              headers = { ...fetchOptions.headers };
+              headers = { ...retryOptions.headers };
             }
           }
           headers.Authorization = `Bearer ${newToken}`;
-          fetchOptions.headers = headers;
+          retryOptions.headers = headers;
 
-          const retryResponse = await originalFetch(fetchUrl, fetchOptions);
+          const retryResponse = await originalFetch(fetchUrl, retryOptions);
           if (retryResponse.status === 401) {
             logout();
             throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
@@ -124,9 +144,11 @@ export function AuthProvider({ children }) {
 
         return response;
       } catch (error) {
+        // Улучшение: logout только если ошибка явно от auth (и не от login)
         if (
-          error.message.includes("401") ||
-          error.message.includes("Unauthorized")
+          (error.message.includes("401") ||
+            error.message.includes("Unauthorized")) &&
+          !args[0]?.includes("/auth/login")
         ) {
           logout();
         }

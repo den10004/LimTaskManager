@@ -14,7 +14,10 @@ function Modal({ onCancel, onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const getErrorMessage = useCallback((error) => {
-    if (error.message?.includes("status: 401")) {
+    if (
+      error.message?.includes("status: 401") ||
+      error.message?.includes("status: 422")
+    ) {
       return "Неправильный логин или пароль";
     }
     if (error.message?.includes("status: ")) {
@@ -22,6 +25,9 @@ function Modal({ onCancel, onLoginSuccess }) {
       if (statusMatch) {
         return `Ошибка сервера: ${statusMatch[1]}`;
       }
+    }
+    if (error.message?.includes("Сессия истекла")) {
+      return "Сессия истекла. Пожалуйста, войдите снова.";
     }
     return error.message || "Произошла неизвестная ошибка";
   }, []);
