@@ -638,14 +638,13 @@ const TaskDetails = () => {
         <div
           className="info"
           style={{
-            alignItems: "center",
-            padding: "6px 12px",
-            borderRadius: "20px",
-            color: statusColors[task.status] || "inherit",
+            background: statusColors[task.status] || "inherit",
             border:
+              task.status === ASSIGNED ? "1px solid var(--color-text)" : `none`,
+            color:
               task.status === ASSIGNED
-                ? "1px solid var(--color-text)"
-                : `1px solid ${statusColors[task.status]}`,
+                ? "var(--color-text)"
+                : `var(--color-background)`,
           }}
         >
           {task.status}

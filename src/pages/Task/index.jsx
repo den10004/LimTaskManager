@@ -260,6 +260,7 @@ function Task() {
   const displayedTasks = useMemo(() => {
     const result = sortedTasks.slice(0, visibleCount);
     setHasMore(sortedTasks.length > result.length);
+
     return result;
   }, [sortedTasks, visibleCount]);
 

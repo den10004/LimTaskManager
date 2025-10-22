@@ -26,9 +26,22 @@ function TaskTableRow({ task, directions, team }) {
       <td>{formatDate(task.due_at, "Не установлен")}</td>
       <td>{directionName}</td>
       <td className="truncate-cell">{task.title || "Нет текста"}</td>
-      <td style={{ color: statusColors[task.status] || "inherit" }}>
-        {task.status || "Не указан"}
-        {task.status === ASSIGNED && task.notified_pending === 1 && " ⌛"}
+      <td>
+        <div
+          className="info"
+          style={{
+            background: statusColors[task.status] || "inherit",
+            border:
+              task.status === ASSIGNED ? "1px solid var(--color-text)" : `none`,
+            color:
+              task.status === ASSIGNED
+                ? "var(--color-text)"
+                : `var(--color-background)`,
+          }}
+        >
+          {task.status || "Не указан"}
+          {task.status === ASSIGNED && task.notified_pending === 1 && " ⌛"}
+        </div>
       </td>
       <td
         style={{

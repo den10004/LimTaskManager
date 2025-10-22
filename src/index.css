@@ -389,6 +389,17 @@ input[type="datetime-local"] {
 }
 
 
+.info {
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 12px;
+  display: inline-block;
+  white-space: nowrap;
+  text-align: center;
+
+}
+
 @media screen and (max-width:1240px) {
   .container {
     padding: 0 20px;
