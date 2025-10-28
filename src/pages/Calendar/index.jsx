@@ -4,6 +4,8 @@ import {
   API_URL,
   ASSIGNED,
   COMPLETED,
+  OVERDUE,
+  WORK,
   statusColors,
 } from "../../utils/rolesTranslations";
 import "./style.css";
@@ -157,7 +159,7 @@ function MainPage() {
     const dayClass = `calendar-day ${isToday(date) ? "today" : ""} ${
       isOtherMonth ? "other-month" : ""
     }`;
-
+    console.log(dayEvents);
     return (
       <div key={dateKey} className={dayClass}>
         <div className="day-number">{date.getDate()}</div>
@@ -175,7 +177,14 @@ function MainPage() {
                 textDecoration: "none",
                 color: "inherit",
                 cursor: "pointer",
-                backgroundColor: event.color,
+                backgroundColor:
+                  event.status === OVERDUE
+                    ? "var(--color-err)"
+                    : event.status === ASSIGNED
+                    ? "orange"
+                    : event.status === WORK
+                    ? "var(--color-green)"
+                    : "black",
               }}
             >
               {event.isStartDay && (
