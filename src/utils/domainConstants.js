@@ -4,9 +4,11 @@ export const WORK = "В работе";
 export const ASSIGNED = "Ответственный назначен";
 export const ADMIN = "Администратор";
 
-export const PAGE_SIZE = 10;
+// Единый источник правды для размера страницы
+export const PAGE_SIZE = 20;
 
-export const taskStatus = [[OVERDUE], [COMPLETED], [ASSIGNED], [WORK]];
+// Плоский список статусов
+export const taskStatus = [OVERDUE, COMPLETED, ASSIGNED, WORK];
 
 export const statusColors = {
   [OVERDUE]: "rgb(254, 202, 202)",
@@ -25,4 +27,6 @@ export const URGENCY_COLORS = {
   medium: "orange",
   high: "var(--color-err)",
 };
+
+
 

@@ -3,7 +3,8 @@ import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import { API_URL } from "../../utils/config";
+import { API_URL } from "../../utils/rolesTranslations";
+import { parseResponseError } from "../../utils/errorUtils";
 import {
   ASSIGNED,
   COMPLETED,
@@ -12,8 +13,6 @@ import {
   WORK,
 } from "../../utils/domainConstants";
 import "./style.css";
-import { json } from "../../utils/apiClient";
-import { parseError } from "../../utils/errorUtils";
 
 const STATUS_LABELS = {
   completed: COMPLETED,
@@ -50,7 +49,7 @@ function Task() {
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [hasMore, setHasMore] = useState(true);
+  // hasMore теперь вычисляемое значение, а не состояние
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -75,12 +74,28 @@ function Task() {
 
   const getAuthToken = useCallback(() => getCookie("authTokenPM"), []);
 
-  const fetchTaskData = useCallback(async (url, options = {}) => {
-    return await json(url, {
-      headers: { "Content-Type": "application/json" },
-      ...options,
-    });
-  }, []);
+  const fetchTaskData = useCallback(
+    async (url, options = {}) => {
+      const token = getAuthToken();
+      if (!token) throw new Error("Токен авторизации отсутствует");
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        ...options,
+      });
+
+      if (!response.ok) {
+        const { message } = await parseResponseError(response);
+        throw new Error(message || `Ошибка HTTP: ${response.status}`);
+      }
+
+      return await response.json();
+    },
+    [getAuthToken]
+  );
 
   const isTaskPendingUpdate = useCallback((task, currentTime) => {
     if (task.status !== ASSIGNED || task.notified_pending !== 0) return false;
@@ -118,17 +133,21 @@ function Task() {
   }, []);
 
   const fetchAllTasks = useCallback(async () => {
+    const controller = new AbortController();
     try {
-      const data = await fetchTaskData(`${API_URL}/task`);
+      const data = await fetchTaskData(`${API_URL}/task`, {
+        signal: controller.signal,
+      });
       setAllTasks(data.items || []);
     } catch (err) {
-      const e = parseError(err);
-      console.error("Fetch error:", e.message);
-      setError(`Ошибка загрузки данных${e.message ? `: ${e.message}` : ""}`);
-      setHasMore(false);
+      if (err?.name !== "AbortError") {
+        console.error("Fetch error:", err);
+        setError(`Ошибка загрузки данных: ${err.message}`);
+      }
     } finally {
       setIsLoading(false);
     }
+    return () => controller.abort();
   }, [fetchTaskData]);
 
   const updatePendingTasks = useCallback(async () => {
@@ -150,9 +169,12 @@ function Task() {
       }
 
       // Обновление данных задач
+      const controller = new AbortController();
       const updatedTasks = await Promise.all(
         tasksToUpdate.map((task) =>
-          fetchTaskData(`${API_URL}/task/${task.id}`).catch(() => task)
+          fetchTaskData(`${API_URL}/task/${task.id}`, {
+            signal: controller.signal,
+          }).catch(() => task)
         )
       );
 
@@ -202,8 +224,17 @@ function Task() {
 
   useEffect(() => {
     fetchDirections(setDirections, setIsLoading, setError);
-    fetchAllTasks();
+    const cleanup = fetchAllTasks();
+    return () => {
+      if (typeof cleanup === "function") cleanup();
+    };
   }, [fetchAllTasks]);
+
+  // Дебаунс поиска
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchName.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchName]);
 
   useEffect(() => {
     scheduleNextUpdate(0);
@@ -224,7 +255,7 @@ function Task() {
   }, [allTasks, statusFilters, getStatusKey]);
 
   const searchFilteredTasks = useMemo(() => {
-    if (!debouncedSearch.trim()) return statusFilteredTasks;
+    if (!debouncedSearch) return statusFilteredTasks;
 
     const lowerSearch = debouncedSearch.toLowerCase();
     return statusFilteredTasks.filter((task) => {
@@ -234,24 +265,31 @@ function Task() {
 
       return userName.includes(lowerSearch) || taskTitle.includes(lowerSearch);
     });
-  }, [statusFilteredTasks, searchName, team]);
+  }, [statusFilteredTasks, debouncedSearch, team]);
 
   const sortedTasks = useMemo(() => {
     if (!sortDirection) return searchFilteredTasks;
 
     return [...searchFilteredTasks].sort((a, b) => {
-      const dateA = new Date(a.due_at || 0);
-      const dateB = new Date(b.due_at || 0);
-      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      const tsA = a.due_at
+        ? new Date(a.due_at).getTime()
+        : Number.POSITIVE_INFINITY;
+      const tsB = b.due_at
+        ? new Date(b.due_at).getTime()
+        : Number.POSITIVE_INFINITY;
+      if (tsA === tsB) return 0;
+      return sortDirection === "asc" ? tsA - tsB : tsB - tsA;
     });
   }, [searchFilteredTasks, sortDirection]);
 
   const displayedTasks = useMemo(() => {
-    const result = sortedTasks.slice(0, visibleCount);
-    setHasMore(sortedTasks.length > result.length);
-
-    return result;
+    return sortedTasks.slice(0, visibleCount);
   }, [sortedTasks, visibleCount]);
+
+  const hasMore = useMemo(
+    () => sortedTasks.length > visibleCount,
+    [sortedTasks, visibleCount]
+  );
 
   // Обработчики событий
   const handleLoadMore = () => {
@@ -262,12 +300,6 @@ function Task() {
     setSearchName(e.target.value);
     resetPagination();
   };
-
-  // Debounce search input
-  useEffect(() => {
-    const id = setTimeout(() => setDebouncedSearch(searchName), 300);
-    return () => clearTimeout(id);
-  }, [searchName]);
 
   const handleSort = (direction) => {
     setSortDirection((current) => (current === direction ? null : direction));
@@ -321,7 +353,7 @@ function Task() {
         <th style={{ width: "300px", minWidth: "300px", maxWidth: "300px" }}>
           Название
         </th>
-        <th>Статус</th>
+        <th style={{ width: "170px" }}>Статус</th>
         <th>Приоритет</th>
       </tr>
     </thead>
@@ -384,7 +416,7 @@ function Task() {
       {renderContent()}
 
       {hasMore && !loading && !error && (
-        <button className="addBtnStyle create-btn" onClick={handleLoadMore}>
+        <button className="addBtnStyle" onClick={handleLoadMore}>
           Загрузить ещё
         </button>
       )}
