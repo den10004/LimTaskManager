@@ -159,7 +159,7 @@ function MainPage() {
     const dayClass = `calendar-day ${isToday(date) ? "today" : ""} ${
       isOtherMonth ? "other-month" : ""
     }`;
-    console.log(dayEvents);
+
     return (
       <div key={dateKey} className={dayClass}>
         <div className="day-number">{date.getDate()}</div>

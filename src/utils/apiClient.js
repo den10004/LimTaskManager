@@ -15,14 +15,18 @@ async function refreshToken() {
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${res.status}`
+        );
       }
       const data = await res.json();
       // write cookies (same logic as AuthContext.setCookie)
       const setCookie = (name, value, days) => {
         const date = new Date();
         date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        let cookieString = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+        let cookieString = `${name}=${encodeURIComponent(
+          value
+        )};expires=${date.toUTCString()};path=/`;
         if (window.location.protocol === "https:") cookieString += ";secure";
         cookieString += ";samesite=strict";
         document.cookie = cookieString;
@@ -33,8 +37,10 @@ async function refreshToken() {
     })()
       .catch((e) => {
         // clear cookies on failure
-        document.cookie = "authTokenPM=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-        document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+        document.cookie =
+          "authTokenPM=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+        document.cookie =
+          "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
         throw e;
       })
       .finally(() => {
@@ -46,15 +52,17 @@ async function refreshToken() {
 
 function shouldAttachAuth(url) {
   if (typeof url !== "string") return true;
-  if (url.includes("/auth/login") || url.includes("/auth/refresh")) return false;
+  if (url.includes("/auth/login") || url.includes("/auth/refresh"))
+    return false;
   return true;
 }
 
 export async function request(url, options = {}) {
   const opts = { ...options };
-  const headers = opts.headers instanceof Headers
-    ? Object.fromEntries(opts.headers.entries())
-    : { ...(opts.headers || {}) };
+  const headers =
+    opts.headers instanceof Headers
+      ? Object.fromEntries(opts.headers.entries())
+      : { ...(opts.headers || {}) };
 
   if (shouldAttachAuth(url)) {
     const token = getCookie("authTokenPM");
@@ -64,6 +72,7 @@ export async function request(url, options = {}) {
 
   let res = await fetch(url, opts);
   if (res.status === 401 && shouldAttachAuth(url) && headers.Authorization) {
+    // eslint-disable-next-line no-useless-catch
     try {
       const newToken = await refreshToken();
       const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
@@ -82,6 +91,7 @@ export async function json(url, options = {}) {
     try {
       const data = await res.clone().json();
       message = data?.message || "";
+      // eslint-disable-next-line no-unused-vars
     } catch (_) {
       message = await res.text().catch(() => "");
     }
@@ -92,6 +102,3 @@ export async function json(url, options = {}) {
   }
   return res.json();
 }
-
-
-

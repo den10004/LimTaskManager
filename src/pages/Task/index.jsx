@@ -4,7 +4,13 @@ import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
 import { API_URL } from "../../utils/config";
-import { ASSIGNED, COMPLETED, OVERDUE, PAGE_SIZE, WORK } from "../../utils/domainConstants";
+import {
+  ASSIGNED,
+  COMPLETED,
+  OVERDUE,
+  PAGE_SIZE,
+  WORK,
+} from "../../utils/domainConstants";
 import "./style.css";
 import { json } from "../../utils/apiClient";
 import { parseError } from "../../utils/errorUtils";
@@ -378,7 +384,7 @@ function Task() {
       {renderContent()}
 
       {hasMore && !loading && !error && (
-        <button className="addBtnStyle" onClick={handleLoadMore}>
+        <button className="addBtnStyle create-btn" onClick={handleLoadMore}>
           Загрузить ещё
         </button>
       )}

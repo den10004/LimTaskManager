@@ -78,6 +78,7 @@ function AddFiles({ formData, handleFileChange }) {
           border: isDragging ? "2px dashed #3b82f6" : "2px dashed #d1d5db",
           backgroundColor: isDragging ? "#f0f9ff" : "transparent",
           transition: "all 0.2s ease",
+          padding: "10px",
         }}
       >
         <img src="/files.svg" alt="загрузка файлов" />
