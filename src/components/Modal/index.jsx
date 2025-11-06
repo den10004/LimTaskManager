@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
 import { API_URL } from "../../utils/rolesTranslations";
+import { request } from "../../utils/apiClient";
 
 function Modal({ onCancel, onLoginSuccess }) {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function Modal({ onCancel, onLoginSuccess }) {
       setError("");
 
       try {
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const response = await request(`${API_URL}/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

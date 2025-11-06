@@ -1,11 +1,13 @@
-import MainPage from "./pages/Main";
-import Gant from "./pages/Gant";
-import Calendar from "./pages/Calendar";
-import Task from "./pages/Task";
-import TeamPage from "./pages/Team";
-import TaskDetails from "./pages/TaskDetails";
-import Directions from "./pages/Directions";
-import CreatePage from "./pages/Create";
+import { lazy } from "react";
+
+const MainPage = lazy(() => import("./pages/Main"));
+const Gant = lazy(() => import("./pages/Gant"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const Task = lazy(() => import("./pages/Task"));
+const TeamPage = lazy(() => import("./pages/Team"));
+const TaskDetails = lazy(() => import("./pages/TaskDetails"));
+const Directions = lazy(() => import("./pages/Directions"));
+const CreatePage = lazy(() => import("./pages/Create"));
 
 export const routes = [
   { path: "/", component: MainPage, protected: false },

@@ -12,6 +12,7 @@ import {
   WORK,
 } from "../../utils/rolesTranslations";
 import "./style.css";
+import { json } from "../../utils/apiClient";
 
 const STATUS_LABELS = {
   completed: COMPLETED,
@@ -72,27 +73,12 @@ function Task() {
 
   const getAuthToken = useCallback(() => getCookie("authTokenPM"), []);
 
-  const fetchTaskData = useCallback(
-    async (url, options = {}) => {
-      const token = getAuthToken();
-      if (!token) throw new Error("Токен авторизации отсутствует");
-
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        ...options,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ошибка HTTP: ${response.status}`);
-      }
-
-      return await response.json();
-    },
-    [getAuthToken]
-  );
+  const fetchTaskData = useCallback(async (url, options = {}) => {
+    return await json(url, {
+      headers: { "Content-Type": "application/json" },
+      ...options,
+    });
+  }, []);
 
   const isTaskPendingUpdate = useCallback((task, currentTime) => {
     if (task.status !== ASSIGNED || task.notified_pending !== 0) return false;

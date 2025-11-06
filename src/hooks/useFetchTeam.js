@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { getCookie } from "../utils/getCookies";
 import { useAuth } from "../contexts/AuthContext";
+import { json } from "../utils/apiClient";
 
 const useFetchTeam = (apiUrl) => {
   const [team, setTeam] = useState([]);
@@ -10,49 +10,11 @@ const useFetchTeam = (apiUrl) => {
 
   const fetchTeam = useCallback(async () => {
     try {
-      const currentToken = getCookie("authTokenPM");
-      if (!currentToken) {
-        setError("Токен авторизации отсутствует");
-        return;
-      }
-
       setLoading(true);
-      const response = await fetch(`${apiUrl}/users`, {
+      const data = await json(`${apiUrl}/users`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${currentToken}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          const retryResponse = await fetch(`${apiUrl}/users`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${getCookie("authTokenPM")}`,
-              "Content-Type": "application/json",
-            },
-          });
-
-          if (!retryResponse.ok) {
-            const errorText = await retryResponse.text();
-            throw new Error(
-              `Ошибка HTTPS: ${retryResponse.status} - ${errorText}`
-            );
-          }
-
-          const data = await retryResponse.json();
-          setTeam(data.items);
-          setError(null);
-          return;
-        }
-
-        const errorText = await response.text();
-        throw new Error(`Ошибка HTTPS: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
       setTeam(data.items);
       setError(null);
     } catch (err) {

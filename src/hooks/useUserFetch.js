@@ -1,15 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { getCookie } from "../utils/getCookies";
 import { API_URL } from "../utils/rolesTranslations";
+import { json } from "../utils/apiClient";
 
 const useUserFetch = (id) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [token, setToken] = useState(getCookie("authTokenPM"));
 
   const fetchUser = useCallback(async () => {
-    if (!id || !token) {
+    if (!id) {
       setUser(null);
       return;
     }
@@ -18,20 +17,10 @@ const useUserFetch = (id) => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_URL}/users/${id}`, {
+      const data = await json(`${API_URL}/users/${id}`, {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Ошибка HTTPS: ${response.status} - ${errorText}`);
-      }
-
-      const data = await response.json();
       setUser(data);
     } catch (err) {
       setError("Ошибка загрузки данных пользователя");
@@ -40,19 +29,7 @@ const useUserFetch = (id) => {
     } finally {
       setIsLoading(false);
     }
-  }, [id, token]);
-
-  // Обновление токена
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentToken = getCookie("authTokenPM");
-      if (currentToken !== token) {
-        setToken(currentToken);
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [token]);
+  }, [id]);
 
   // Запрос данных при изменении id или токена
   useEffect(() => {

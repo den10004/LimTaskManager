@@ -1,26 +1,12 @@
-import { getCookie } from "../utils/getCookies";
 import { API_URL } from "../utils/rolesTranslations";
+import { json } from "../utils/apiClient";
 
 export const fetchDirections = async (setDirection, setLoading, setError) => {
   try {
-    const token = getCookie("authTokenPM");
-    if (!token) {
-      throw new Error("Токен авторизации отсутствует");
-    }
-
-    const response = await fetch(`${API_URL}/directions`, {
+    const data = await json(`${API_URL}/directions`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
-
-    if (!response.ok) {
-      throw new Error(`Ошибка HTTPS: ${response.status}`);
-    }
-
-    const data = await response.json();
     setDirection(data.items);
     setLoading(false);
   } catch (err) {

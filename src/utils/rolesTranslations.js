@@ -4,7 +4,14 @@ export const WORK = "В работе";
 export const ASSIGNED = "Ответственный назначен";
 export const ADMIN = "Администратор";
 
-export const API_URL = import.meta.env.VITE_API_KEY;
+const envApiUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_KEY;
+if (!envApiUrl) {
+  // eslint-disable-next-line no-console
+  console.error(
+    "API base URL is not set. Please define VITE_API_URL in your environment."
+  );
+}
+export const API_URL = envApiUrl;
 
 export const PAGE_SIZE = 20;
 

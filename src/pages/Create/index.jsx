@@ -7,6 +7,7 @@ import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
 import { API_URL, normalizeUrl } from "../../utils/rolesTranslations";
+import { request } from "../../utils/apiClient";
 
 function CreatePage() {
   const [formData, setFormData] = useState({
@@ -94,7 +95,7 @@ function CreatePage() {
     const currentToken = getCookie("authTokenPM") || authToken;
 
     try {
-      const taskResponse = await fetch(`${API_URL}/task`, {
+      const taskResponse = await request(`${API_URL}/task`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${currentToken}`,
@@ -145,7 +146,7 @@ function CreatePage() {
         });
         FormDataNew.append("uploadType", "multiple");
 
-        const fileResponse = await fetch(`${API_URL}/task/${taskId}/files`, {
+        const fileResponse = await request(`${API_URL}/task/${taskId}/files`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${currentToken}`,

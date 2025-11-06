@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkAuthStatus();
-    setupErrorInterceptor();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -40,122 +39,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const performRefresh = async () => {
-    try {
-      const refreshT = getCookie("refreshToken");
-      if (!refreshT) {
-        throw new Error("No refresh token");
-      }
-
-      const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refresh_token: refreshT }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      setCookie("authTokenPM", data.token, { days: 7 });
-      if (data.refresh_token) {
-        setCookie("refreshToken", data.refresh_token, { days: 30 });
-      }
-    } catch (error) {
-      document.cookie =
-        "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
-      logout();
-      throw error;
-    }
-  };
-
-  const setupErrorInterceptor = () => {
-    let currentRefreshPromise = null;
-    const originalFetch = window.fetch;
-
-    window.fetch = async (...args) => {
-      try {
-        const response = await originalFetch(...args);
-
-        const url = args[0];
-        const isRefreshRequest =
-          typeof url === "string" && url.includes("/auth/refresh");
-        const isLoginRequest =
-          typeof url === "string" && url.includes("/auth/login");
-
-        // Проверяем заголовок Authorization (для доп. безопасности)
-        let fetchOptions = args[1] || {};
-        let hasAuthHeader = false;
-        if (fetchOptions.headers) {
-          if (fetchOptions.headers instanceof Headers) {
-            hasAuthHeader = fetchOptions.headers.has("Authorization");
-          } else if (typeof fetchOptions.headers === "object") {
-            hasAuthHeader = !!fetchOptions.headers.Authorization;
-          }
-        }
-
-        // Обрабатываем 401 ТОЛЬКО для protected запросов (не login/refresh)
-        if (
-          response.status === 401 &&
-          !isRefreshRequest &&
-          !isLoginRequest &&
-          hasAuthHeader
-        ) {
-          if (!currentRefreshPromise) {
-            currentRefreshPromise = performRefresh();
-          }
-
-          try {
-            await currentRefreshPromise;
-          } catch {
-            throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
-          } finally {
-            currentRefreshPromise = null;
-          }
-
-          // Повторяем запрос с новым токеном
-          const newToken = getCookie("authTokenPM");
-          const fetchUrl = args[0];
-          let retryOptions = { ...fetchOptions };
-          let headers = {};
-          if (retryOptions.headers) {
-            if (retryOptions.headers instanceof Headers) {
-              headers = Object.fromEntries(retryOptions.headers.entries());
-            } else {
-              headers = { ...retryOptions.headers };
-            }
-          }
-          headers.Authorization = `Bearer ${newToken}`;
-          retryOptions.headers = headers;
-
-          const retryResponse = await originalFetch(fetchUrl, retryOptions);
-          if (retryResponse.status === 401) {
-            logout();
-            throw new Error("Сессия истекла. Пожалуйста, войдите снова.");
-          }
-          return retryResponse;
-        }
-
-        return response;
-      } catch (error) {
-        // Улучшение: logout только если ошибка явно от auth (и не от login)
-        if (
-          (error.message.includes("401") ||
-            error.message.includes("Unauthorized")) &&
-          !args[0]?.includes("/auth/login")
-        ) {
-          logout();
-        }
-        throw error;
-      }
-    };
-  };
+  // Removed global fetch override. Token refresh and retries handled in apiClient.
 
   const setCookie = (name, value, options = {}) => {
     const days = options.days || 7;
