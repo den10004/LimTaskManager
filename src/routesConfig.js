@@ -11,7 +11,7 @@ const CreatePage = lazy(() => import("./pages/Create"));
 
 export const routes = [
   { path: "/", component: MainPage, protected: false },
-  { path: "/Gant", component: Gant, protected: true },
+  { path: "/gant", component: Gant, protected: true },
   { path: "/calendar", component: Calendar, protected: true },
   { path: "/task", component: Task, protected: true },
   { path: "/team", component: TeamPage, protected: true },

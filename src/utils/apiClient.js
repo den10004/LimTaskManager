@@ -1,5 +1,5 @@
 import { getCookie } from "./getCookies";
-import { API_URL } from "./rolesTranslations";
+import { API_URL } from "./config";
 
 let refreshPromise = null;
 
@@ -78,10 +78,20 @@ export async function request(url, options = {}) {
 export async function json(url, options = {}) {
   const res = await request(url, options);
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status}: ${text}`);
+    let message = "";
+    try {
+      const data = await res.clone().json();
+      message = data?.message || "";
+    } catch (_) {
+      message = await res.text().catch(() => "");
+    }
+    const err = new Error(message || `HTTP ${res.status}`);
+    // attach HTTP status code for normalization utils
+    err.code = res.status;
+    throw err;
   }
   return res.json();
 }
+
 
 

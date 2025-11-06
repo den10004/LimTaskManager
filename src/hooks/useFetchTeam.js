@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { json } from "../utils/apiClient";
+import { isUnauthorized, parseError } from "../utils/errorUtils";
 
 const useFetchTeam = (apiUrl) => {
   const [team, setTeam] = useState([]);
@@ -18,12 +19,12 @@ const useFetchTeam = (apiUrl) => {
       setTeam(data.items);
       setError(null);
     } catch (err) {
-      if (err.message.includes("401") || err.message.includes("Unauthorized")) {
-        setError("Сессия истекла. Пожалуйста, войдите снова.");
-      } else {
-        setError("Ошибка загрузки данных");
-      }
-      console.error("Fetch error:", err.message);
+      setError(
+        isUnauthorized(err)
+          ? "Сессия истекла. Пожалуйста, войдите снова."
+          : `Ошибка загрузки данных${parseError(err).message ? `: ${parseError(err).message}` : ""}`
+      );
+      console.error("Fetch error:", parseError(err).message);
     } finally {
       setLoading(false);
     }

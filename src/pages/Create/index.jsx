@@ -6,8 +6,10 @@ import { fetchDirections } from "../../hooks/useFetchDirection";
 import { getCookie } from "../../utils/getCookies";
 import "./style.css";
 import { useState, useEffect } from "react";
-import { API_URL, normalizeUrl } from "../../utils/rolesTranslations";
-import { request } from "../../utils/apiClient";
+import { API_URL } from "../../utils/config";
+import { normalizeUrl } from "../../utils/url";
+import { request, json } from "../../utils/apiClient";
+import { parseError, parseResponseError } from "../../utils/errorUtils";
 
 function CreatePage() {
   const [formData, setFormData] = useState({
@@ -92,13 +94,10 @@ function CreatePage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const currentToken = getCookie("authTokenPM") || authToken;
-
     try {
-      const taskResponse = await request(`${API_URL}/task`, {
+      const taskData = await json(`${API_URL}/task`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${currentToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -111,32 +110,6 @@ function CreatePage() {
           links: formData.links.filter((link) => link.trim() !== ""),
         }),
       });
-
-      if (!taskResponse.ok) {
-        const errorText = await taskResponse.text();
-        console.error(
-          "Ошибка при создании задачи:",
-          taskResponse.status,
-          errorText
-        );
-        if (taskResponse.status === 401) {
-          setToast({
-            show: true,
-            text: "Ошибка авторизации (401). Возможно, токен устарел или недействителен. Пожалуйста, войдите заново.",
-            color: "red",
-          });
-        } else {
-          setToast({
-            show: true,
-            text: `Ошибка при создании задачи (${taskResponse.status}). Пожалуйста, попробуйте снова.`,
-            color: "red",
-          });
-        }
-        setIsLoading(false);
-        return;
-      }
-
-      const taskData = await taskResponse.json();
       const taskId = taskData.id;
 
       if (formData.files.length > 0) {
@@ -148,23 +121,15 @@ function CreatePage() {
 
         const fileResponse = await request(`${API_URL}/task/${taskId}/files`, {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${currentToken}`,
-          },
           body: FormDataNew,
         });
 
         if (!fileResponse.ok) {
-          const errorText = await fileResponse.text();
-          console.error(
-            "Ошибка при загрузке файлов:",
-            fileResponse.status,
-            errorText
-          );
-
+          const fileErr = await parseResponseError(fileResponse);
+          console.error("Ошибка при загрузке файлов:", fileErr.code, fileErr.message);
           setToast({
             show: true,
-            text: `Ошибка при загрузке файлов (${fileResponse.status}). Пожалуйста, попробуйте снова.`,
+            text: `Ошибка при загрузке файлов (${fileErr.code}). ${fileErr.message}`,
             color: "red",
           });
           setIsLoading(false);
@@ -190,10 +155,11 @@ function CreatePage() {
         navigate("/task");
       }, 3000);
     } catch (error) {
-      console.error("Ошибка сети:", error);
+      const err = parseError(error);
+      console.error("Ошибка сети:", err.message);
       setToast({
         show: true,
-        text: "Ошибка сети. Пожалуйста, проверьте соединения",
+        text: `Ошибка сети. ${err.message || "Пожалуйста, проверьте соединения"}`,
         color: "red",
       });
     } finally {

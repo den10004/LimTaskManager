@@ -1,4 +1,4 @@
-import { API_URL } from "../utils/rolesTranslations";
+import { API_URL } from "../utils/config";
 import { json } from "../utils/apiClient";
 
 export const fetchDirections = async (setDirection, setLoading, setError) => {

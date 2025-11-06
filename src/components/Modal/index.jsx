@@ -2,7 +2,8 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import "./style.css";
-import { API_URL } from "../../utils/rolesTranslations";
+import { API_URL } from "../../utils/config";
+import { isUnauthorized, parseError } from "../../utils/errorUtils";
 import { request } from "../../utils/apiClient";
 
 function Modal({ onCancel, onLoginSuccess }) {
@@ -15,22 +16,12 @@ function Modal({ onCancel, onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const getErrorMessage = useCallback((error) => {
-    if (
-      error.message?.includes("status: 401") ||
-      error.message?.includes("status: 422")
-    ) {
+    const { code, message } = parseError(error);
+    if (isUnauthorized(error) || code === 422) {
       return "Неправильный логин или пароль";
     }
-    if (error.message?.includes("status: ")) {
-      const statusMatch = error.message.match(/status: (\d+)/);
-      if (statusMatch) {
-        return `Ошибка сервера: ${statusMatch[1]}`;
-      }
-    }
-    if (error.message?.includes("Сессия истекла")) {
-      return "Сессия истекла. Пожалуйста, войдите снова.";
-    }
-    return error.message || "Произошла неизвестная ошибка";
+    if (code) return `Ошибка сервера: ${code}`;
+    return message || "Произошла неизвестная ошибка";
   }, []);
 
   const handleLogin = useCallback(

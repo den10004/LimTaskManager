@@ -3,16 +3,11 @@ import { getCookie } from "../../utils/getCookies";
 import TaskTableRow from "../../components/TaskTableRow";
 import { useTeam } from "../../contexts/TeamContext";
 import { fetchDirections } from "../../hooks/useFetchDirection";
-import {
-  API_URL,
-  ASSIGNED,
-  COMPLETED,
-  OVERDUE,
-  PAGE_SIZE,
-  WORK,
-} from "../../utils/rolesTranslations";
+import { API_URL } from "../../utils/config";
+import { ASSIGNED, COMPLETED, OVERDUE, PAGE_SIZE, WORK } from "../../utils/domainConstants";
 import "./style.css";
 import { json } from "../../utils/apiClient";
+import { parseError } from "../../utils/errorUtils";
 
 const STATUS_LABELS = {
   completed: COMPLETED,
@@ -52,6 +47,7 @@ function Task() {
   const [hasMore, setHasMore] = useState(true);
   const [searchName, setSearchName] = useState("");
   const [sortDirection, setSortDirection] = useState(null);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilters, setStatusFilters] = useState({
     completed: true,
     overdue: true,
@@ -120,8 +116,9 @@ function Task() {
       const data = await fetchTaskData(`${API_URL}/task`);
       setAllTasks(data.items || []);
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(`Ошибка загрузки данных: ${err.message}`);
+      const e = parseError(err);
+      console.error("Fetch error:", e.message);
+      setError(`Ошибка загрузки данных${e.message ? `: ${e.message}` : ""}`);
       setHasMore(false);
     } finally {
       setIsLoading(false);
@@ -221,9 +218,9 @@ function Task() {
   }, [allTasks, statusFilters, getStatusKey]);
 
   const searchFilteredTasks = useMemo(() => {
-    if (!searchName.trim()) return statusFilteredTasks;
+    if (!debouncedSearch.trim()) return statusFilteredTasks;
 
-    const lowerSearch = searchName.toLowerCase();
+    const lowerSearch = debouncedSearch.toLowerCase();
     return statusFilteredTasks.filter((task) => {
       const user = team.find((m) => m.id === task.assigned_user_id);
       const userName = user?.name.toLowerCase() || "";
@@ -259,6 +256,12 @@ function Task() {
     setSearchName(e.target.value);
     resetPagination();
   };
+
+  // Debounce search input
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(searchName), 300);
+    return () => clearTimeout(id);
+  }, [searchName]);
 
   const handleSort = (direction) => {
     setSortDirection((current) => (current === direction ? null : direction));

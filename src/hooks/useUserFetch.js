@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { API_URL } from "../utils/rolesTranslations";
+import { API_URL } from "../utils/config";
 import { json } from "../utils/apiClient";
 
 const useUserFetch = (id) => {

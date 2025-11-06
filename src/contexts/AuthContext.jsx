@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getCookie } from "../utils/getCookies";
-import { API_URL } from "../utils/rolesTranslations";
 
 const AuthContext = createContext();
 
