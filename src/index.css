@@ -403,6 +403,19 @@ input[type="datetime-local"] {
 
 }
 
+
+
+.btns-direction {
+  display: flex;
+  margin-left: auto
+}
+
+.btns-direction>.delete-btn {
+  margin-left: 10px
+}
+
+
+
 @media screen and (max-width:1240px) {
   .container {
     padding: 0 20px;
@@ -427,6 +440,17 @@ input[type="datetime-local"] {
     flex-wrap: wrap;
   }
 
+}
+
+@media screen and (max-width:550px) {
+  .btns-direction {
+    flex-direction: column;
+  }
+
+  .btns-direction>.delete-btn {
+    margin-left: 0px;
+    margin-top: 10px;
+  }
 }
 
 @media screen and (max-width:425px) {
