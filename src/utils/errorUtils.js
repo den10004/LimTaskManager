@@ -19,19 +19,14 @@ export async function parseResponseError(response) {
   try {
     const data = await response.clone().json();
     return { code, message: data?.message || `HTTP ${code}` };
+    // eslint-disable-next-line no-unused-vars
   } catch (_) {
     try {
       const text = await response.text();
       return { code, message: text || `HTTP ${code}` };
+      // eslint-disable-next-line no-unused-vars
     } catch (_) {
       return { code, message: `HTTP ${code}` };
     }
   }
 }
-
-
-
-
-
-
-
